@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Villa Lisanna - Beach House Privada</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Public Sans', sans-serif;
+    }
+
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-media {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: zoomIn 2s ease-out both;
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(1.08);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .hero-scrim {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0) 25%,
+        rgba(0, 0, 0, 0.2) 100%
+      );
+      z-index: 1;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 60px 40px;
+      height: 100%;
+      animation: fadeInUp 0.8s ease-out 0.3s both;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .logo-box {
+      margin-bottom: auto;
+      padding-top: 40px;
+    }
+
+    .tagline {
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #D4AF7A;
+      font-weight: 700;
+      margin-bottom: 12px;
+      opacity: 0.95;
+    }
+
+    .logo {
+      font-size: clamp(2.2rem, 6vw, 3.5rem);
+      font-weight: 700;
+      color: white;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      margin-bottom: 8px;
+      text-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    .location {
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.85);
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 300;
+      margin-bottom: 8px;
+      letter-spacing: 0.01em;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      margin-top: auto;
+      margin-bottom: 50px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.4, 1);
+      text-decoration: none;
+      display: inline-block;
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(160deg, rgba(46, 111, 142, 0.95) 0%, rgba(27, 73, 101, 0.95) 100%);
+      color: white;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 24px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.6);
+      transform: translateY(-3px);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0.7;
+      animation: bounce 2s infinite;
+    }
+
+    .scroll-hint p {
+      font-size: 0.75rem;
+      color: white;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-8px); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-content {
+        padding: 40px 24px;
+      }
+
+      .logo-box {
+        padding-top: 20px;
+      }
+
+      .tagline {
+        font-size: 0.7rem;
+      }
+
+      .hero-actions {
+        gap: 10px;
+        margin-bottom: 40px;
+      }
+
+      .btn {
+        padding: 12px 24px;
+        font-size: 0.86rem;
+      }
+
+      .scroll-hint {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-media">
+    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1800&auto=format&fit=crop" alt="Villa Lisanna - Playa privada en Little Gasparilla Island, Florida">
+  </div>
+  <div class="hero-scrim"></div>
+
+  <div class="hero-content">
+    <div class="logo-box">
+      <p class="tagline">🏝️ Villa de Lujo Privada</p>
+      <h1 class="logo">Villa Lisanna</h1>
+      <p class="location">Little Gasparilla Island • Florida</p>
+      <p class="subtitle">Playa privada • Vistas al océano • Lujo total</p>
+    </div>
+
+    <div class="hero-actions">
+      <a href="#reservar" class="btn btn-primary">Reservar Ahora</a>
+      <a href="#fotos" class="btn btn-secondary">Ver Galería</a>
+    </div>
+
+    <div class="scroll-hint">
+      <p>Desplaza hacia abajo</p>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path d="M10 16L4 10M10 16L16 10M10 2V14" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

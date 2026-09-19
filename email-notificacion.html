@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nueva Consulta - Villa Lissana</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f5f5f5; padding: 20px; }
+    .email-container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #FFD700, #FFC700); padding: 30px 20px; text-align: center; border-bottom: 4px solid #FF9800; }
+    .logo { font-size: 28px; font-weight: 700; color: #CC6600; margin-bottom: 10px; }
+    .header-text { color: #333; font-size: 16px; font-weight: 600; }
+    .alert { background: #FFF3CD; color: #856404; padding: 15px 20px; text-align: center; font-weight: 600; border-bottom: 1px solid #FFE69C; }
+    .content { padding: 30px 20px; }
+    .greeting { font-size: 20px; color: #333; font-weight: 600; margin-bottom: 15px; }
+    .message { color: #666; line-height: 1.8; margin-bottom: 20px; font-size: 14px; }
+    .data-box { background: #F9F9F9; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #E0E0E0; }
+    .data-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #E0E0E0; }
+    .data-row:last-child { border-bottom: none; }
+    .label { font-weight: 600; color: #CC6600; font-size: 13px; }
+    .value { color: #333; font-size: 14px; text-align: right; }
+    .message-box { background: #FFFAF0; padding: 15px; border-left: 4px solid #FFD700; border-radius: 4px; margin: 15px 0; }
+    .message-box-title { color: #CC6600; font-weight: 600; font-size: 12px; margin-bottom: 8px; }
+    .message-box-text { color: #666; font-size: 14px; line-height: 1.6; }
+    .action-buttons { text-align: center; margin: 20px 0; }
+    .button { background: #FFD700; color: #333; padding: 12px 25px; border: none; border-radius: 6px; text-decoration: none; display: inline-block; margin: 5px; font-weight: 600; cursor: pointer; margin-right: 10px; }
+    .button-secondary { background: #00E5FF; color: #2D7A9F; }
+    .footer { background: #F9F9F9; padding: 20px; text-align: center; color: #999; font-size: 12px; border-top: 1px solid #E0E0E0; }
+    .timestamp { color: #999; font-size: 12px; margin-top: 15px; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="email-container">
+    <!-- Alert Banner -->
+    <div class="alert">
+      🎯 NUEVA CONSULTA RECIBIDA
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <div class="logo">⭐ Villa Lissana</div>
+      <div class="header-text">Notificación de Consulta</div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="content">
+      <div class="greeting">¡Hola Liset! 👋</div>
+
+      <div class="message">
+        Acabas de recibir una nueva consulta desde el formulario de contacto de Villa Lissana. Aquí están los detalles:
+      </div>
+
+      <!-- Datos de la Consulta -->
+      <div class="data-box">
+        <div class="data-row">
+          <span class="label">📝 NOMBRE:</span>
+          <span class="value">Juan García Rodríguez</span>
+        </div>
+        <div class="data-row">
+          <span class="label">📧 EMAIL:</span>
+          <span class="value">juan@example.com</span>
+        </div>
+        <div class="data-row">
+          <span class="label">📞 TELÉFONO:</span>
+          <span class="value">+1 555 123 4567</span>
+        </div>
+        <div class="data-row">
+          <span class="label">⏰ FECHA/HORA:</span>
+          <span class="value">04 Sep 2026, 14:32</span>
+        </div>
+      </div>
+
+      <!-- Mensaje del Cliente -->
+      <div class="message-box">
+        <div class="message-box-title">💬 MENSAJE DEL CLIENTE:</div>
+        <div class="message-box-text">
+          "Interesado en una estadía de 5 noches con acceso a todas las amenidades. ¿Hay disponibilidad en octubre? También me gustaría saber si ofrecen servicio de chef personalizado."
+        </div>
+      </div>
+
+      <div class="message">
+        <strong>Recomendación:</strong> Responde dentro de las próximas 24 horas para mantener una buena experiencia del cliente.
+      </div>
+
+      <!-- Acciones -->
+      <div class="action-buttons">
+        <a href="mailto:juan@example.com?subject=Re: Tu consulta en Villa Lissana" class="button">Responder Email</a>
+        <a href="tel:+15551234567" class="button button-secondary">Llamar</a>
+      </div>
+
+      <div class="timestamp">
+        ID de Consulta: VL-2026-0904-001847 | IP: 192.168.1.100
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Villa Lissana Dashboard</strong></p>
+      <p>Panel de Control para Gestionar Consultas</p>
+      <p>📧 liset.garcell05@gmail.com</p>
+    </div>
+  </div>
+</body>
+</html>

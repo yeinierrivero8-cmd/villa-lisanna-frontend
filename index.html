@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Villa Lissana — Lujo y Confort en Paraíso Privado</title>
+  <meta name="description" content="Villa Lissana: alojamiento de lujo frente al mar en Gasparilla Island, Florida. Piscina, wifi Starlink, jacuzzi climatizado, carro de golf privado. Retiro perfecto.">
+  <meta name="theme-color" content="#F5F3F0">
+  <meta property="og:title" content="Villa Lissana — Tu Escape de Lujo">
+  <meta property="og:description" content="Vive la experiencia de villa de lujo con amenidades premium: Starlink, Jacuzzi, Piscina, Carro de Golf.">
+  <meta property="og:image" content="img/hero.jpg">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://villalisanna.com/">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<!-- Header -->
+<header id="siteHeader" class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <span class="logo-text">Villa Lissana</span>
+    </div>
+    <nav id="mainNav" class="main-nav">
+      <a href="#inicio" class="nav-link">Inicio</a>
+      <a href="#galeria" class="nav-link">Galería</a>
+      <a href="#amenidades" class="nav-link">Amenidades</a>
+      <a href="#ubicacion" class="nav-link">Ubicación</a>
+      <a href="#contacto" class="nav-link">Contacto</a>
+    </nav>
+    <button id="navToggle" class="nav-toggle" aria-label="Menú">
+      <span></span><span></span><span></span>
+    </button>
+    <button id="infoPanelToggle" class="info-panel-toggle" aria-expanded="false">
+      <span class="toggle-text">💎 INFO & RESERVA</span>
+      <i class="fas fa-chevron-down"></i>
+    </button>
+  </div>
+</header>
+
+<!-- Info Panel - Colapsable -->
+<div id="infoPanel" class="info-panel">
+
+  <div id="infoPanelContent" class="info-panel-content">
+    <!-- Calendario -->
+    <div class="calendar-section">
+      <label class="calendar-label">Selecciona tus fechas</label>
+      <input type="text" id="dateRange" class="calendar-input" placeholder="Selecciona check-in y check-out" readonly>
+      <div class="calendar-info">
+        <span class="calendar-dot available"></span> Disponible
+        <span class="calendar-dot occupied"></span> Ocupado
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-item">
+        <span class="info-label">Disponibilidad</span>
+        <span class="info-value">✓ Disponible</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Check-in</span>
+        <span class="info-value">4:00 PM</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Check-out</span>
+        <span class="info-value">11:00 AM</span>
+      </div>
+      <div class="info-item">
+        <span class="info-label">Huéspedes</span>
+        <select id="guestCount" class="guest-selector">
+          <option value="1">1 persona</option>
+          <option value="2" selected>2 personas</option>
+          <option value="3">3 personas</option>
+          <option value="4">4 personas</option>
+          <option value="5">5 personas</option>
+          <option value="6">6 personas</option>
+          <option value="7">7 personas</option>
+          <option value="8">8 personas</option>
+          <option value="9">9 personas</option>
+          <option value="10">10 personas</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="info-price">
+      <span class="info-label">Precio por noche</span>
+      <span class="info-value">$500 USD</span>
+    </div>
+
+    <a href="#contacto" class="btn btn-primary btn-full">RESERVA AHORA</a>
+
+    <div class="social-links">
+      <a href="https://wa.me/18327635760" class="social-link" title="WhatsApp" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-whatsapp"></i>
+      </a>
+      <a href="https://instagram.com" class="social-link" title="Instagram" target="_blank" rel="noopener noreferrer">
+        <i class="fab fa-instagram"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Hero Section -->
+<section id="inicio" class="hero" style="background-image: url('/img/00.jpeg')">
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+  </div>
+</section>
+
+<!-- Promo Banner -->
+<section class="promo-banner">
+  <div class="promo-content">
+    <div class="promo-badge">🌟 OFERTA ESPECIAL</div>
+    <h2>20% Descuento en Reservas de 7+ Noches</h2>
+    <p>Hasta fin de septiembre • Disponibilidad limitada</p>
+    <a href="#contacto" class="btn btn-primary">Reservar Ahora</a>
+  </div>
+</section>
+
+<!-- Descripción -->
+<section class="description-section" data-reveal>
+  <div class="container">
+    <h2>Tu Oasis Privado te Espera</h2>
+    <p>Ubicada en un rincón privilegiado, Villa Lissana combina elegancia arquitectónica con comodidades modernas. Diseñada para quien busca desconexión absoluta sin sacrificar lujos esenciales: conectividad satellite de última generación, espacios amplios y vistas que roban el aliento.</p>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Habitaciones Lujosas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">3+</div>
+        <div class="stat-label">Baños Completos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">24/7</div>
+        <div class="stat-label">Soporte Concierge</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Galería -->
+<section id="galeria" class="gallery-section">
+  <div class="container">
+    <h2>Recorre Cada Rincón</h2>
+    <p class="section-subtitle">Fotografía profesional de cada espacio</p>
+
+    <!-- Sala Principal -->
+    <div class="gallery-group">
+      <h3 class="gallery-group-title">Sala Principal</h3>
+      <div class="gallery-grid">
+        <figure class="gallery-item" data-lightbox>
+          <img src="/img/sala-1.jpg" alt="Sala principal con mobiliario premium" loading="lazy">
+          <figcaption>Diseño Contemporáneo</figcaption>
+        </figure>
+        <figure class="gallery-item" data-lightbox>
+          <img src="/img/sala-2.jpg" alt="Detalle decorativo de sala" loading="lazy">
+          <figcaption>Elementos de Lujo</figcaption>
+        </figure>
+        <figure class="gallery-item" data-lightbox>
+          <img src="/img/sala-3.jpg" alt="Zona de estar con vistas" loading="lazy">
+          <figcaption>Vistas Panorámicas</figcaption>
+        </figure>
+        <figure class="gallery-item" data-lightbox>
+          <img src="/img/sala-4.jpg" alt="Sala iluminada naturalmente" loading="lazy">
+          <figcaption>Luz Natural</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <!-- Suites Principales -->
+    <div class="gallery-group">
+      <h3 class="gallery-group-title">Suites Principales</h3>
+      <div class="gallery-grid">
+        <figure class="gallery-item" data-lightbox>
+          <img src="/img/habitacion-2.jpg" alt="Suite con vista al mar" loading="lazy">
+          <figcaption>Suite Ocean View</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials-section" data-reveal>
+  <div class="container">
+    <h2>Lo que Dicen Nuestros Huéspedes</h2>
+    <p class="section-subtitle">Experiencias reales de lujo en Gasparilla Island</p>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"Villa Lissana superó todas mis expectativas. La vista al océano, el Starlink funcionó perfecto para mi trabajo remoto, y el equipo fue increíblemente atento."</p>
+        <div class="testimonial-author">
+          <div class="avatar">MC</div>
+          <div>
+            <h4>María Consuelo</h4>
+            <span>Marzo 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"El jacuzzi bajo las estrellas fue simplemente mágico. La arquitectura moderna de la villa es una obra de arte. Definitivamente volveremos."</p>
+        <div class="testimonial-author">
+          <div class="avatar">JP</div>
+          <div>
+            <h4>James Patterson</h4>
+            <span>Julio 2026</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card">
+        <div class="stars">⭐⭐⭐⭐⭐</div>
+        <p class="testimonial-text">"El carro de golf privado nos permitió explorar la isla con total libertad. Una experiencia de lujo genuino sin pretensiones. Altamente recomendado."</p>
+        <div class="testimonial-author">
+          <div class="avatar">SL</div>
+          <div>
+            <h4>Sofia Lombardi</h4>
+            <span>Agosto 2026</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Amenidades -->
+<section id="amenidades" class="amenities-section" data-reveal>
+  <div class="container">
+    <h2>Amenidades Premium</h2>
+    <p class="section-subtitle">Todo lo que necesitas para una estadía perfecta</p>
+
+    <div class="amenities-grid">
+      <div class="amenity-card" data-animate>
+        <div class="amenity-image-container">
+          <img src="/img/starlink.jpg" alt="Starlink - Internet satelital" class="amenity-img" loading="lazy">
+        </div>
+        <h3>Internet Starlink</h3>
+        <p>Conexión satelital de ultra alta velocidad. Trabajo remoto sin interrupciones.</p>
+      </div>
+
+      <div class="amenity-card" data-animate>
+        <div class="amenity-image-container">
+          <img src="/img/jacuzzi.jpg" alt="Jacuzzi climatizado de lujo" class="amenity-img" loading="lazy">
+        </div>
+        <h3>Jacuzzi Climatizado</h3>
+        <p>Spa privado con control de temperatura. Relax bajo las estrellas.</p>
+      </div>
+
+      <div class="amenity-card" data-animate>
+        <div class="amenity-image-container">
+          <img src="/img/golf-cart.jpg" alt="Carrito de golf privado" class="amenity-img" loading="lazy">
+        </div>
+        <h3>Carro de Golf Privado</h3>
+        <p>Explora los alrededores con comodidad y estilo.</p>
+      </div>
+
+      <div class="amenity-card" data-animate>
+        <div class="amenity-image-container">
+          <img src="/img/wifi-router.jpg" alt="WiFi router de alta velocidad" class="amenity-img" loading="lazy">
+        </div>
+        <h3>WiFi de Alta Velocidad</h3>
+        <p>Red redundante para conectividad sin fallos.</p>
+      </div>
+
+      <div class="amenity-card" data-animate>
+        <div class="amenity-image-container">
+          <img src="/img/bed.jpg" alt="Camas de lujo king size" class="amenity-img" loading="lazy">
+        </div>
+        <h3>Camas de Lujo</h3>
+        <p>Descanso absoluto con textiles premium de 5 estrellas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Reglas de la Casa -->
+<section class="rules-section" data-reveal>
+  <div class="container">
+    <h2>Reglas de la Casa</h2>
+    <p class="section-subtitle">Por favor respeta estas políticas para mantener nuestro espacio perfecto</p>
+
+    <div class="rules-grid">
+      <div class="rule-card">
+        <div class="rule-icon">🚭</div>
+        <h3>No Fumar</h3>
+        <p>Está prohibido fumar dentro de la villa. El incumplimiento resultará en un cargo de $500 USD por limpieza profunda.</p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-icon">🐾</div>
+        <h3>Sin Mascotas</h3>
+        <p>No se permiten mascotas en la propiedad. Consulta primero si deseas una excepción.</p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-icon">🔇</div>
+        <h3>Respeto al Ruido</h3>
+        <p>Por favor mantén el ruido bajo después de las 10 PM. Somos una comunidad tranquila.</p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-icon">🏊</div>
+        <h3>Jacuzzi Responsable</h3>
+        <p>El jacuzzi está disponible para uso exclusivo. No se permite usar productos químicos no autorizados.</p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-icon">🎱</div>
+        <h3>Amenidades Cuidadas</h3>
+        <p>Por favor usa la mesa de billar, dominó y bar responsablemente. Los daños correrán por tu cuenta.</p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-icon">⛳</div>
+        <h3>Golf Cart</h3>
+        <p>El carro de golf debe devolverse con carga completa de batería. Respeta los límites de velocidad de la isla.</p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-icon">🔐</div>
+        <h3>Privacidad y Seguridad</h3>
+        <p>La privacidad de otros huéspedes es sagrada. No tomes fotos de terceros sin consentimiento.</p>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-icon">💳</div>
+        <h3>Depósito de Seguridad</h3>
+        <p>Se requiere un depósito de seguridad de $500 USD. Se reembolsará completamente si no hay daños.</p>
+      </div>
+    </div>
+
+    <div class="rules-note">
+      <i class="fas fa-info-circle"></i>
+      <p><strong>Nota:</strong> El incumplimiento de estas reglas puede resultar en expulsión inmediata sin reembolso.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Experiencias -->
+<section class="experiences-section" data-reveal>
+  <div class="container">
+    <h2>Momentos Inolvidables</h2>
+    <p class="section-subtitle">Cada rincón de Villa Lissana cuenta una historia</p>
+
+    <div class="experiences-grid">
+      <div class="experience-card">
+        <div class="experience-icon experience-sunset">
+          <img src="/img/sunset.jpg" alt="Atardecer en la playa" class="experience-img" loading="lazy">
+        </div>
+        <h3>Atardecer en la Playa</h3>
+        <p>Observa cómo el cielo se tiñe de dorado mientras disfrutas de una copa con vistas al océano. Momento puro de contemplación.</p>
+      </div>
+
+      <div class="experience-card">
+        <div class="experience-icon experience-sunset">
+          <img src="/img/jacuzzi.jpg" alt="Jacuzzi climatizado de lujo" class="experience-img" loading="lazy">
+        </div>
+        <h3>Jacuzzi Climatizado</h3>
+        <p>Relájate bajo las estrellas en el jacuzzi privado. Temperatura perfecta en cualquier estación, total privacidad garantizada.</p>
+      </div>
+
+      <div class="experience-card">
+        <div class="experience-icon experience-sunset">
+          <img src="/img/golf-cart.jpg" alt="Carrito de golf privado" class="experience-img" loading="lazy">
+        </div>
+        <h3>Exploración con Golf Cart</h3>
+        <p>Recorre Gasparilla Island a tu ritmo. Descubre playas vírgenes y la verdadera esencia de la isla.</p>
+      </div>
+
+      <div class="experience-card">
+        <div class="experience-icon">💻</div>
+        <h3>Trabajo Remoto Premium</h3>
+        <p>Internet Starlink ultra-rápido. Oficina privada con vista al mar. Productividad + paraíso en perfecta armonía.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Ubicación -->
+<section id="ubicacion" class="location-section">
+  <div class="container">
+    <h2>Ubicación Privilegiada</h2>
+    <div class="location-grid">
+      <div id="map" class="map-container"></div>
+      <div class="location-info">
+        <div class="location-card">
+          <h3>Gasparilla Island, Florida</h3>
+          <p>Ubicada en una isla privada de ensueño, Villa Lissana ofrece privacidad absoluta con acceso fácil a servicios. Playas vírgenes, comunidad exclusiva y el retiro que siempre soñaste.</p>
+          <ul class="location-list">
+            <li><i class="fas fa-map-marker-alt"></i> Isla privada con playas vírgenes</li>
+            <li><i class="fas fa-car"></i> 20 min. de Boca Grande</li>
+            <li><i class="fas fa-plane"></i> 1 hora del Aeropuerto de Sarasota</li>
+            <li><i class="fas fa-utensils"></i> Clubs y restaurantes exclusivos nearby</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Formulario de Contacto -->
+<section id="contacto" class="contact-section" data-reveal>
+  <div class="container container-sm">
+    <h2>Planifica tu Estadía</h2>
+    <p class="section-subtitle">Cuéntanos qué buscas</p>
+
+    <form id="contactForm" class="contact-form">
+      <div class="form-group">
+        <label for="nombre">Nombre Completo *</label>
+        <input type="text" id="nombre" name="nombre" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+          <label for="telefono">Teléfono *</label>
+          <input type="tel" id="telefono" name="telefono" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="mensaje">Mensaje</label>
+        <textarea id="mensaje" name="mensaje" rows="5" placeholder="Cuéntanos sobre tu viaje ideal..."></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Enviar Consulta</button>
+    </form>
+
+    <div id="formMessage" class="form-message" style="display:none;"></div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>Villa Lissana</h4>
+        <p>Lujo privado en el paraíso</p>
+        <div class="footer-social">
+          <a href="https://wa.me/18327635760" class="footer-social-link" title="WhatsApp" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-whatsapp"></i>
+          </a>
+          <a href="https://instagram.com" class="footer-social-link" title="Instagram" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-instagram"></i>
+          </a>
+        </div>
+      </div>
+      <div class="footer-section">
+        <h4>Contacto</h4>
+        <p><a href="tel:+18327635760">+1 832 763 5760</a></p>
+        <p><a href="mailto:liset.garcell05@gmail.com">liset.garcell05@gmail.com</a></p>
+      </div>
+      <div class="footer-section">
+        <h4>Ubicación</h4>
+        <p>Gasparilla Island<br>Florida, United States</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Villa Lissana. Todos los derechos reservados.</p>
+      <div class="footer-links">
+        <a href="#" class="footer-link">Política de Privacidad</a>
+        <span class="footer-separator">•</span>
+        <a href="#" class="footer-link">Términos y Condiciones</a>
+        <span class="footer-separator">•</span>
+        <a href="#" class="footer-link">Política de Cancelación</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Lightbox -->
+<div id="lightbox" class="lightbox">
+  <button id="lightboxClose" class="lightbox-close"><i class="fas fa-times"></i></button>
+  <button id="lightboxPrev" class="lightbox-nav lightbox-prev"><i class="fas fa-chevron-left"></i></button>
+  <img id="lightboxImg" src="" alt="">
+  <button id="lightboxNext" class="lightbox-nav lightbox-next"><i class="fas fa-chevron-right"></i></button>
+  <figcaption id="lightboxCaption" class="lightbox-caption"></figcaption>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+function initializeMap() {
+  const gasparillaLocation = [26.5895, -82.2597];
+  const map = L.map('map', {
+    dragging: true,
+    touchZoom: true,
+    doubleClickZoom: true,
+    scrollWheelZoom: true
+  }).setView(gasparillaLocation, 16);
+
+  // Mapa satélite HD de máxima calidad
+  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+    attribution: '© Esri, DigitalGlobe, Earthstar Geographics',
+    maxZoom: 20,
+    minZoom: 2,
+    className: 'leaflet-tile-satellite'
+  }).addTo(map);
+
+  // Overlay de contrast suave para mejor legibilidad
+  const overlay = L.tileLayer('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIwLjAyIj48cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiLz48L3N2Zz4=', {
+    opacity: 0.08,
+    maxZoom: 20,
+    minZoom: 2
+  }).addTo(map);
+
+  const marker = L.circleMarker(gasparillaLocation, {
+    radius: 16,
+    fillColor: '#D4AF37',
+    color: '#FFFFFF',
+    weight: 4,
+    opacity: 1,
+    fillOpacity: 0.95,
+    lineCap: 'round',
+    lineJoin: 'round'
+  }).addTo(map);
+
+  marker.bindTooltip('Villa Lissana — Lujo en el Paraíso', {
+    permanent: false,
+    direction: 'top',
+    offset: L.point(0, -25),
+    className: 'villa-tooltip'
+  });
+
+  const popup = L.popup({
+    closeButton: true,
+    offset: L.point(0, -30)
+  }).setLatLng(gasparillaLocation).setContent(`
+    <div style="background: rgba(15, 23, 42, 0.98); padding: 16px; border-radius: 12px; border: 1px solid #D4AF37; font-family: Inter, sans-serif; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
+      <div style="color: #D4AF37; font-weight: 700; font-size: 16px; margin-bottom: 6px;">🏡 Villa Lissana</div>
+      <div style="color: #F1F5F9; font-size: 13px; margin-bottom: 4px;">Gasparilla Island, Florida</div>
+      <div style="color: #D4AF37; font-size: 12px; font-weight: 600;">Lujo en Paraíso Privado</div>
+    </div>
+  `);
+
+  marker.bindPopup(popup);
+  marker.openPopup();
+
+  marker.on('mouseover', function() {
+    this.setRadius(18);
+  });
+  marker.on('mouseout', function() {
+    this.setRadius(14);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', initializeMap);
+</script>
+<script src="js/app.js"></script>
+</body>
+</html>
