@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, current_app
 from datetime import datetime, date, timedelta
 from app.extensions import db
-from app.models import Booking, BlockedDate, Inquiry
+from app.models import Booking, BlockedDate, Inquiry, PricingConfig
 from app.services.pricing import PricingService
 from app.services.email_service import EmailService
 from app.services.stripe_service import StripeService
@@ -155,4 +155,14 @@ def create_inquiry():
         }), 201
     except Exception as e:
         db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@api.route('/pricing', methods=['GET'])
+def get_pricing():
+    try:
+        pricing = PricingConfig.query.first()
+        if not pricing:
+            return jsonify({'success': False, 'error': 'Pricing not configured'}), 404
+        return jsonify(pricing.to_dict())
+    except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500

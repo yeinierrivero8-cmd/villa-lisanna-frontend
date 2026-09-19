@@ -1,0 +1,19 @@
+[build]
+  publish = "."
+  command = "echo 'Static site - no build needed'"
+
+[context.production]
+  command = "echo 'Production deploy'"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

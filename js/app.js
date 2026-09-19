@@ -24,7 +24,7 @@ const guestSelector = document.getElementById('guestCount');
 if (guestSelector) {
   guestSelector.addEventListener('change', (e) => {
     const selectedGuests = e.target.value;
-    console.log(`✅ Huéspedes seleccionados: ${selectedGuests} ${selectedGuests == 1 ? 'persona' : 'personas'}`);
+    console.log(`✅ Guests selected: ${selectedGuests}`);
   });
 }
 
@@ -113,99 +113,257 @@ if ('IntersectionObserver' in window) {
 }
 
 // Lightbox gallery
-const lightboxEls = Array.from(document.querySelectorAll('[data-lightbox]'));
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightboxImg');
-const lightboxCaption = document.getElementById('lightboxCaption');
-let currentIndex = 0;
+function initLightbox() {
+  const lightboxEls = Array.from(document.querySelectorAll('[data-lightbox]'));
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const lightboxClose = document.getElementById('lightboxClose');
+  const lightboxPrev = document.getElementById('lightboxPrev');
+  const lightboxNext = document.getElementById('lightboxNext');
 
-function openLightbox(index) {
-  currentIndex = (index + lightboxEls.length) % lightboxEls.length;
-  const fig = lightboxEls[currentIndex];
-  const img = fig.querySelector('img');
-  const caption = fig.querySelector('figcaption')?.textContent || '';
+  let currentIndex = 0;
 
-  lightboxImg.src = img.src;
-  lightboxImg.alt = img.alt;
-  lightboxCaption.textContent = caption;
-  lightbox.classList.add('is-open');
-  document.body.style.overflow = 'hidden';
-}
+  function openLightbox(index) {
+    if (lightboxEls.length === 0) return;
+    currentIndex = (index + lightboxEls.length) % lightboxEls.length;
+    const fig = lightboxEls[currentIndex];
+    const img = fig.querySelector('img');
+    const caption = fig.querySelector('figcaption')?.textContent || '';
 
-function closeLightbox() {
-  lightbox.classList.remove('is-open');
-  document.body.style.overflow = '';
-}
+    lightboxImg.src = img.src;
+    lightboxImg.alt = img.alt;
+    lightboxCaption.textContent = caption;
+    lightbox.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
 
-lightboxEls.forEach((fig, i) => {
-  fig.addEventListener('click', () => openLightbox(i));
-  fig.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+  function closeLightbox() {
+    lightbox.classList.remove('is-open');
+    document.body.style.overflow = '';
+  }
+
+  // Click en fotos
+  lightboxEls.forEach((fig, i) => {
+    fig.style.cursor = 'pointer';
+    fig.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopPropagation();
       openLightbox(i);
-    }
+    });
   });
-});
 
-document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
-document.getElementById('lightboxPrev').addEventListener('click', () => openLightbox(currentIndex - 1));
-document.getElementById('lightboxNext').addEventListener('click', () => openLightbox(currentIndex + 1));
+  // Botones
+  if (lightboxClose) {
+    lightboxClose.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeLightbox();
+    });
+  }
 
-lightbox.addEventListener('click', (e) => {
-  if (e.target === lightbox) closeLightbox();
-});
+  if (lightboxPrev) {
+    lightboxPrev.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openLightbox(currentIndex - 1);
+    });
+  }
 
-document.addEventListener('keydown', (e) => {
-  if (!lightbox.classList.contains('is-open')) return;
-  if (e.key === 'Escape') closeLightbox();
-  if (e.key === 'ArrowRight') openLightbox(currentIndex + 1);
-  if (e.key === 'ArrowLeft') openLightbox(currentIndex - 1);
-});
+  if (lightboxNext) {
+    lightboxNext.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openLightbox(currentIndex + 1);
+    });
+  }
 
-// Contact form
+  // Click en fondo para cerrar
+  if (lightbox) {
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) {
+        closeLightbox();
+      }
+    });
+  }
+
+  // Teclado
+  document.addEventListener('keydown', (e) => {
+    if (!lightbox.classList.contains('is-open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') openLightbox(currentIndex + 1);
+    if (e.key === 'ArrowLeft') openLightbox(currentIndex - 1);
+  });
+}
+
+// Esperar a que el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initLightbox);
+} else {
+  initLightbox();
+}
+
+// Accordion Handler
+function initAccordion() {
+  const accordionHeaders = document.querySelectorAll('.accordion-header');
+
+  accordionHeaders.forEach(header => {
+    header.addEventListener('click', () => {
+      const accordionItem = header.parentElement;
+      const accordionContent = accordionItem.querySelector('.accordion-content');
+      const isActive = header.classList.contains('active');
+
+      // Cerrar otros acordeones
+      document.querySelectorAll('.accordion-header.active').forEach(h => {
+        if (h !== header) {
+          h.classList.remove('active');
+          h.parentElement.querySelector('.accordion-content').classList.remove('active');
+        }
+      });
+
+      // Toggle actual
+      header.classList.toggle('active', !isActive);
+      accordionContent.classList.toggle('active', !isActive);
+    });
+  });
+}
+
+// Inicializar acordeón cuando el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAccordion);
+} else {
+  initAccordion();
+}
+
+// Dynamic Price Calculator
+function initPriceCalculator() {
+  const dateRangeInput = document.getElementById('dateRange');
+  const nightsCountEl = document.getElementById('nightsCount');
+  const subtotalPriceEl = document.getElementById('subtotalPrice');
+  const taxesPriceEl = document.getElementById('taxesPrice');
+  const totalPriceEl = document.getElementById('totalPrice');
+
+  let pricing = {
+    nightly_rate: 500,
+    rate_2_nights: 495,
+    rate_3_nights: 475,
+    rate_4plus_nights: 450,
+    cleaning_fee: 295,
+    damage_deposit: 500,
+    sales_tax_rate: 0.12
+  };
+
+  // Load pricing from server
+  async function loadPricing() {
+    try {
+      const response = await fetch('/api/pricing');
+      if (response.ok) {
+        pricing = await response.json();
+      }
+    } catch (e) {
+      console.log('Using default pricing');
+    }
+  }
+
+  function calculatePrices() {
+    if (!dateRangeInput || !dateRangeInput.value) return;
+
+    const dates = dateRangeInput.value.split(' al ');
+    if (dates.length !== 2) return;
+
+    const parseDate = (dateStr) => {
+      const parts = dateStr.trim().split(' ');
+      if (parts.length !== 3) return null;
+      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      const monthIndex = months.indexOf(parts[1]);
+      if (monthIndex === -1) return null;
+      return new Date(parseInt(parts[2]), monthIndex, parseInt(parts[0]));
+    };
+
+    const checkIn = parseDate(dates[0]);
+    const checkOut = parseDate(dates[1]);
+
+    if (!checkIn || !checkOut) return;
+
+    const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+    if (nights <= 0) return;
+
+    // Update language for flatpickr
+    if (typeof flatpickr !== 'undefined' && currentLanguage === 'es') {
+      // Update calendar labels if needed (handled by language.js)
+    }
+
+    // Select rate based on nights
+    let nightly_rate = pricing.nightly_rate;
+    if (nights === 2) nightly_rate = pricing.rate_2_nights;
+    else if (nights === 3) nightly_rate = pricing.rate_3_nights;
+    else if (nights >= 4) nightly_rate = pricing.rate_4plus_nights;
+
+    const subtotal = nightly_rate * nights;
+    const subtotalWithCleaning = subtotal + pricing.cleaning_fee;
+    const taxes = Math.round(subtotalWithCleaning * pricing.sales_tax_rate * 100) / 100;
+    const total = subtotalWithCleaning + taxes;
+
+    if (nightsCountEl) nightsCountEl.textContent = nights;
+    if (subtotalPriceEl) subtotalPriceEl.textContent = `$${subtotal.toLocaleString('en-US')}`;
+    if (taxesPriceEl) taxesPriceEl.textContent = `$${taxes.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    if (totalPriceEl) totalPriceEl.innerHTML = `<strong>$${total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD</strong>`;
+  }
+
+  if (dateRangeInput) {
+    dateRangeInput.addEventListener('change', calculatePrices);
+    dateRangeInput.addEventListener('blur', calculatePrices);
+  }
+
+  loadPricing();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPriceCalculator);
+} else {
+  initPriceCalculator();
+}
+
+// Contact form - WhatsApp Integration
 const contactForm = document.getElementById('contactForm');
 const formMessage = document.getElementById('formMessage');
 
-contactForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
+if (contactForm) {
+  contactForm.addEventListener('submit', (e) => {
+    e.preventDefault();
 
-  const nombre = document.getElementById('nombre').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const telefono = document.getElementById('telefono').value.trim();
-  const mensaje = document.getElementById('mensaje').value.trim();
+    const nombre = document.getElementById('nombre').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const checkin = document.getElementById('checkin').value;
+    const checkout = document.getElementById('checkout').value;
+    const mensaje = document.getElementById('mensaje').value.trim();
 
-  // Validation
-  if (nombre.length < 3) {
-    showMessage('Por favor ingresa tu nombre completo', 'error');
-    return;
-  }
-  if (!/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
-    showMessage('Por favor ingresa un email válido', 'error');
-    return;
-  }
-  if (telefono.replace(/\D/g, '').length < 7) {
-    showMessage('Por favor ingresa un teléfono válido', 'error');
-    return;
-  }
+    // Validation
+    if (nombre.length < 3) {
+      showMessage('Por favor ingresa tu nombre completo', 'error');
+      return;
+    }
+    if (telefono.replace(/\D/g, '').length < 7) {
+      showMessage('Por favor ingresa un teléfono WhatsApp válido', 'error');
+      return;
+    }
+    if (!checkin || !checkout) {
+      showMessage('Por favor selecciona fechas de check-in y check-out', 'error');
+      return;
+    }
 
-  try {
-    const btn = contactForm.querySelector('.btn');
-    const originalText = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = '⏳ Enviando...';
+    // Build WhatsApp message
+    const whatsappMessage = `Hi! I'm interested in inquiring about Villa Lisanna.\n\n📋 *Details:*\nName: ${nombre}\nPhone: ${telefono}\n${email ? `Email: ${email}\n` : ''}Check-in: ${checkin}\nCheck-out: ${checkout}\n${mensaje ? `\n📝 Message: ${mensaje}` : ''}\n\nWhat is the availability and price?`;
 
-    // Simulated submission (replace with real API later)
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Encode for WhatsApp
+    const encodedMessage = encodeURIComponent(whatsappMessage);
+    const whatsappUrl = `https://wa.me/18327635760?text=${encodedMessage}`;
 
-    showMessage('✅ ¡Gracias! Tu mensaje ha sido enviado. Nos pondremos en contacto pronto.', 'success');
-    contactForm.reset();
-    btn.textContent = originalText;
-    btn.disabled = false;
+    // Open WhatsApp
+    window.open(whatsappUrl, '_blank');
 
-  } catch (err) {
-    showMessage('❌ Error al enviar. Intenta más tarde.', 'error');
-  }
-});
+    showMessage('✅ WhatsApp will open. Complete the sending there.', 'success');
+    setTimeout(() => contactForm.reset(), 1500);
+  });
+}
 
 function showMessage(text, type) {
   formMessage.textContent = text;
@@ -263,3 +421,212 @@ const observer = new IntersectionObserver((entries) => {
 });
 
 document.querySelector('.stats-grid') && observer.observe(document.querySelector('.stats-grid'));
+
+// Booking Modal Handler
+const bookingBtn = document.getElementById('bookingBtn');
+const bookingModal = document.getElementById('bookingModal');
+const modalOverlay = document.getElementById('modalOverlay');
+const modalClose = document.getElementById('modalClose');
+const bookingForm = document.getElementById('bookingForm');
+const bookingMessage = document.getElementById('bookingMessage');
+
+function openBookingModal() {
+  const dateRangeInput = document.getElementById('dateRange');
+  const guestCount = document.getElementById('guestCount').value;
+  const dateRange = dateRangeInput.value.trim();
+
+  if (!dateRange) {
+    alert('⚠️ Please select your check-in and check-out dates');
+    return;
+  }
+
+  const dates = dateRange.split(' al ');
+  const checkIn = dates[0].trim();
+  const checkOut = dates[1].trim();
+
+  document.getElementById('bookingCheckIn').value = checkIn;
+  document.getElementById('bookingCheckOut').value = checkOut;
+  document.getElementById('bookingGuests').value = guestCount;
+
+  bookingModal.classList.remove('hidden');
+}
+
+function closeBookingModal() {
+  bookingModal.classList.add('hidden');
+  bookingForm.reset();
+  bookingMessage.textContent = '';
+}
+
+if (bookingBtn) {
+  bookingBtn.addEventListener('click', openBookingModal);
+}
+
+if (modalClose) {
+  modalClose.addEventListener('click', closeBookingModal);
+}
+
+if (modalOverlay) {
+  modalOverlay.addEventListener('click', closeBookingModal);
+}
+
+if (bookingForm) {
+  bookingForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById('bookingName').value.trim();
+    const email = document.getElementById('bookingEmail').value.trim();
+    const phone = document.getElementById('bookingPhone').value.trim();
+    const checkIn = document.getElementById('bookingCheckIn').value;
+    const checkOut = document.getElementById('bookingCheckOut').value;
+    const guests = parseInt(document.getElementById('bookingGuests').value);
+    const ageConfirmed = document.getElementById('bookingAge').checked;
+
+    if (!name || !email || !phone) {
+      bookingMessage.textContent = '❌ Please complete all fields';
+      bookingMessage.classList.add('error');
+      return;
+    }
+
+    if (!ageConfirmed) {
+      bookingMessage.textContent = '❌ You must confirm you are 25 years old or older';
+      bookingMessage.classList.add('error');
+      return;
+    }
+
+    try {
+      const submitBtn = bookingForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Sending...';
+
+      // Convert dates to YYYY-MM-DD format if needed
+      let checkInDate = checkIn;
+      let checkOutDate = checkOut;
+
+      // Parse dates in case they're in d M Y format
+      if (!checkInDate.includes('-')) {
+        const dateObj = new Date(checkInDate);
+        checkInDate = dateObj.toISOString().split('T')[0];
+      }
+      if (!checkOutDate.includes('-')) {
+        const dateObj = new Date(checkOutDate);
+        checkOutDate = dateObj.toISOString().split('T')[0];
+      }
+
+      const response = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          guest_name: name,
+          guest_email: email,
+          guest_phone: phone,
+          check_in: checkInDate,
+          check_out: checkOutDate,
+          guest_count: guests,
+          age_confirmed: ageConfirmed
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        bookingMessage.textContent = '✅ Booking sent! We will contact you soon.';
+        bookingMessage.classList.remove('error');
+        bookingMessage.classList.add('success');
+        setTimeout(() => {
+          closeBookingModal();
+        }, 2000);
+      } else {
+        bookingMessage.textContent = `❌ ${data.error || 'Error sending booking'}`;
+        bookingMessage.classList.add('error');
+      }
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+    } catch (err) {
+      bookingMessage.textContent = '❌ Connection error. Try again later.';
+      bookingMessage.classList.add('error');
+      console.error('Booking error:', err);
+    }
+  });
+}
+
+// Gallery Modal
+const galleryImages = [
+  '/img/sala-1.jpg',
+  '/img/sala-2.jpg',
+  '/img/sala-3.jpg',
+  '/img/habitacion-2.jpg',
+  '/img/jacuzzi.jpg',
+  '/img/golf-cart.jpg',
+  '/img/bed.jpg',
+  '/img/cocina-1.jpg',
+  '/img/cocina-2.jpg'
+];
+
+let currentImageIndex = 0;
+
+function initGalleryModal() {
+  const openBtn = document.getElementById('openGalleryBtn');
+  const modal = document.getElementById('galleryModal');
+  const closeBtn = document.getElementById('galleryModalClose');
+  const overlay = document.getElementById('galleryModalOverlay');
+  const prevBtn = document.getElementById('galleryPrev');
+  const nextBtn = document.getElementById('galleryNext');
+  const galleryImg = document.getElementById('galleryCarouselImg');
+  const counter = document.getElementById('galleryCounter');
+  const total = document.getElementById('galleryTotal');
+
+  if (!openBtn) return;
+
+  total.textContent = galleryImages.length;
+
+  openBtn.addEventListener('click', () => {
+    modal.classList.add('active');
+    modal.classList.remove('hidden');
+    currentImageIndex = 0;
+    updateImage();
+    document.body.style.overflow = 'hidden';
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  overlay.addEventListener('click', closeModal);
+
+  function closeModal() {
+    modal.classList.remove('active');
+    setTimeout(() => modal.classList.add('hidden'), 300);
+    document.body.style.overflow = '';
+  }
+
+  prevBtn.addEventListener('click', () => {
+    currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+    updateImage();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+    updateImage();
+  });
+
+  function updateImage() {
+    galleryImg.src = galleryImages[currentImageIndex];
+    counter.textContent = currentImageIndex + 1;
+  }
+
+  // Keyboard navigation
+  document.addEventListener('keydown', (e) => {
+    if (!modal.classList.contains('active')) return;
+    if (e.key === 'ArrowLeft') prevBtn.click();
+    if (e.key === 'ArrowRight') nextBtn.click();
+    if (e.key === 'Escape') closeModal();
+  });
+}
+
+// Inicializar galería modal
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initGalleryModal);
+} else {
+  initGalleryModal();
+}

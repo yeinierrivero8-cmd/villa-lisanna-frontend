@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Villa Lissana — Lujo y Confort en Paraíso Privado</title>
-  <meta name="description" content="Villa Lissana: alojamiento de lujo frente al mar en Gasparilla Island, Florida. Piscina, wifi Starlink, jacuzzi climatizado, carro de golf privado. Retiro perfecto.">
+  <title>Villa Lisanna — Luxury and Comfort in Private Paradise</title>
+  <meta name="description" content="Villa Lisanna: luxury accommodation on private island of Gasparilla Island, Florida. Heated jacuzzi, ultra-fast Starlink, 24/7 private golf cart. Perfect retreat with concierge included.">
   <meta name="theme-color" content="#F5F3F0">
-  <meta property="og:title" content="Villa Lissana — Tu Escape de Lujo">
-  <meta property="og:description" content="Vive la experiencia de villa de lujo con amenidades premium: Starlink, Jacuzzi, Piscina, Carro de Golf.">
+  <meta property="og:title" content="Villa Lisanna — Your Luxury Escape">
+  <meta property="og:description" content="Experience luxury villa with premium amenities: Starlink, Jacuzzi, Pool, Golf Cart.">
   <meta property="og:image" content="img/hero.jpg">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
@@ -16,6 +16,12 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
   <link rel="stylesheet" href="/css/styles.css">
+  <style>
+    .language-switcher { display: flex; gap: 8px; align-items: center; }
+    .language-switcher button { background: transparent; border: 2px solid white; color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.3s; }
+    .language-switcher button.active { background: white; color: #2c3e50; }
+    .language-switcher button:hover { transform: scale(1.05); }
+  </style>
 </head>
 <body>
 
@@ -23,20 +29,24 @@
 <header id="siteHeader" class="header">
   <div class="header-inner">
     <div class="logo">
-      <span class="logo-text">Villa Lissana</span>
+      <span class="logo-text">Villa Lisanna</span>
     </div>
     <nav id="mainNav" class="main-nav">
-      <a href="#inicio" class="nav-link">Inicio</a>
-      <a href="#galeria" class="nav-link">Galería</a>
-      <a href="#amenidades" class="nav-link">Amenidades</a>
-      <a href="#ubicacion" class="nav-link">Ubicación</a>
-      <a href="#contacto" class="nav-link">Contacto</a>
+      <a href="#inicio" class="nav-link" data-i18n="header.nav_inicio">Home</a>
+      <a href="#galeria" class="nav-link" data-i18n="header.nav_galeria">Gallery</a>
+      <a href="#amenidades" class="nav-link" data-i18n="header.nav_amenidades">Amenities</a>
+      <a href="#ubicacion" class="nav-link" data-i18n="header.nav_ubicacion">Location</a>
+      <a href="#contacto" class="nav-link" data-i18n="header.nav_contacto">Contact</a>
     </nav>
-    <button id="navToggle" class="nav-toggle" aria-label="Menú">
+    <div class="language-switcher" id="languageSwitcher">
+      <button data-lang="en" class="active">EN</button>
+      <button data-lang="es">ES</button>
+    </div>
+    <button id="navToggle" class="nav-toggle" aria-label="Menu">
       <span></span><span></span><span></span>
     </button>
     <button id="infoPanelToggle" class="info-panel-toggle" aria-expanded="false">
-      <span class="toggle-text">💎 INFO & RESERVA</span>
+      <span class="toggle-text" data-i18n="header.info_reserva">💎 INFO & BOOK</span>
       <i class="fas fa-chevron-down"></i>
     </button>
   </div>
@@ -48,58 +58,87 @@
   <div id="infoPanelContent" class="info-panel-content">
     <!-- Calendario -->
     <div class="calendar-section">
-      <label class="calendar-label">Selecciona tus fechas</label>
-      <input type="text" id="dateRange" class="calendar-input" placeholder="Selecciona check-in y check-out" readonly>
+      <label class="calendar-label" data-i18n="calendar.select_dates">Select your dates</label>
+      <input type="text" id="dateRange" class="calendar-input" placeholder="Select check-in and check-out" readonly>
       <div class="calendar-info">
-        <span class="calendar-dot available"></span> Disponible
-        <span class="calendar-dot occupied"></span> Ocupado
+        <span class="calendar-dot available"></span> <span data-i18n="calendar.available">Available</span>
+        <span class="calendar-dot occupied"></span> <span data-i18n="calendar.occupied">Occupied</span>
       </div>
     </div>
 
     <div class="info-grid">
       <div class="info-item">
-        <span class="info-label">Disponibilidad</span>
-        <span class="info-value">✓ Disponible</span>
+        <span class="info-label" data-i18n="calendar.available">Available</span>
+        <span class="info-value">✓ Available</span>
       </div>
       <div class="info-item">
-        <span class="info-label">Check-in</span>
+        <span class="info-label" data-i18n="calendar.check_in">Check-in</span>
         <span class="info-value">4:00 PM</span>
       </div>
       <div class="info-item">
-        <span class="info-label">Check-out</span>
+        <span class="info-label" data-i18n="calendar.check_out">Check-out</span>
         <span class="info-value">11:00 AM</span>
       </div>
       <div class="info-item">
-        <span class="info-label">Huéspedes</span>
+        <span class="info-label" data-i18n="calendar.guests">Guests</span>
         <select id="guestCount" class="guest-selector">
-          <option value="1">1 persona</option>
-          <option value="2" selected>2 personas</option>
-          <option value="3">3 personas</option>
-          <option value="4">4 personas</option>
-          <option value="5">5 personas</option>
-          <option value="6">6 personas</option>
-          <option value="7">7 personas</option>
-          <option value="8">8 personas</option>
-          <option value="9">9 personas</option>
-          <option value="10">10 personas</option>
+          <option value="1">1 guest</option>
+          <option value="2" selected>2 guests</option>
+          <option value="3">3 guests</option>
+          <option value="4">4 guests</option>
+          <option value="5">5 guests</option>
+          <option value="6">6 guests</option>
+          <option value="7">7 guests</option>
+          <option value="8">8 guests</option>
+          <option value="9">9 guests</option>
+          <option value="10">10 guests</option>
         </select>
       </div>
     </div>
 
-    <div class="info-price">
-      <span class="info-label">Precio por noche</span>
-      <span class="info-value">$500 USD</span>
+    <!-- Desglose de Costos Dinámico -->
+    <div class="price-breakdown">
+      <div class="price-row">
+        <span class="price-label" data-i18n="calendar.night_rate">Rate per night</span>
+        <span class="price-value">$500 USD</span>
+      </div>
+      <div class="price-row">
+        <span class="price-label" data-i18n="calendar.nights_selected">Nights selected</span>
+        <span class="price-value" id="nightsCount">0</span>
+      </div>
+      <div class="price-row">
+        <span class="price-label" data-i18n="calendar.subtotal">Subtotal (lodging)</span>
+        <span class="price-value" id="subtotalPrice">$0</span>
+      </div>
+      <div class="price-row">
+        <span class="price-label" data-i18n="calendar.cleaning">Cleaning & services</span>
+        <span class="price-value">$295 USD</span>
+      </div>
+      <div class="price-row">
+        <span class="price-label" data-i18n="calendar.taxes">Taxes (12%)</span>
+        <span class="price-value" id="taxesPrice">$0</span>
+      </div>
+      <div class="price-row divider">
+        <span class="price-label"><strong data-i18n="calendar.total_estimated">Total estimate</strong></span>
+        <span class="price-value" id="totalPrice"><strong>$795 USD</strong></span>
+      </div>
+      <div class="price-info">
+        <i class="fas fa-info-circle"></i>
+        <small data-i18n="calendar.deposit_info">Security deposit: $500 USD (refundable)</small>
+      </div>
     </div>
 
-    <a href="#contacto" class="btn btn-primary btn-full">RESERVA AHORA</a>
+    <button id="bookingBtn" class="btn btn-primary btn-full" data-i18n="calendar.book_now">BOOK NOW</button>
 
     <div class="social-links">
       <a href="https://wa.me/18327635760" class="social-link" title="WhatsApp" target="_blank" rel="noopener noreferrer">
         <i class="fab fa-whatsapp"></i>
       </a>
-      <a href="https://instagram.com" class="social-link" title="Instagram" target="_blank" rel="noopener noreferrer">
+      <!-- Instagram: Enlace comentado hasta configurar perfil
+      <a href="https://instagram.com/villalisanna" class="social-link" title="Instagram" target="_blank" rel="noopener noreferrer">
         <i class="fab fa-instagram"></i>
       </a>
+      -->
     </div>
   </div>
 </div>
@@ -111,119 +150,118 @@
   </div>
 </section>
 
-<!-- Promo Banner -->
-<section class="promo-banner">
-  <div class="promo-content">
-    <div class="promo-badge">🌟 OFERTA ESPECIAL</div>
-    <h2>20% Descuento en Reservas de 7+ Noches</h2>
-    <p>Hasta fin de septiembre • Disponibilidad limitada</p>
-    <a href="#contacto" class="btn btn-primary">Reservar Ahora</a>
-  </div>
-</section>
-
 <!-- Descripción -->
 <section class="description-section" data-reveal>
   <div class="container">
-    <h2>Tu Oasis Privado te Espera</h2>
-    <p>Ubicada en un rincón privilegiado, Villa Lissana combina elegancia arquitectónica con comodidades modernas. Diseñada para quien busca desconexión absoluta sin sacrificar lujos esenciales: conectividad satellite de última generación, espacios amplios y vistas que roban el aliento.</p>
+    <h2 data-i18n="description.title">Your Private Oasis Awaits</h2>
+    <p data-i18n="description.text">Located in a privileged corner, Villa Lisanna combines architectural elegance with modern comforts. Designed for those seeking absolute disconnection without sacrificing essential luxuries: next-generation satellite connectivity, spacious spaces and breathtaking views.</p>
     <div class="stats-grid">
       <div class="stat-card">
-        <div class="stat-number">3</div>
-        <div class="stat-label">Habitaciones Lujosas</div>
+        <div class="stat-number">10</div>
+        <div class="stat-label" data-i18n="description.capacity">Max Capacity</div>
       </div>
       <div class="stat-card">
         <div class="stat-number">3+</div>
-        <div class="stat-label">Baños Completos</div>
+        <div class="stat-label" data-i18n="description.bathrooms">Premium Bathrooms</div>
       </div>
       <div class="stat-card">
         <div class="stat-number">24/7</div>
-        <div class="stat-label">Soporte Concierge</div>
+        <div class="stat-label" data-i18n="description.concierge">Concierge 24/7</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">100+</div>
+        <div class="stat-label" data-i18n="description.mbps">Mbps Starlink</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Galería -->
-<section id="galeria" class="gallery-section">
+<!-- Galería Compacta -->
+<section id="galeria" class="gallery-section-compact">
   <div class="container">
-    <h2>Recorre Cada Rincón</h2>
-    <p class="section-subtitle">Fotografía profesional de cada espacio</p>
+    <h2 data-i18n="gallery.title">Explore Every Corner</h2>
+    <p class="section-subtitle" data-i18n="gallery.subtitle">Professional photography of each space</p>
 
-    <!-- Sala Principal -->
-    <div class="gallery-group">
-      <h3 class="gallery-group-title">Sala Principal</h3>
-      <div class="gallery-grid">
-        <figure class="gallery-item" data-lightbox>
-          <img src="/img/sala-1.jpg" alt="Sala principal con mobiliario premium" loading="lazy">
-          <figcaption>Diseño Contemporáneo</figcaption>
-        </figure>
-        <figure class="gallery-item" data-lightbox>
-          <img src="/img/sala-2.jpg" alt="Detalle decorativo de sala" loading="lazy">
-          <figcaption>Elementos de Lujo</figcaption>
-        </figure>
-        <figure class="gallery-item" data-lightbox>
-          <img src="/img/sala-3.jpg" alt="Zona de estar con vistas" loading="lazy">
-          <figcaption>Vistas Panorámicas</figcaption>
-        </figure>
-        <figure class="gallery-item" data-lightbox>
-          <img src="/img/sala-4.jpg" alt="Sala iluminada naturalmente" loading="lazy">
-          <figcaption>Luz Natural</figcaption>
-        </figure>
-      </div>
+    <div class="gallery-preview-grid">
+      <figure class="gallery-preview-item">
+        <img src="/img/sala-1.jpg" alt="Main room of Villa Lisanna with gray sofa and ocean views" loading="lazy">
+      </figure>
+      <figure class="gallery-preview-item">
+        <img src="/img/sala-2.jpg" alt="Detail of decoration and living room furniture with plants" loading="lazy">
+      </figure>
+      <figure class="gallery-preview-item">
+        <img src="/img/sala-3.jpg" alt="Living room with large windows and view to garden and beach" loading="lazy">
+      </figure>
     </div>
 
-    <!-- Suites Principales -->
-    <div class="gallery-group">
-      <h3 class="gallery-group-title">Suites Principales</h3>
-      <div class="gallery-grid">
-        <figure class="gallery-item" data-lightbox>
-          <img src="/img/habitacion-2.jpg" alt="Suite con vista al mar" loading="lazy">
-          <figcaption>Suite Ocean View</figcaption>
-        </figure>
+    <button id="openGalleryBtn" class="btn btn-secondary btn-large">
+      <i class="fas fa-images"></i> <span data-i18n="gallery.view_full">View Full Gallery</span>
+    </button>
+  </div>
+</section>
+
+<!-- Modal Galería -->
+<div id="galleryModal" class="gallery-modal hidden">
+  <div class="gallery-modal-overlay" id="galleryModalOverlay"></div>
+  <div class="gallery-modal-content">
+    <button id="galleryModalClose" class="gallery-modal-close">
+      <i class="fas fa-times"></i>
+    </button>
+
+    <div class="gallery-carousel">
+      <img id="galleryCarouselImg" src="" alt="Foto de galería" class="gallery-carousel-img">
+      <button id="galleryPrev" class="gallery-carousel-btn gallery-carousel-prev">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button id="galleryNext" class="gallery-carousel-btn gallery-carousel-next">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+      <div class="gallery-carousel-counter">
+        <span id="galleryCounter">1</span> / <span id="galleryTotal">1</span>
       </div>
     </div>
   </div>
-</section>
+</div>
 
 <!-- Testimonials -->
 <section class="testimonials-section" data-reveal>
   <div class="container">
-    <h2>Lo que Dicen Nuestros Huéspedes</h2>
-    <p class="section-subtitle">Experiencias reales de lujo en Gasparilla Island</p>
+    <h2 data-i18n="testimonials.title">What Our Guests Say</h2>
+    <p class="section-subtitle" data-i18n="testimonials.subtitle">Real experiences of luxury on Gasparilla Island</p>
 
     <div class="testimonials-grid">
       <div class="testimonial-card">
         <div class="stars">⭐⭐⭐⭐⭐</div>
-        <p class="testimonial-text">"Villa Lissana superó todas mis expectativas. La vista al océano, el Starlink funcionó perfecto para mi trabajo remoto, y el equipo fue increíblemente atento."</p>
+        <p class="testimonial-text" data-i18n="testimonials.testimonial1">"Villa Lisanna exceeded all my expectations. The ocean view, Starlink worked perfectly for my remote work, and the team was incredibly attentive."</p>
         <div class="testimonial-author">
           <div class="avatar">MC</div>
           <div>
-            <h4>María Consuelo</h4>
-            <span>Marzo 2026</span>
+            <h4 data-i18n="testimonials.author1">María Consuelo</h4>
+            <span data-i18n="testimonials.date1">March 2026</span>
           </div>
         </div>
       </div>
 
       <div class="testimonial-card">
         <div class="stars">⭐⭐⭐⭐⭐</div>
-        <p class="testimonial-text">"El jacuzzi bajo las estrellas fue simplemente mágico. La arquitectura moderna de la villa es una obra de arte. Definitivamente volveremos."</p>
+        <p class="testimonial-text" data-i18n="testimonials.testimonial2">"The jacuzzi under the stars was simply magical. The modern architecture of the villa is a work of art. We will definitely return."</p>
         <div class="testimonial-author">
           <div class="avatar">JP</div>
           <div>
-            <h4>James Patterson</h4>
-            <span>Julio 2026</span>
+            <h4 data-i18n="testimonials.author2">James Patterson</h4>
+            <span data-i18n="testimonials.date2">July 2026</span>
           </div>
         </div>
       </div>
 
       <div class="testimonial-card">
         <div class="stars">⭐⭐⭐⭐⭐</div>
-        <p class="testimonial-text">"El carro de golf privado nos permitió explorar la isla con total libertad. Una experiencia de lujo genuino sin pretensiones. Altamente recomendado."</p>
+        <p class="testimonial-text" data-i18n="testimonials.testimonial3">"The private golf cart allowed us to explore the island with total freedom. A genuine luxury experience without pretension. Highly recommended."</p>
         <div class="testimonial-author">
           <div class="avatar">SL</div>
           <div>
-            <h4>Sofia Lombardi</h4>
-            <span>Agosto 2026</span>
+            <h4 data-i18n="testimonials.author3">Sofia Lombardi</h4>
+            <span data-i18n="testimonials.date3">August 2026</span>
           </div>
         </div>
       </div>
@@ -231,51 +269,33 @@
   </div>
 </section>
 
-<!-- Amenidades -->
+<!-- Amenidades Premium -->
 <section id="amenidades" class="amenities-section" data-reveal>
   <div class="container">
-    <h2>Amenidades Premium</h2>
-    <p class="section-subtitle">Todo lo que necesitas para una estadía perfecta</p>
+    <h2 data-i18n="amenities.title">Premium Amenities</h2>
+    <p class="section-subtitle" data-i18n="amenities.subtitle">Everything you need for a perfect stay</p>
 
     <div class="amenities-grid">
       <div class="amenity-card" data-animate>
         <div class="amenity-image-container">
-          <img src="/img/starlink.jpg" alt="Starlink - Internet satelital" class="amenity-img" loading="lazy">
+          <img src="/img/starlink.jpg" alt="Ultra-fast Starlink connectivity" class="amenity-img" loading="lazy">
         </div>
-        <h3>Internet Starlink</h3>
-        <p>Conexión satelital de ultra alta velocidad. Trabajo remoto sin interrupciones.</p>
+        <h3 data-i18n="amenities.starlink_title">📶 Starlink 100+ Mbps</h3>
+        <p data-i18n="amenities.starlink_text">Dedicated satellite internet with extreme speed. Coverage throughout the villa. Ideal for conferencing, streaming and work without lag.</p>
       </div>
-
       <div class="amenity-card" data-animate>
         <div class="amenity-image-container">
-          <img src="/img/jacuzzi.jpg" alt="Jacuzzi climatizado de lujo" class="amenity-img" loading="lazy">
+          <img src="/img/golf-cart.jpg" alt="Private golf cart with charge" class="amenity-img" loading="lazy">
         </div>
-        <h3>Jacuzzi Climatizado</h3>
-        <p>Spa privado con control de temperatura. Relax bajo las estrellas.</p>
+        <h3 data-i18n="amenities.golfcart_title">⛳ Private Golf Cart 24/7</h3>
+        <p data-i18n="amenities.golfcart_text">Electric vehicle with full charge daily. Free island exploration without depending on tour schedules.</p>
       </div>
-
       <div class="amenity-card" data-animate>
         <div class="amenity-image-container">
-          <img src="/img/golf-cart.jpg" alt="Carrito de golf privado" class="amenity-img" loading="lazy">
+          <img src="/img/bed.jpg" alt="Premium king size beds" class="amenity-img" loading="lazy">
         </div>
-        <h3>Carro de Golf Privado</h3>
-        <p>Explora los alrededores con comodidad y estilo.</p>
-      </div>
-
-      <div class="amenity-card" data-animate>
-        <div class="amenity-image-container">
-          <img src="/img/wifi-router.jpg" alt="WiFi router de alta velocidad" class="amenity-img" loading="lazy">
-        </div>
-        <h3>WiFi de Alta Velocidad</h3>
-        <p>Red redundante para conectividad sin fallos.</p>
-      </div>
-
-      <div class="amenity-card" data-animate>
-        <div class="amenity-image-container">
-          <img src="/img/bed.jpg" alt="Camas de lujo king size" class="amenity-img" loading="lazy">
-        </div>
-        <h3>Camas de Lujo</h3>
-        <p>Descanso absoluto con textiles premium de 5 estrellas.</p>
+        <h3 data-i18n="amenities.bed_title">🛏️ Premium King Beds</h3>
+        <p data-i18n="amenities.bed_text">5-star memory foam mattresses + 1000 thread Egyptian cotton sheets. Luxury hotel sleep every night.</p>
       </div>
     </div>
   </div>
@@ -284,62 +304,58 @@
 <!-- Reglas de la Casa -->
 <section class="rules-section" data-reveal>
   <div class="container">
-    <h2>Reglas de la Casa</h2>
-    <p class="section-subtitle">Por favor respeta estas políticas para mantener nuestro espacio perfecto</p>
+    <h2 data-i18n="rules.title">House Rules</h2>
+    <p class="section-subtitle" data-i18n="rules.subtitle">Please respect these policies to keep our space perfect</p>
 
-    <div class="rules-grid">
-      <div class="rule-card">
-        <div class="rule-icon">🚭</div>
-        <h3>No Fumar</h3>
-        <p>Está prohibido fumar dentro de la villa. El incumplimiento resultará en un cargo de $500 USD por limpieza profunda.</p>
+    <div class="rules-accordion">
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">🚭</span>
+          <span class="accordion-title" data-i18n="rules.no_smoking">No Smoking</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="rules.no_smoking_text">Smoking prohibited inside the villa. $500 USD charge for deep cleaning in case of breach.</p>
+        </div>
       </div>
 
-      <div class="rule-card">
-        <div class="rule-icon">🐾</div>
-        <h3>Sin Mascotas</h3>
-        <p>No se permiten mascotas en la propiedad. Consulta primero si deseas una excepción.</p>
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">🐾</span>
+          <span class="accordion-title" data-i18n="rules.no_pets">No Pets</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="rules.no_pets_text">Pets are not allowed. Exceptions available upon consultation.</p>
+        </div>
       </div>
 
-      <div class="rule-card">
-        <div class="rule-icon">🔇</div>
-        <h3>Respeto al Ruido</h3>
-        <p>Por favor mantén el ruido bajo después de las 10 PM. Somos una comunidad tranquila.</p>
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">🔇</span>
+          <span class="accordion-title" data-i18n="rules.noise">Noise Respect</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="rules.noise_text">Keep volume low after 22:00 hrs. Quiet and respectful community.</p>
+        </div>
       </div>
 
-      <div class="rule-card">
-        <div class="rule-icon">🏊</div>
-        <h3>Jacuzzi Responsable</h3>
-        <p>El jacuzzi está disponible para uso exclusivo. No se permite usar productos químicos no autorizados.</p>
-      </div>
-
-      <div class="rule-card">
-        <div class="rule-icon">🎱</div>
-        <h3>Amenidades Cuidadas</h3>
-        <p>Por favor usa la mesa de billar, dominó y bar responsablemente. Los daños correrán por tu cuenta.</p>
-      </div>
-
-      <div class="rule-card">
-        <div class="rule-icon">⛳</div>
-        <h3>Golf Cart</h3>
-        <p>El carro de golf debe devolverse con carga completa de batería. Respeta los límites de velocidad de la isla.</p>
-      </div>
-
-      <div class="rule-card">
-        <div class="rule-icon">🔐</div>
-        <h3>Privacidad y Seguridad</h3>
-        <p>La privacidad de otros huéspedes es sagrada. No tomes fotos de terceros sin consentimiento.</p>
-      </div>
-
-      <div class="rule-card">
-        <div class="rule-icon">💳</div>
-        <h3>Depósito de Seguridad</h3>
-        <p>Se requiere un depósito de seguridad de $500 USD. Se reembolsará completamente si no hay daños.</p>
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">✨</span>
+          <span class="accordion-title" data-i18n="rules.care">Care of Amenities</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="rules.care_text">Use jacuzzi, golf cart and equipment responsibly. $500 security deposit (refundable if no damage).</p>
+        </div>
       </div>
     </div>
 
     <div class="rules-note">
       <i class="fas fa-info-circle"></i>
-      <p><strong>Nota:</strong> El incumplimiento de estas reglas puede resultar en expulsión inmediata sin reembolso.</p>
+      <p><strong data-i18n="rules.important_note">Important note: Failure to comply with these rules may result in immediate expulsion without refund.</strong></p>
     </div>
   </div>
 </section>
@@ -347,38 +363,32 @@
 <!-- Experiencias -->
 <section class="experiences-section" data-reveal>
   <div class="container">
-    <h2>Momentos Inolvidables</h2>
-    <p class="section-subtitle">Cada rincón de Villa Lissana cuenta una historia</p>
+    <h2 data-i18n="experiences.title">Unforgettable Moments</h2>
+    <p class="section-subtitle" data-i18n="experiences.subtitle">Every corner of Villa Lisanna tells a story</p>
 
     <div class="experiences-grid">
       <div class="experience-card">
         <div class="experience-icon experience-sunset">
-          <img src="/img/sunset.jpg" alt="Atardecer en la playa" class="experience-img" loading="lazy">
+          <img src="/img/sunset.jpg" alt="Golden sunset on the beach" class="experience-img" loading="lazy">
         </div>
-        <h3>Atardecer en la Playa</h3>
-        <p>Observa cómo el cielo se tiñe de dorado mientras disfrutas de una copa con vistas al océano. Momento puro de contemplación.</p>
+        <h3 data-i18n="experiences.sunset">🌅 Contemplative Sunset</h3>
+        <p data-i18n="experiences.sunset_text">The sky turns golden, the ocean reflects the light, and time stands still. Glass in hand, infinite views, absolute peace.</p>
       </div>
 
       <div class="experience-card">
-        <div class="experience-icon experience-sunset">
-          <img src="/img/jacuzzi.jpg" alt="Jacuzzi climatizado de lujo" class="experience-img" loading="lazy">
+        <div class="experience-icon experience-nature">
+          <img src="/img/exploration-golfcart.jpg" alt="Private island exploration" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
-        <h3>Jacuzzi Climatizado</h3>
-        <p>Relájate bajo las estrellas en el jacuzzi privado. Temperatura perfecta en cualquier estación, total privacidad garantizada.</p>
+        <h3 data-i18n="experiences.nature">🌴 Private Island Just for You</h3>
+        <p data-i18n="experiences.nature_text">Your car, your schedule, no tourists. Desert beaches, secret trails, genuine tranquility. Discovery without rushing.</p>
       </div>
 
       <div class="experience-card">
-        <div class="experience-icon experience-sunset">
-          <img src="/img/golf-cart.jpg" alt="Carrito de golf privado" class="experience-img" loading="lazy">
+        <div class="experience-icon experience-work">
+          <img src="/img/trabajo-remoto.jpg" alt="Premium office facing the sea" style="width: 100%; height: 100%; object-fit: cover;">
         </div>
-        <h3>Exploración con Golf Cart</h3>
-        <p>Recorre Gasparilla Island a tu ritmo. Descubre playas vírgenes y la verdadera esencia de la isla.</p>
-      </div>
-
-      <div class="experience-card">
-        <div class="experience-icon">💻</div>
-        <h3>Trabajo Remoto Premium</h3>
-        <p>Internet Starlink ultra-rápido. Oficina privada con vista al mar. Productividad + paraíso en perfecta armonía.</p>
+        <h3 data-i18n="experiences.work">💻 Productivity in Paradise</h3>
+        <p data-i18n="experiences.work_text">Meetings from your desk overlooking the ocean. WiFi that doesn't fail, distraction-free concentration, and lunch with infinite views.</p>
       </div>
 
     </div>
@@ -388,18 +398,18 @@
 <!-- Ubicación -->
 <section id="ubicacion" class="location-section">
   <div class="container">
-    <h2>Ubicación Privilegiada</h2>
+    <h2 data-i18n="location.title">Privileged Location</h2>
     <div class="location-grid">
       <div id="map" class="map-container"></div>
       <div class="location-info">
         <div class="location-card">
-          <h3>Gasparilla Island, Florida</h3>
-          <p>Ubicada en una isla privada de ensueño, Villa Lissana ofrece privacidad absoluta con acceso fácil a servicios. Playas vírgenes, comunidad exclusiva y el retiro que siempre soñaste.</p>
+          <h3 data-i18n="location.location_name">Gasparilla Island, Florida</h3>
+          <p data-i18n="location.location_text">Located on a dreamlike private island, Villa Lisanna offers absolute privacy with easy access to services. Virgin beaches, exclusive community and the retreat you've always dreamed of.</p>
           <ul class="location-list">
-            <li><i class="fas fa-map-marker-alt"></i> Isla privada con playas vírgenes</li>
-            <li><i class="fas fa-car"></i> 20 min. de Boca Grande</li>
-            <li><i class="fas fa-plane"></i> 1 hora del Aeropuerto de Sarasota</li>
-            <li><i class="fas fa-utensils"></i> Clubs y restaurantes exclusivos nearby</li>
+            <li><i class="fas fa-map-marker-alt"></i> <span data-i18n="location.private_beach">Private island with virgin beaches</span></li>
+            <li><i class="fas fa-car"></i> <span data-i18n="location.near_bocagrande">20 min. from Boca Grande</span></li>
+            <li><i class="fas fa-plane"></i> <span data-i18n="location.airport">1 hour from Sarasota Airport</span></li>
+            <li><i class="fas fa-utensils"></i> <span data-i18n="location.restaurants">Exclusive clubs and nearby restaurants</span></li>
           </ul>
         </div>
       </div>
@@ -407,38 +417,184 @@
   </div>
 </section>
 
-<!-- Formulario de Contacto -->
-<section id="contacto" class="contact-section" data-reveal>
-  <div class="container container-sm">
-    <h2>Planifica tu Estadía</h2>
-    <p class="section-subtitle">Cuéntanos qué buscas</p>
+<!-- Tu Concierge Personal -->
+<section class="concierge-section" data-reveal>
+  <div class="container">
+    <h2 data-i18n="concierge.title">Your Personal Concierge Included</h2>
+    <p class="section-subtitle" data-i18n="concierge.subtitle">Exclusive services and 24/7 attention</p>
 
-    <form id="contactForm" class="contact-form">
-      <div class="form-group">
-        <label for="nombre">Nombre Completo *</label>
-        <input type="text" id="nombre" name="nombre" required>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label for="email">Email *</label>
-          <input type="email" id="email" name="email" required>
-        </div>
-        <div class="form-group">
-          <label for="telefono">Teléfono *</label>
-          <input type="tel" id="telefono" name="telefono" required>
+    <div class="concierge-accordion">
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">🗺️</span>
+          <span class="accordion-title" data-i18n="concierge.beach_recs">Beach Recommendations</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="concierge.beach_recs_text">Access to nearby virgin beaches: Boca Grande Beach, Captiva Island and Sanibel Island with personalized recommendations for the best times to visit.</p>
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="mensaje">Mensaje</label>
-        <textarea id="mensaje" name="mensaje" rows="5" placeholder="Cuéntanos sobre tu viaje ideal..."></textarea>
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">⏰</span>
+          <span class="accordion-title" data-i18n="concierge.support">24/7 Support</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="concierge.support_text">Available by phone, WhatsApp or email anytime for emergencies, restaurant recommendations and immediate assistance.</p>
+        </div>
       </div>
 
-      <button type="submit" class="btn btn-primary">Enviar Consulta</button>
-    </form>
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">🍾</span>
+          <span class="accordion-title" data-i18n="concierge.events">Exclusive Events</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="concierge.events_text">Complete coordination for weddings, anniversaries and corporate events with personalized catering, entertainment and every detail coordinated.</p>
+        </div>
+      </div>
 
-    <div id="formMessage" class="form-message" style="display:none;"></div>
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">✨</span>
+          <span class="accordion-title" data-i18n="concierge.special">Personalized Requests</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="concierge.special_text">Custom experiences: premium restaurant reservations, water activities, private tours and any special request organized by our team.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Accordion -->
+<section id="contacto" class="faq-section" data-reveal>
+  <div class="container">
+    <h2 data-i18n="faq.title">Frequently Asked Questions</h2>
+    <p class="section-subtitle" data-i18n="faq.subtitle">Everything you need to know before booking</p>
+
+    <div class="faq-accordion">
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">📶</span>
+          <span class="accordion-title" data-i18n="faq.internet_q">What is the internet speed?</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="faq.internet_a">Starlink 100+ Mbps + redundant mesh WiFi throughout the villa. Perfect for remote work without interruptions or lag.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">🚭</span>
+          <span class="accordion-title" data-i18n="faq.pets_q">Are pets allowed?</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="faq.pets_a">Pets are not allowed as a general policy. Exceptions available upon consultation and approval.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">🌊</span>
+          <span class="accordion-title" data-i18n="faq.beach_q">Is there beach and exploration?</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="faq.beach_a">Yes. Gasparilla Island is a private island with virgin beaches. The private golf cart is available 24/7 for free exploration.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">💳</span>
+          <span class="accordion-title" data-i18n="faq.payment_q">What are the payment terms?</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="faq.payment_a">Deposit: 50% when booking. Balance: 30 days before check-in. Damage deposit: $500 USD (refundable if no damage). We accept Visa, Mastercard, PayPal, Apple Pay and Stripe.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">✅</span>
+          <span class="accordion-title" data-i18n="faq.cancellation_q">What is the cancellation policy?</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="faq.cancellation_a">30+ days before: 100% refund. 15-29 days: 50% refund. Less than 15 days: No refund. We recommend travel insurance.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">🎉</span>
+          <span class="accordion-title" data-i18n="faq.events_q">Can events be held?</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="faq.events_a">Yes. We coordinate weddings, anniversaries and corporate meetings. Our concierge manages catering, entertainment and every detail. Contact us for personalized quote.</p>
+        </div>
+      </div>
+
+      <div class="accordion-item">
+        <button class="accordion-header">
+          <span class="accordion-icon">🔐</span>
+          <span class="accordion-title" data-i18n="faq.security_q">How are villa payments processed?</span>
+          <i class="fas fa-chevron-down accordion-toggle"></i>
+        </button>
+        <div class="accordion-content">
+          <p data-i18n="faq.security_a">All initial payments (deposit and balance) are processed before check-in. Transactions are 100% secure with SSL encryption. No surprises or additional charges at the villa.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trust Badges + Contact CTA -->
+    <div class="trust-section-faq">
+      <div class="trust-badges-compact">
+        <div class="trust-label" data-i18n="faq.secure_payments">Secure Payments</div>
+        <div class="payment-logos-row">
+          <svg class="payment-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="32" rx="2" fill="#1434CB"/><text x="24" y="22" font-size="10" font-weight="bold" fill="white" text-anchor="middle">VISA</text>
+          </svg>
+          <svg class="payment-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="32" rx="2" fill="white" stroke="#999" stroke-width="0.5"/><circle cx="16" cy="16" r="6" fill="#EB001B"/><circle cx="32" cy="16" r="6" fill="#FF5F00"/>
+          </svg>
+          <svg class="payment-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="32" rx="2" fill="white" stroke="#999" stroke-width="0.5"/><text x="24" y="20" font-size="9" font-weight="bold" fill="#003087" text-anchor="middle">PayPal</text>
+          </svg>
+          <svg class="payment-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="32" rx="2" fill="#0066FF"/><text x="24" y="22" font-size="9" font-weight="bold" fill="white" text-anchor="middle">Stripe</text>
+          </svg>
+        </div>
+        <div class="trust-label" data-i18n="faq.certifications">Certifications</div>
+        <div class="verification-badges-compact">
+          <span class="verify-badge"><i class="fas fa-check-circle"></i> <span data-i18n="faq.verified">Verified</span></span>
+          <span class="verify-badge"><i class="fas fa-certificate"></i> <span data-i18n="faq.license">FL License</span></span>
+          <span class="verify-badge"><i class="fas fa-lock"></i> <span data-i18n="faq.ssl_secure">SSL Secure</span></span>
+        </div>
+      </div>
+
+      <div class="contact-cta">
+        <h3 data-i18n="faq.questions">Additional questions?</h3>
+        <p data-i18n="faq.questions_text">Our team responds in minutes by WhatsApp or email.</p>
+        <div class="contact-buttons">
+          <a href="https://wa.me/18327635760?text=Hi,%20I%20have%20a%20question%20about%20Villa%20Lisanna" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+            <i class="fab fa-whatsapp"></i> <span data-i18n="faq.chat_whatsapp">Chat on WhatsApp</span>
+          </a>
+          <a href="mailto:liset.garcell05@gmail.com" class="btn btn-secondary">
+            <i class="fas fa-envelope"></i> <span data-i18n="faq.send_email">Send Email</span>
+          </a>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -447,35 +603,28 @@
   <div class="container">
     <div class="footer-content">
       <div class="footer-section">
-        <h4>Villa Lissana</h4>
-        <p>Lujo privado en el paraíso</p>
+        <h4>Villa Lisanna</h4>
+        <p data-i18n="footer.luxury_retreat">Private luxury in paradise</p>
         <div class="footer-social">
           <a href="https://wa.me/18327635760" class="footer-social-link" title="WhatsApp" target="_blank" rel="noopener noreferrer">
             <i class="fab fa-whatsapp"></i>
           </a>
-          <a href="https://instagram.com" class="footer-social-link" title="Instagram" target="_blank" rel="noopener noreferrer">
-            <i class="fab fa-instagram"></i>
-          </a>
         </div>
       </div>
       <div class="footer-section">
-        <h4>Contacto</h4>
+        <h4 data-i18n="footer.contact">Contact</h4>
         <p><a href="tel:+18327635760">+1 832 763 5760</a></p>
         <p><a href="mailto:liset.garcell05@gmail.com">liset.garcell05@gmail.com</a></p>
       </div>
       <div class="footer-section">
-        <h4>Ubicación</h4>
+        <h4 data-i18n="footer.location">Location</h4>
         <p>Gasparilla Island<br>Florida, United States</p>
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2026 Villa Lissana. Todos los derechos reservados.</p>
+      <p data-i18n="footer.all_rights">© 2026 Villa Lisanna. All rights reserved. Florida Vacation License.</p>
       <div class="footer-links">
-        <a href="#" class="footer-link">Política de Privacidad</a>
-        <span class="footer-separator">•</span>
-        <a href="#" class="footer-link">Términos y Condiciones</a>
-        <span class="footer-separator">•</span>
-        <a href="#" class="footer-link">Política de Cancelación</a>
+        <p style="font-size: 13px; color: var(--text-secondary); margin: 16px 0;" data-i18n="footer.policy">Privacy policy, terms and cancellation available upon request.</p>
       </div>
     </div>
   </div>
@@ -492,73 +641,73 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="/js/language.js"></script>
 <script>
 function initializeMap() {
   const gasparillaLocation = [26.5895, -82.2597];
-  const map = L.map('map', {
-    dragging: true,
-    touchZoom: true,
-    doubleClickZoom: true,
-    scrollWheelZoom: true
-  }).setView(gasparillaLocation, 16);
+  const map = L.map('map').setView(gasparillaLocation, 13);
 
-  // Mapa satélite HD de máxima calidad
-  L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-    attribution: '© Esri, DigitalGlobe, Earthstar Geographics',
-    maxZoom: 20,
-    minZoom: 2,
-    className: 'leaflet-tile-satellite'
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
   }).addTo(map);
 
-  // Overlay de contrast suave para mejor legibilidad
-  const overlay = L.tileLayer('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgZmlsbD0iIzAwMDAwMCIgZmlsbC1vcGFjaXR5PSIwLjAyIj48cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiLz48L3N2Zz4=', {
-    opacity: 0.08,
-    maxZoom: 20,
-    minZoom: 2
-  }).addTo(map);
-
-  const marker = L.circleMarker(gasparillaLocation, {
-    radius: 16,
-    fillColor: '#D4AF37',
-    color: '#FFFFFF',
-    weight: 4,
-    opacity: 1,
-    fillOpacity: 0.95,
-    lineCap: 'round',
-    lineJoin: 'round'
-  }).addTo(map);
-
-  marker.bindTooltip('Villa Lissana — Lujo en el Paraíso', {
-    permanent: false,
-    direction: 'top',
-    offset: L.point(0, -25),
-    className: 'villa-tooltip'
-  });
-
-  const popup = L.popup({
-    closeButton: true,
-    offset: L.point(0, -30)
-  }).setLatLng(gasparillaLocation).setContent(`
-    <div style="background: rgba(15, 23, 42, 0.98); padding: 16px; border-radius: 12px; border: 1px solid #D4AF37; font-family: Inter, sans-serif; min-width: 200px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);">
-      <div style="color: #D4AF37; font-weight: 700; font-size: 16px; margin-bottom: 6px;">🏡 Villa Lissana</div>
-      <div style="color: #F1F5F9; font-size: 13px; margin-bottom: 4px;">Gasparilla Island, Florida</div>
-      <div style="color: #D4AF37; font-size: 12px; font-weight: 600;">Lujo en Paraíso Privado</div>
-    </div>
-  `);
-
-  marker.bindPopup(popup);
-  marker.openPopup();
-
-  marker.on('mouseover', function() {
-    this.setRadius(18);
-  });
-  marker.on('mouseout', function() {
-    this.setRadius(14);
-  });
+  const marker = L.marker(gasparillaLocation).addTo(map);
+  marker.bindPopup('<b>Villa Lisanna</b><br>Gasparilla Island, Florida');
 }
 
 document.addEventListener('DOMContentLoaded', initializeMap);
 </script>
+
+<!-- Floating WhatsApp Button -->
+<a href="https://wa.me/18327635760?text=Hi,%20I'm%20interested%20in%20learning%20more%20about%20Villa%20Lisanna" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Contact us on WhatsApp">
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<!-- Booking Modal -->
+<div id="bookingModal" class="modal hidden" role="dialog" aria-labelledby="bookingTitle">
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="bookingTitle" data-i18n="booking_modal.title">Confirm Your Booking</h2>
+      <button id="modalClose" class="modal-close" aria-label="Close">✕</button>
+    </div>
+    <form id="bookingForm" class="booking-form">
+      <div class="form-group">
+        <label for="bookingName" data-i18n="booking_modal.full_name">Full name</label>
+        <input type="text" id="bookingName" name="name" required placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label for="bookingEmail" data-i18n="booking_modal.email">Email</label>
+        <input type="email" id="bookingEmail" name="email" required placeholder="your@email.com">
+      </div>
+      <div class="form-group">
+        <label for="bookingPhone" data-i18n="booking_modal.phone">Phone</label>
+        <input type="tel" id="bookingPhone" name="phone" required placeholder="+1 234 567 8900">
+      </div>
+      <div class="form-group">
+        <label for="bookingCheckIn" data-i18n="booking_modal.check_in">Check-in</label>
+        <input type="text" id="bookingCheckIn" name="check_in" readonly placeholder="Select from calendar">
+      </div>
+      <div class="form-group">
+        <label for="bookingCheckOut" data-i18n="booking_modal.check_out">Check-out</label>
+        <input type="text" id="bookingCheckOut" name="check_out" readonly placeholder="Select from calendar">
+      </div>
+      <div class="form-group">
+        <label for="bookingGuests" data-i18n="booking_modal.guests">Guests</label>
+        <input type="number" id="bookingGuests" name="guests" readonly min="1" max="10">
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" id="bookingAge" name="age_confirmed" required>
+          <span data-i18n="booking_modal.age_confirm">I confirm I am 25 years old or older</span>
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" data-i18n="booking_modal.submit">Submit Booking</button>
+      <p id="bookingMessage" class="booking-message"></p>
+    </form>
+  </div>
+</div>
+
 <script src="js/app.js"></script>
 </body>
 </html>

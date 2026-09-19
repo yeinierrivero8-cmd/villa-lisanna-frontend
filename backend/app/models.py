@@ -31,15 +31,39 @@ class PricingConfig(db.Model):
     __tablename__ = 'pricing_config'
 
     id = db.Column(db.Integer, primary_key=True)
-    nightly_rate = db.Column(db.Float, nullable=False, default=400)
+
+    # Base pricing
+    nightly_rate = db.Column(db.Float, nullable=False, default=500)
+    rate_2_nights = db.Column(db.Float, nullable=False, default=495)
+    rate_3_nights = db.Column(db.Float, nullable=False, default=475)
+    rate_4plus_nights = db.Column(db.Float, nullable=False, default=450)
+
     cleaning_fee = db.Column(db.Float, nullable=False, default=295)
     damage_deposit = db.Column(db.Float, nullable=False, default=500)
     sales_tax_rate = db.Column(db.Float, nullable=False, default=0.12)
-    min_nights = db.Column(db.Integer, nullable=False, default=3)
+
+    # Restrictions
+    min_nights = db.Column(db.Integer, nullable=False, default=2)
     max_nights = db.Column(db.Integer, nullable=False, default=28)
     max_guests = db.Column(db.Integer, nullable=False, default=10)
     min_age = db.Column(db.Integer, nullable=False, default=25)
+
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'nightly_rate': self.nightly_rate,
+            'rate_2_nights': self.rate_2_nights,
+            'rate_3_nights': self.rate_3_nights,
+            'rate_4plus_nights': self.rate_4plus_nights,
+            'cleaning_fee': self.cleaning_fee,
+            'damage_deposit': self.damage_deposit,
+            'sales_tax_rate': self.sales_tax_rate,
+            'min_nights': self.min_nights,
+            'max_nights': self.max_nights,
+            'max_guests': self.max_guests,
+            'min_age': self.min_age,
+        }
 
 class BlockedDate(db.Model):
     __tablename__ = 'blocked_date'
@@ -51,6 +75,33 @@ class BlockedDate(db.Model):
 
     def __repr__(self):
         return f'<BlockedDate {self.date}>'
+
+class SeasonalOffer(db.Model):
+    __tablename__ = 'seasonal_offer'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=False)
+    start_date = db.Column(db.Date, nullable=False, index=True)
+    end_date = db.Column(db.Date, nullable=False, index=True)
+    nightly_rate = db.Column(db.Float, nullable=False)
+    discount_type = db.Column(db.String(20), default='fixed')
+    active = db.Column(db.Boolean, default=True, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<SeasonalOffer {self.name}>'
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'start_date': self.start_date.isoformat(),
+            'end_date': self.end_date.isoformat(),
+            'nightly_rate': self.nightly_rate,
+            'discount_type': self.discount_type,
+            'active': self.active
+        }
 
 class Inquiry(db.Model):
     __tablename__ = 'inquiry'

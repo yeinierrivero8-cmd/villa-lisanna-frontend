@@ -1,0 +1,22 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .nature { fill: none; stroke: #6B7F6F; stroke-width: 2; }
+    .solid { fill: #6B7F6F; }
+  </style>
+  
+  <!-- Círculo brújula -->
+  <circle cx="50" cy="50" r="35" class="nature"/>
+  
+  <!-- Pico de montaña -->
+  <path d="M 35 65 L 50 30 L 65 65" class="nature"/>
+  <line x1="50" y1="30" x2="50" y2="65" class="nature" opacity="0.3"/>
+  
+  <!-- Hoja izquierda -->
+  <ellipse cx="25" cy="55" rx="8" ry="12" class="solid" transform="rotate(-35 25 55)"/>
+  
+  <!-- Hoja derecha -->
+  <ellipse cx="75" cy="55" rx="8" ry="12" class="solid" transform="rotate(35 75 55)"/>
+  
+  <!-- Punto norte -->
+  <circle cx="50" cy="18" r="2.5" class="solid"/>
+</svg>

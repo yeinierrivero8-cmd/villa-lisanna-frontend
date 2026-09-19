@@ -1,0 +1,23 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .tub { fill: none; stroke: #5B9CA6; stroke-width: 2.5; }
+    .bubble { fill: #5B9CA6; opacity: 0.7; }
+    .steam { fill: none; stroke: #5B9CA6; stroke-width: 1.5; stroke-linecap: round; }
+  </style>
+  
+  <!-- Bañera -->
+  <ellipse cx="50" cy="60" rx="30" ry="25" class="tub"/>
+  <path d="M 20 60 Q 20 40 50 35 Q 80 40 80 60" class="tub"/>
+  
+  <!-- Burbujas dentro -->
+  <circle cx="38" cy="58" r="3" class="bubble"/>
+  <circle cx="50" cy="54" r="3" class="bubble"/>
+  <circle cx="62" cy="58" r="3" class="bubble"/>
+  <circle cx="45" cy="65" r="2.5" class="bubble"/>
+  <circle cx="55" cy="65" r="2.5" class="bubble"/>
+  
+  <!-- Vapor arriba -->
+  <path d="M 30 25 Q 32 15 30 5" class="steam"/>
+  <path d="M 50 20 Q 52 10 50 0" class="steam"/>
+  <path d="M 70 25 Q 72 15 70 5" class="steam"/>
+</svg>

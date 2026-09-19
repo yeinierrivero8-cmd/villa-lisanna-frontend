@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, render_template, redirect, url_fo
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime, date
 from app.extensions import db, login_manager
-from app.models import AdminUser, Booking, BlockedDate, PricingConfig
+from app.models import AdminUser, Booking, BlockedDate, PricingConfig, SeasonalOffer
 from app.services.stripe_service import StripeService
 from app.services.email_service import EmailService
 
@@ -236,6 +236,156 @@ def change_password():
         db.session.commit()
 
         return jsonify({'success': True, 'message': 'Password changed successfully'})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@admin.route('/pricing', methods=['GET'])
+@login_required
+def pricing_page():
+    pricing = PricingConfig.query.first()
+    return render_template('admin/pricing.html', pricing=pricing)
+
+@admin.route('/api/pricing', methods=['GET'])
+@login_required
+def get_pricing():
+    pricing = PricingConfig.query.first()
+    if not pricing:
+        return jsonify({'error': 'Pricing not configured'}), 404
+    return jsonify(pricing.to_dict())
+
+@admin.route('/api/pricing', methods=['POST'])
+@login_required
+def update_pricing():
+    try:
+        data = request.json
+        pricing = PricingConfig.query.first()
+
+        if not pricing:
+            pricing = PricingConfig()
+
+        if 'nightly_rate' in data:
+            pricing.nightly_rate = float(data['nightly_rate'])
+        if 'rate_2_nights' in data:
+            pricing.rate_2_nights = float(data['rate_2_nights'])
+        if 'rate_3_nights' in data:
+            pricing.rate_3_nights = float(data['rate_3_nights'])
+        if 'rate_4plus_nights' in data:
+            pricing.rate_4plus_nights = float(data['rate_4plus_nights'])
+        if 'cleaning_fee' in data:
+            pricing.cleaning_fee = float(data['cleaning_fee'])
+        if 'damage_deposit' in data:
+            pricing.damage_deposit = float(data['damage_deposit'])
+        if 'sales_tax_rate' in data:
+            pricing.sales_tax_rate = float(data['sales_tax_rate'])
+        if 'min_nights' in data:
+            pricing.min_nights = int(data['min_nights'])
+        if 'max_nights' in data:
+            pricing.max_nights = int(data['max_nights'])
+        if 'max_guests' in data:
+            pricing.max_guests = int(data['max_guests'])
+        if 'min_age' in data:
+            pricing.min_age = int(data['min_age'])
+
+        db.session.add(pricing)
+        db.session.commit()
+
+        return jsonify({'success': True, 'message': 'Pricing updated successfully', 'pricing': pricing.to_dict()})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@admin.route('/ofertas', methods=['GET'])
+@login_required
+def manage_offers():
+    offers = SeasonalOffer.query.order_by(SeasonalOffer.start_date).all()
+    return render_template('admin/ofertas.html', offers=offers)
+
+@admin.route('/api/ofertas', methods=['GET'])
+@login_required
+def list_offers():
+    try:
+        offers = SeasonalOffer.query.order_by(SeasonalOffer.start_date).all()
+        return jsonify({
+            'success': True,
+            'offers': [o.to_dict() for o in offers]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@admin.route('/api/ofertas', methods=['POST'])
+@login_required
+def create_offer():
+    try:
+        data = request.json
+
+        required = ['name', 'start_date', 'end_date', 'nightly_rate']
+        for field in required:
+            if not data.get(field):
+                return jsonify({'success': False, 'error': f'Campo requerido: {field}'}), 400
+
+        start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date()
+        end_date = datetime.strptime(data['end_date'], '%Y-%m-%d').date()
+
+        if start_date > end_date:
+            return jsonify({'success': False, 'error': 'La fecha inicial debe ser antes de la fecha final'}), 400
+
+        offer = SeasonalOffer(
+            name=data['name'],
+            start_date=start_date,
+            end_date=end_date,
+            nightly_rate=float(data['nightly_rate']),
+            discount_type=data.get('discount_type', 'fixed'),
+            active=data.get('active', True)
+        )
+
+        db.session.add(offer)
+        db.session.commit()
+
+        return jsonify({'success': True, 'offer': offer.to_dict()}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@admin.route('/api/ofertas/<int:offer_id>', methods=['PUT'])
+@login_required
+def update_offer(offer_id):
+    try:
+        offer = SeasonalOffer.query.get_or_404(offer_id)
+        data = request.json
+
+        if 'name' in data:
+            offer.name = data['name']
+        if 'start_date' in data:
+            offer.start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date()
+        if 'end_date' in data:
+            offer.end_date = datetime.strptime(data['end_date'], '%Y-%m-%d').date()
+        if 'nightly_rate' in data:
+            offer.nightly_rate = float(data['nightly_rate'])
+        if 'discount_type' in data:
+            offer.discount_type = data['discount_type']
+        if 'active' in data:
+            offer.active = data['active']
+
+        if offer.start_date > offer.end_date:
+            return jsonify({'success': False, 'error': 'La fecha inicial debe ser antes de la fecha final'}), 400
+
+        db.session.commit()
+
+        return jsonify({'success': True, 'offer': offer.to_dict()})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@admin.route('/api/ofertas/<int:offer_id>', methods=['DELETE'])
+@login_required
+def delete_offer(offer_id):
+    try:
+        offer = SeasonalOffer.query.get_or_404(offer_id)
+        db.session.delete(offer)
+        db.session.commit()
+
+        return jsonify({'success': True})
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500

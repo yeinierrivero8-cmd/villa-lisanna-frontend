@@ -26,11 +26,23 @@ def create_app(config_name='development'):
     def index():
         return send_from_directory(os.path.join(os.path.dirname(__file__), '../..'), 'index.html')
 
+    @app.route('/css/<path:filename>')
+    def serve_css(filename):
+        return send_from_directory(os.path.join(os.path.dirname(__file__), '../../css'), filename)
+
+    @app.route('/js/<path:filename>')
+    def serve_js(filename):
+        return send_from_directory(os.path.join(os.path.dirname(__file__), '../../js'), filename)
+
+    @app.route('/img/<path:filename>')
+    def serve_img(filename):
+        return send_from_directory(os.path.join(os.path.dirname(__file__), '../../img'), filename)
+
     return app
 
 def init_db(app):
     with app.app_context():
-        from app.models import AdminUser, PricingConfig
+        from app.models import AdminUser, PricingConfig, SeasonalOffer
         try:
             db.create_all()
 

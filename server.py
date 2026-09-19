@@ -24,7 +24,7 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
 os.chdir(DIRECTORY)
 with socketserver.TCPServer(("", PORT), MyHTTPRequestHandler) as httpd:
-    print(f"[OK] Servidor Villa Lissana activo en http://localhost:{PORT}")
+    print(f"[OK] Servidor Villa Lisanna activo en http://localhost:{PORT}")
     print(f"[DIR] Sirviendo desde: {DIRECTORY}")
     print("Presiona Ctrl+C para detener...")
     try:

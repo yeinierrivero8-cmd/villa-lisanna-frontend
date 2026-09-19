@@ -189,43 +189,40 @@
             <h3 style="margin-bottom: 20px;">Nueva Oferta</h3>
             <form id="ofertaForm">
                 <div class="form-group">
-                    <label for="titulo">Título de la Oferta *</label>
-                    <input type="text" id="titulo" name="titulo" placeholder="Ej: 20% Descuento en Reservas de 7+ Noches" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="descripcion">Descripción *</label>
-                    <textarea id="descripcion" name="descripcion" placeholder="Describe los detalles de la oferta" required></textarea>
+                    <label for="nombre">Nombre de la Oferta *</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej: Baja Temporada Oct-Nov" required>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="descuento">Descuento (%) *</label>
-                        <input type="number" id="descuento" name="descuento" min="0" max="100" placeholder="20" required>
+                        <label for="start_date">Fecha de Inicio *</label>
+                        <input type="date" id="start_date" name="start_date" required>
                     </div>
                     <div class="form-group">
-                        <label for="noches_minimas">Noches Mínimas *</label>
-                        <input type="number" id="noches_minimas" name="noches_minimas" min="1" placeholder="7" required>
+                        <label for="end_date">Fecha de Fin *</label>
+                        <input type="date" id="end_date" name="end_date" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="fecha_inicio">Fecha de Inicio *</label>
-                        <input type="date" id="fecha_inicio" name="fecha_inicio" required>
+                        <label for="nightly_rate">Precio Especial por Noche ($) *</label>
+                        <input type="number" id="nightly_rate" name="nightly_rate" min="0" placeholder="450" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label for="fecha_fin">Fecha de Fin *</label>
-                        <input type="date" id="fecha_fin" name="fecha_fin" required>
+                        <label for="discount_type">Tipo de Tarifa</label>
+                        <select id="discount_type" name="discount_type">
+                            <option value="fixed">Precio Fijo</option>
+                            <option value="percentage">Porcentaje</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="estado">Estado</label>
-                    <select id="estado" name="estado">
-                        <option value="activa">Activa</option>
-                        <option value="inactiva">Inactiva</option>
-                    </select>
+                    <label>
+                        <input type="checkbox" id="active" name="active" checked style="width: auto; margin-right: 8px;">
+                        <span>Oferta Activa</span>
+                    </label>
                 </div>
 
                 <button type="submit">💾 Crear Oferta</button>
@@ -233,7 +230,7 @@
         </div>
 
         <div class="card">
-            <h3 style="margin-bottom: 20px;">Ofertas Activas</h3>
+            <h3 style="margin-bottom: 20px;">Ofertas Creadas</h3>
             <div id="ofertasContainer">
                 <p style="color: #999;">Cargando ofertas...</p>
             </div>
@@ -249,26 +246,29 @@
             setTimeout(() => alert.style.display = 'none', 5000);
         }
 
+        function formatDate(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
         function loadOfertas() {
             fetch('/admin/api/ofertas')
                 .then(r => r.json())
                 .then(data => {
                     const container = document.getElementById('ofertasContainer');
-                    if (data.ofertas && data.ofertas.length > 0) {
-                        container.innerHTML = data.ofertas.map(oferta => `
+                    if (data.success && data.offers && data.offers.length > 0) {
+                        container.innerHTML = data.offers.map(oferta => `
                             <div class="oferta-item">
                                 <div style="display: flex; justify-content: space-between; align-items: start;">
                                     <div style="flex: 1;">
-                                        <h3>${oferta.titulo}</h3>
-                                        <p style="color: #666; margin-bottom: 8px;">${oferta.descripcion}</p>
+                                        <h3>${oferta.name}</h3>
                                         <div class="oferta-meta">
-                                            <strong>${oferta.descuento}% descuento</strong> •
-                                            Mínimo ${oferta.noches_minimas} noches •
-                                            ${oferta.fecha_inicio} al ${oferta.fecha_fin}
+                                            <strong>$${oferta.nightly_rate.toFixed(2)}/noche</strong> •
+                                            ${formatDate(oferta.start_date)} al ${formatDate(oferta.end_date)}
                                         </div>
                                     </div>
-                                    <span class="badge ${oferta.estado === 'activa' ? 'active' : 'inactive'}">
-                                        ${oferta.estado === 'activa' ? '✓ Activa' : '○ Inactiva'}
+                                    <span class="badge ${oferta.active ? 'active' : 'inactive'}">
+                                        ${oferta.active ? '✓ Activa' : '○ Inactiva'}
                                     </span>
                                 </div>
                                 <div class="oferta-actions">
@@ -306,8 +306,14 @@
         document.getElementById('ofertaForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
-            const formData = new FormData(e.target);
-            const data = Object.fromEntries(formData);
+            const data = {
+                name: document.getElementById('nombre').value,
+                start_date: document.getElementById('start_date').value,
+                end_date: document.getElementById('end_date').value,
+                nightly_rate: parseFloat(document.getElementById('nightly_rate').value),
+                discount_type: document.getElementById('discount_type').value,
+                active: document.getElementById('active').checked
+            };
 
             try {
                 const response = await fetch('/admin/api/ofertas', {
