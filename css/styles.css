@@ -2326,16 +2326,17 @@ a:focus-visible {
 
 @media (max-width: 640px) {
   .modal {
-    padding: 0;
-    align-items: flex-end;
+    padding: 16px;
+    align-items: center;
+    justify-content: center;
   }
 
   .modal-content {
     max-height: 85vh;
-    border-radius: 20px 20px 0 0;
+    border-radius: 16px;
     max-width: 100%;
     width: 100%;
-    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.15);
   }
 
   .modal-header {
