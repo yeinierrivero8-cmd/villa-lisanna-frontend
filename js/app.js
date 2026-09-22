@@ -10,13 +10,27 @@ if (infoPanelToggle && infoPanel) {
     infoPanelToggle.setAttribute('aria-expanded', !isOpen);
   });
 
-  // Cerrar el panel si se hace click fuera
+  // Cerrar el panel si se hace click fuera (desktop)
   document.addEventListener('click', (e) => {
     if (!infoPanel.contains(e.target) && e.target !== infoPanelToggle) {
       infoPanel.classList.remove('is-open');
       infoPanelToggle.setAttribute('aria-expanded', 'false');
     }
   });
+
+  // Cerrar panel al hacer scroll en móvil
+  let lastScrollY = 0;
+  window.addEventListener('scroll', () => {
+    const currentScrollY = window.scrollY;
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile && infoPanel.classList.contains('is-open') &&
+        Math.abs(currentScrollY - lastScrollY) > 10) {
+      infoPanel.classList.remove('is-open');
+      infoPanelToggle.setAttribute('aria-expanded', 'false');
+    }
+    lastScrollY = currentScrollY;
+  }, { passive: true });
 }
 
 // Guest Count Selector
@@ -28,47 +42,114 @@ if (guestSelector) {
   });
 }
 
-// Calendario Flatpickr - Configuración de disponibilidad
-if (typeof flatpickr !== 'undefined') {
-  // Fechas ocupadas (ejemplo - puedes cambiar estas fechas)
-  const occupiedDates = [
-    '2026-09-15',
-    '2026-09-16',
-    '2026-09-17',
-    '2026-09-22',
-    '2026-09-23',
-    '2026-10-05',
-    '2026-10-06',
-    '2026-10-07',
-    '2026-10-15',
-    '2026-10-16',
-  ];
+// Calendario Flatpickr - Configuración dinámica de disponibilidad (Lazy-loaded)
+function initializeFlatpickr() {
+  if (typeof flatpickr === 'undefined') {
+    console.warn('Flatpickr not loaded yet, will retry');
+    return;
+  }
 
-  flatpickr('#dateRange', {
-    mode: 'range',
-    minDate: 'today',
-    dateFormat: 'd M Y',
-    conjunctions: 'al',
-    locale: {
-      rangeSeparator: ' al ',
-      weekdays: {
-        shorthand: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
-        longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
-      },
-      months: {
-        shorthand: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
-        longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+  let occupiedDates = [];
+
+  async function loadAvailability() {
+    try {
+      const response = await fetch('/api/availability');
+      if (response.ok) {
+        const data = await response.json();
+        occupiedDates = data.unavailable_dates || [];
+        initializeCalendar();
+      } else {
+        console.warn('Could not load availability, using fallback');
+        occupiedDates = [];
+        initializeCalendar();
       }
-    },
-    disable: occupiedDates,
-    onClose: (selectedDates) => {
-      if (selectedDates.length === 2) {
-        const checkIn = selectedDates[0].toLocaleDateString('es-ES');
-        const checkOut = selectedDates[1].toLocaleDateString('es-ES');
-        console.log(`✅ Check-in: ${checkIn}, Check-out: ${checkOut}`);
-      }
+    } catch (e) {
+      console.warn('Availability load failed, using fallback');
+      occupiedDates = [];
+      initializeCalendar();
     }
-  });
+  }
+
+  function initializeCalendar() {
+    flatpickr('#dateRange', {
+      mode: 'range',
+      minDate: 'today',
+      minDays: 3,
+      dateFormat: 'd M Y',
+      conjunctions: 'al',
+      locale: {
+        rangeSeparator: ' al ',
+        weekdays: {
+          shorthand: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+          longhand: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+        },
+        months: {
+          shorthand: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+          longhand: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
+        }
+      },
+      disable: occupiedDates,
+      onClose: (selectedDates) => {
+        if (selectedDates.length === 2) {
+          const checkIn = selectedDates[0].toLocaleDateString('es-ES');
+          const checkOut = selectedDates[1].toLocaleDateString('es-ES');
+          console.log(`✅ Check-in: ${checkIn}, Check-out: ${checkOut}`);
+          updateQuotePreview(selectedDates);
+        }
+      }
+    });
+  }
+
+  async function updateQuotePreview(selectedDates) {
+    if (selectedDates.length !== 2) return;
+
+    const guestCount = document.getElementById('guestCount').value || 2;
+    const checkIn = selectedDates[0].toISOString().split('T')[0];
+    const checkOut = selectedDates[1].toISOString().split('T')[0];
+
+    try {
+      const response = await fetch('/api/quote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          check_in_date: checkIn,
+          check_out_date: checkOut,
+          guest_count: parseInt(guestCount)
+        })
+      });
+
+      if (response.ok) {
+        const quote = await response.json();
+        document.getElementById('nightsCount').textContent = quote.nights;
+        document.getElementById('subtotalPrice').textContent = `$${quote.subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('taxesPrice').textContent = `$${quote.taxes.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('totalPrice').innerHTML = `<strong>$${quote.total_amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD</strong>`;
+      }
+    } catch (e) {
+      console.log('Quote update failed, keeping manual calculation');
+    }
+  }
+
+  loadAvailability();
+}
+
+// Esperar a que Flatpickr esté disponible (lazy-loaded)
+document.addEventListener('flatpickr-ready', () => {
+  initializeFlatpickr();
+});
+
+// Inicializar Flatpickr si ya está cargado
+if (typeof flatpickr !== 'undefined') {
+  initializeFlatpickr();
+} else if (window.flatpickrLoaded !== false) {
+  // Esperar a que se cargue de forma lazy
+  const checkFlatpickr = setInterval(() => {
+    if (typeof flatpickr !== 'undefined') {
+      clearInterval(checkFlatpickr);
+      initializeFlatpickr();
+    }
+  }, 100);
+  setTimeout(() => clearInterval(checkFlatpickr), 5000); // Timeout después de 5s
 }
 
 // Header scroll effect
@@ -232,39 +313,12 @@ if (document.readyState === 'loading') {
   initAccordion();
 }
 
-// Dynamic Price Calculator
+// Dynamic Price Calculator (fallback if calendar update doesn't fire)
 function initPriceCalculator() {
   const dateRangeInput = document.getElementById('dateRange');
-  const nightsCountEl = document.getElementById('nightsCount');
-  const subtotalPriceEl = document.getElementById('subtotalPrice');
-  const taxesPriceEl = document.getElementById('taxesPrice');
-  const totalPriceEl = document.getElementById('totalPrice');
-
-  let pricing = {
-    nightly_rate: 500,
-    rate_2_nights: 495,
-    rate_3_nights: 475,
-    rate_4plus_nights: 450,
-    cleaning_fee: 295,
-    damage_deposit: 500,
-    sales_tax_rate: 0.12
-  };
-
-  // Load pricing from server
-  async function loadPricing() {
-    try {
-      const response = await fetch('/api/pricing');
-      if (response.ok) {
-        pricing = await response.json();
-      }
-    } catch (e) {
-      console.log('Using default pricing');
-    }
-  }
 
   function calculatePrices() {
     if (!dateRangeInput || !dateRangeInput.value) return;
-
     const dates = dateRangeInput.value.split(' al ');
     if (dates.length !== 2) return;
 
@@ -279,40 +333,38 @@ function initPriceCalculator() {
 
     const checkIn = parseDate(dates[0]);
     const checkOut = parseDate(dates[1]);
-
     if (!checkIn || !checkOut) return;
 
-    const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
-    if (nights <= 0) return;
+    const guestCount = document.getElementById('guestCount')?.value || 2;
+    const checkInStr = checkIn.toISOString().split('T')[0];
+    const checkOutStr = checkOut.toISOString().split('T')[0];
 
-    // Update language for flatpickr
-    if (typeof flatpickr !== 'undefined' && currentLanguage === 'es') {
-      // Update calendar labels if needed (handled by language.js)
-    }
+    fetch('/api/quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        check_in_date: checkInStr,
+        check_out_date: checkOutStr,
+        guest_count: parseInt(guestCount)
+      })
+    }).then(r => r.ok ? r.json() : null).then(quote => {
+      if (!quote) return;
+      const nightsCountEl = document.getElementById('nightsCount');
+      const subtotalPriceEl = document.getElementById('subtotalPrice');
+      const taxesPriceEl = document.getElementById('taxesPrice');
+      const totalPriceEl = document.getElementById('totalPrice');
 
-    // Select rate based on nights
-    let nightly_rate = pricing.nightly_rate;
-    if (nights === 2) nightly_rate = pricing.rate_2_nights;
-    else if (nights === 3) nightly_rate = pricing.rate_3_nights;
-    else if (nights >= 4) nightly_rate = pricing.rate_4plus_nights;
-
-    const subtotal = nightly_rate * nights;
-    const subtotalWithCleaning = subtotal + pricing.cleaning_fee;
-    const taxes = Math.round(subtotalWithCleaning * pricing.sales_tax_rate * 100) / 100;
-    const total = subtotalWithCleaning + taxes;
-
-    if (nightsCountEl) nightsCountEl.textContent = nights;
-    if (subtotalPriceEl) subtotalPriceEl.textContent = `$${subtotal.toLocaleString('en-US')}`;
-    if (taxesPriceEl) taxesPriceEl.textContent = `$${taxes.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
-    if (totalPriceEl) totalPriceEl.innerHTML = `<strong>$${total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD</strong>`;
+      if (nightsCountEl) nightsCountEl.textContent = quote.nights;
+      if (subtotalPriceEl) subtotalPriceEl.textContent = `$${quote.subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      if (taxesPriceEl) taxesPriceEl.textContent = `$${quote.taxes.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+      if (totalPriceEl) totalPriceEl.innerHTML = `<strong>$${quote.total_amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})} USD</strong>`;
+    }).catch(e => console.log('Quote calculation failed'));
   }
 
   if (dateRangeInput) {
     dateRangeInput.addEventListener('change', calculatePrices);
     dateRangeInput.addEventListener('blur', calculatePrices);
   }
-
-  loadPricing();
 }
 
 if (document.readyState === 'loading') {

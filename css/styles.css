@@ -255,18 +255,18 @@ body::before {
   z-index: 998;
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
-  transition: all 0.3s ease;
-  transform-origin: top right;
+  transition: opacity 0.3s ease, max-height 0.3s ease;
   opacity: 0;
-  transform: translateY(-8px) scaleY(0.95);
+  max-height: 0;
+  overflow: hidden;
   pointer-events: none;
-  max-height: calc(100vh - 150px);
-  overflow-y: auto;
+  will-change: opacity, max-height;
 }
 
 .info-panel.is-open {
   opacity: 1;
-  transform: translateY(0) scaleY(1);
+  max-height: calc(100vh - 150px);
+  overflow-y: auto;
   pointer-events: auto;
 }
 
@@ -281,12 +281,71 @@ body::before {
     border-radius: 0;
     border: none;
     border-bottom: 1px solid var(--border);
-    transform-origin: top;
-    box-shadow: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    pointer-events: none;
   }
 
   .info-panel.is-open {
-    transform: scaleY(1);
+    opacity: 1;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+    pointer-events: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .info-panel {
+    top: 56px;
+    max-height: calc(100vh - 100px);
+  }
+
+  .info-panel-content {
+    padding: 16px 12px;
+    gap: 16px;
+  }
+
+  .calendar-section {
+    gap: 10px;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .info-item {
+    padding: 12px;
+    gap: 6px;
+  }
+
+  .price-breakdown {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .price-row {
+    padding: 8px 0;
+    font-size: 13px;
+  }
+
+  .price-row.divider {
+    padding: 12px 0;
+    font-size: 14px;
+  }
+
+  .social-links {
+    gap: 8px;
+    padding-top: 8px;
+  }
+
+  .social-link {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
   }
 }
 
@@ -306,6 +365,15 @@ body::before {
   letter-spacing: 0.5px;
   border-radius: 6px;
   white-space: nowrap;
+  min-height: 44px;
+}
+
+@media (max-width: 1024px) {
+  .info-panel-toggle {
+    margin-right: 0;
+    padding: 10px 12px;
+    font-size: 12px;
+  }
 }
 
 .info-panel-toggle:hover {
@@ -351,6 +419,16 @@ body::before {
   font-weight: 500;
   transition: all 0.2s ease;
   font-family: 'Inter', sans-serif;
+  min-height: 44px;
+}
+
+@media (max-width: 640px) {
+  .calendar-input,
+  .guest-selector {
+    min-height: 48px;
+    padding: 12px 14px;
+    font-size: 16px;
+  }
 }
 
 .calendar-input:focus,
@@ -501,11 +579,23 @@ body::before {
   border-radius: 10px;
   border: none;
   cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-primary:hover {
   box-shadow: 0 8px 24px rgba(2, 132, 199, 0.3);
   transform: translateY(-2px);
+}
+
+@media (max-width: 640px) {
+  .btn-primary {
+    min-height: 48px;
+    font-size: 14px;
+    padding: 12px 24px;
+  }
 }
 
 .btn-full {
@@ -2237,30 +2327,38 @@ a:focus-visible {
 @media (max-width: 640px) {
   .modal {
     padding: 0;
+    align-items: flex-end;
   }
 
   .modal-content {
-    max-height: 100vh;
-    border-radius: 16px 16px 0 0;
-    margin-top: auto;
+    max-height: 85vh;
+    border-radius: 20px 20px 0 0;
     max-width: 100%;
-    width: 100vw;
-    margin-left: -50%;
-    margin-right: -50%;
-    left: 50%;
-    right: auto;
+    width: 100%;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
   }
 
   .modal-header {
-    padding: 20px;
+    padding: 16px 16px;
+    position: sticky;
+    top: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    z-index: 10;
   }
 
   .modal-header h2 {
+    font-size: 18px;
+  }
+
+  .modal-close {
+    width: 36px;
+    height: 36px;
     font-size: 20px;
   }
 
   .booking-form {
-    padding: 20px;
+    padding: 16px;
     gap: 12px;
   }
 
@@ -2270,14 +2368,15 @@ a:focus-visible {
   }
 
   .form-group label {
-    font-size: 12px;
-    margin-bottom: 0;
+    font-size: 13px;
+    margin-bottom: 4px;
   }
 
   .form-group input:not([type="checkbox"]) {
-    padding: 10px 12px;
-    font-size: 14px;
-    border-radius: 6px;
+    padding: 12px 12px;
+    font-size: 16px;
+    border-radius: 8px;
+    min-height: 48px;
   }
 
   .form-group input[type="text"],
@@ -2290,18 +2389,20 @@ a:focus-visible {
 
   .form-group label:has(input[type="checkbox"]) {
     font-size: 13px;
-    gap: 6px;
+    gap: 8px;
   }
 
   .form-group input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     flex-shrink: 0;
+    cursor: pointer;
   }
 
   .btn-full {
-    padding: 12px 16px;
+    padding: 14px 16px;
     font-size: 14px;
+    min-height: 48px;
   }
 
   .lightbox-nav,
@@ -3014,7 +3115,84 @@ a:focus-visible {
   display: none;
 }
 
+/* Check-in / Check-out Info */
+.checkin-info-section {
+  padding: 40px 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 12px;
+  margin: 40px 0;
+}
+
+.checkin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.checkin-card {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.checkin-card h3 {
+  color: #5B9CA6;
+  font-size: 18px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.checkin-card p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: #64748B;
+  margin-bottom: 12px;
+}
+
+.checkin-card strong {
+  color: #1E293B;
+  font-weight: 600;
+}
+
+.checkin-details {
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  border-left: 4px solid #5B9CA6;
+}
+
+.checkin-details h4 {
+  color: #1E293B;
+  font-size: 16px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.checkin-details ul {
+  list-style: none;
+  padding: 0;
+}
+
+.checkin-details li {
+  font-size: 14px;
+  color: #64748B;
+  padding: 10px 0;
+  border-bottom: 1px solid #E2E8F0;
+  line-height: 1.6;
+}
+
+.checkin-details li:last-child {
+  border-bottom: none;
+}
+
 @media (max-width: 768px) {
+  .checkin-grid {
+    grid-template-columns: 1fr;
+  }
+
   .gallery-carousel-btn {
     width: 40px;
     height: 40px;
