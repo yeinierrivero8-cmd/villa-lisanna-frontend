@@ -20,18 +20,31 @@ class EmailService:
             part2 = MIMEText(html_content, 'html')
             msg.attach(part2)
 
-            with smtplib.SMTP(current_app.config['SMTP_SERVER'], current_app.config['SMTP_PORT']) as server:
-                server.starttls()
-                server.login(current_app.config['SMTP_USER'], current_app.config['SMTP_PASSWORD'])
-                server.send_message(msg)
+            port = current_app.config['SMTP_PORT']
 
+            # Use SSL_SMTP for port 465, regular SMTP + STARTTLS for 587
+            if port == 465:
+                with smtplib.SMTP_SSL(current_app.config['SMTP_SERVER'], port) as server:
+                    server.login(current_app.config['SMTP_USER'], current_app.config['SMTP_PASSWORD'])
+                    server.send_message(msg)
+            else:
+                with smtplib.SMTP(current_app.config['SMTP_SERVER'], port) as server:
+                    server.starttls()
+                    server.login(current_app.config['SMTP_USER'], current_app.config['SMTP_PASSWORD'])
+                    server.send_message(msg)
+
+            print(f"[SUCCESS] Email enviado a {to_email}")
             return {'success': True}
         except Exception as e:
-            print(f"❌ Error enviando email: {str(e)}")
+            print(f"[ERROR] Error enviando email a {to_email}: {str(e)}")
             return {'success': False, 'error': str(e)}
 
     @staticmethod
     def send_booking_confirmation(booking):
+        if not current_app.config.get('SEND_GUEST_CONFIRMATION', True):
+            print(f"[INFO] Confirmación al huésped desactivada (dev mode)")
+            return {'success': True, 'skipped': True}
+
         subject = f"Solicitud de Reserva #{booking.confirmation_code} - Villa Lisanna"
 
         html_content = f"""
