@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Villa Lisanna — Luxury and Comfort in Private Paradise</title>
-  <meta name="description" content="Villa Lisanna: luxury accommodation on private island of Gasparilla Island, Florida. Heated jacuzzi, ultra-fast Starlink, 24/7 private golf cart. Perfect retreat with concierge included.">
+  <meta name="description" content="Rent Villa Lisanna luxury vacation rental on Gasparilla Island, Florida. Premium 10-guest beach house with heated jacuzzi, 100+ Mbps Starlink, private golf cart & 24/7 concierge. Ideal for holidays, events & remote work.">
+  <meta name="keywords" content="villa rental Florida, luxury vacation home, Gasparilla Island vacation rental, beach house rental, private villa rental, vacation home Florida, luxury accommodation, villa with hot tub, vacation rental with concierge">
   <meta name="theme-color" content="#F5F3F0">
   <meta property="og:title" content="Villa Lisanna — Your Luxury Escape">
   <meta property="og:description" content="Experience luxury villa with premium amenities: Starlink, Jacuzzi, Pool, Golf Cart.">
@@ -12,16 +13,88 @@
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="canonical" href="https://villalisanna.com/">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <!-- Preload critical fonts -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" as="style">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
+  <!-- Lazy-load Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="/css/styles.css">
   <style>
     .language-switcher { display: flex; gap: 8px; align-items: center; }
-    .language-switcher button { background: transparent; border: 2px solid white; color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.3s; }
+    .language-switcher button { background: #2c3e50; border: 2px solid white; color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: 600; font-size: 12px; transition: all 0.3s; }
     .language-switcher button.active { background: white; color: #2c3e50; }
     .language-switcher button:hover { transform: scale(1.05); }
   </style>
+  <!-- Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MP7BD4TSYK"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MP7BD4TSYK');
+  </script>
+  <!-- Schema Markup: LocalBusiness -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Villa Lisanna",
+    "description": "Luxury vacation rental villa on private Gasparilla Island, Florida",
+    "url": "https://www.villalisanna.com",
+    "telephone": "+1-832-763-5760",
+    "email": "liset.garcell05@gmail.com",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Gasparilla Island",
+      "addressLocality": "Boca Grande",
+      "addressRegion": "FL",
+      "postalCode": "33921",
+      "addressCountry": "US"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 26.5895,
+      "longitude": -82.2597
+    },
+    "image": "https://www.villalisanna.com/img/hero.jpg",
+    "priceRange": "$$$"
+  }
+  </script>
+  <!-- Schema Markup: VacationRental -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VacationRental",
+    "name": "Villa Lisanna",
+    "url": "https://www.villalisanna.com",
+    "description": "Luxury private villa rental with heated jacuzzi, Starlink internet, golf cart & concierge",
+    "image": "https://www.villalisanna.com/img/hero.jpg",
+    "telephone": "+1-832-763-5760",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Gasparilla Island",
+      "addressLocality": "Boca Grande",
+      "addressRegion": "FL",
+      "postalCode": "33921",
+      "addressCountry": "US"
+    },
+    "priceRange": "$500-$5000",
+    "amenityFeature": [
+      {"@type": "LocationFeatureSpecification", "name": "Heated Jacuzzi"},
+      {"@type": "LocationFeatureSpecification", "name": "Starlink 100+ Mbps"},
+      {"@type": "LocationFeatureSpecification", "name": "Private Golf Cart 24/7"},
+      {"@type": "LocationFeatureSpecification", "name": "Ocean Views"},
+      {"@type": "LocationFeatureSpecification", "name": "Beach Access"}
+    ],
+    "numberOfRooms": "3+",
+    "sleepingCapacity": 10,
+    "occupancy": "1-10 guests",
+    "petsAllowed": false,
+    "checkInTime": "16:00",
+    "checkOutTime": "11:00"
+  }
+  </script>
 </head>
 <body>
 
@@ -39,8 +112,8 @@
       <a href="#contacto" class="nav-link" data-i18n="header.nav_contacto">Contact</a>
     </nav>
     <div class="language-switcher" id="languageSwitcher">
-      <button data-lang="en" class="active">EN</button>
-      <button data-lang="es">ES</button>
+      <button class="lang-btn active" data-lang="en">🇺🇸 EN</button>
+      <button class="lang-btn" data-lang="es">🇪🇸 ES</button>
     </div>
     <button id="navToggle" class="nav-toggle" aria-label="Menu">
       <span></span><span></span><span></span>
@@ -176,6 +249,15 @@
   </div>
 </section>
 
+<!-- Limited Time Offers Banner -->
+<section id="ofertas" class="offers-section" style="background: #F5F3F0; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 16px 20px;">
+  <div class="container" style="max-width: 1200px;">
+    <div id="offersContainer" style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; align-items: center;">
+      <p style="color: #666; font-size: 13px;">Loading offers...</p>
+    </div>
+  </div>
+</section>
+
 <!-- Galería Compacta -->
 <section id="galeria" class="gallery-section-compact">
   <div class="container">
@@ -222,52 +304,6 @@
     </div>
   </div>
 </div>
-
-<!-- Testimonials -->
-<section class="testimonials-section" data-reveal>
-  <div class="container">
-    <h2 data-i18n="testimonials.title">What Our Guests Say</h2>
-    <p class="section-subtitle" data-i18n="testimonials.subtitle">Real experiences of luxury on Gasparilla Island</p>
-
-    <div class="testimonials-grid">
-      <div class="testimonial-card">
-        <div class="stars">⭐⭐⭐⭐⭐</div>
-        <p class="testimonial-text" data-i18n="testimonials.testimonial1">"Villa Lisanna exceeded all my expectations. The ocean view, Starlink worked perfectly for my remote work, and the team was incredibly attentive."</p>
-        <div class="testimonial-author">
-          <div class="avatar">MC</div>
-          <div>
-            <h4 data-i18n="testimonials.author1">María Consuelo</h4>
-            <span data-i18n="testimonials.date1">March 2026</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial-card">
-        <div class="stars">⭐⭐⭐⭐⭐</div>
-        <p class="testimonial-text" data-i18n="testimonials.testimonial2">"The jacuzzi under the stars was simply magical. The modern architecture of the villa is a work of art. We will definitely return."</p>
-        <div class="testimonial-author">
-          <div class="avatar">JP</div>
-          <div>
-            <h4 data-i18n="testimonials.author2">James Patterson</h4>
-            <span data-i18n="testimonials.date2">July 2026</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="testimonial-card">
-        <div class="stars">⭐⭐⭐⭐⭐</div>
-        <p class="testimonial-text" data-i18n="testimonials.testimonial3">"The private golf cart allowed us to explore the island with total freedom. A genuine luxury experience without pretension. Highly recommended."</p>
-        <div class="testimonial-author">
-          <div class="avatar">SL</div>
-          <div>
-            <h4 data-i18n="testimonials.author3">Sofia Lombardi</h4>
-            <span data-i18n="testimonials.date3">August 2026</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- Amenidades Premium -->
 <section id="amenidades" class="amenities-section" data-reveal>
@@ -420,8 +456,7 @@
 <!-- Tu Concierge Personal -->
 <section class="concierge-section" data-reveal>
   <div class="container">
-    <h2 data-i18n="concierge.title">Your Personal Concierge Included</h2>
-    <p class="section-subtitle" data-i18n="concierge.subtitle">Exclusive services and 24/7 attention</p>
+    <h2>Exclusive Services</h2>
 
     <div class="concierge-accordion">
       <div class="accordion-item">
@@ -518,7 +553,7 @@
           <i class="fas fa-chevron-down accordion-toggle"></i>
         </button>
         <div class="accordion-content">
-          <p data-i18n="faq.payment_a">Deposit: 50% when booking. Balance: 30 days before check-in. Damage deposit: $500 USD (refundable if no damage). We accept Visa, Mastercard, PayPal, Apple Pay and Stripe.</p>
+          <p data-i18n="faq.payment_a">Deposit: 50% when booking. Balance: 30 days before check-in. Damage deposit: $500 USD (refundable if no damage). We accept Visa and Mastercard.</p>
         </div>
       </div>
 
@@ -556,6 +591,7 @@
       </div>
     </div>
 
+
     <!-- Trust Badges + Contact CTA -->
     <div class="trust-section-faq">
       <div class="trust-badges-compact">
@@ -566,12 +602,6 @@
           </svg>
           <svg class="payment-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg">
             <rect width="48" height="32" rx="2" fill="white" stroke="#999" stroke-width="0.5"/><circle cx="16" cy="16" r="6" fill="#EB001B"/><circle cx="32" cy="16" r="6" fill="#FF5F00"/>
-          </svg>
-          <svg class="payment-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg">
-            <rect width="48" height="32" rx="2" fill="white" stroke="#999" stroke-width="0.5"/><text x="24" y="20" font-size="9" font-weight="bold" fill="#003087" text-anchor="middle">PayPal</text>
-          </svg>
-          <svg class="payment-logo" viewBox="0 0 48 32" xmlns="http://www.w3.org/2000/svg">
-            <rect width="48" height="32" rx="2" fill="#0066FF"/><text x="24" y="22" font-size="9" font-weight="bold" fill="white" text-anchor="middle">Stripe</text>
           </svg>
         </div>
         <div class="trust-label" data-i18n="faq.certifications">Certifications</div>
@@ -624,7 +654,10 @@
     <div class="footer-bottom">
       <p data-i18n="footer.all_rights">© 2026 Villa Lisanna. All rights reserved. Florida Vacation License.</p>
       <div class="footer-links">
-        <p style="font-size: 13px; color: var(--text-secondary); margin: 16px 0;" data-i18n="footer.policy">Privacy policy, terms and cancellation available upon request.</p>
+        <p style="font-size: 13px; color: var(--text-secondary); margin: 16px 0;">
+          <a href="/privacy-policy.html" style="color: #5B9CA6; text-decoration: none; margin-right: 20px;">Privacy Policy</a>
+          <a href="/terms-of-service.html" style="color: #5B9CA6; text-decoration: none;">Terms of Service</a>
+        </p>
       </div>
     </div>
   </div>
@@ -639,9 +672,206 @@
   <figcaption id="lightboxCaption" class="lightbox-caption"></figcaption>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
+<!-- Leaflet loaded immediately for map -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="/js/language.js"></script>
+<!-- Flatpickr loaded lazily when calendar is needed -->
+<script>
+  // Lazy-load Flatpickr when calendar input is focused
+  document.addEventListener('DOMContentLoaded', () => {
+    const dateRange = document.getElementById('dateRange');
+    if (dateRange && !window.flatpickrLoaded) {
+      dateRange.addEventListener('focus', () => {
+        if (!window.flatpickrLoaded) {
+          const script = document.createElement('script');
+          script.src = 'https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js';
+          script.onload = () => {
+            window.flatpickrLoaded = true;
+            // Re-trigger the calendar initialization from app.js
+            const event = new Event('flatpickr-ready');
+            document.dispatchEvent(event);
+          };
+          document.head.appendChild(script);
+        }
+      }, { once: true });
+    }
+  });
+</script>
+
+<!-- Translations Data -->
+<script>
+window.translations = {
+  "en": {
+    "header": {
+      "nav_inicio": "Home",
+      "nav_galeria": "Gallery",
+      "nav_amenidades": "Amenities",
+      "nav_ubicacion": "Location",
+      "nav_contacto": "Contact",
+      "info_reserva": "💎 INFO & BOOK"
+    },
+    "calendar": {
+      "select_dates": "Select your dates",
+      "available": "Available",
+      "occupied": "Occupied",
+      "check_in": "Check-in",
+      "check_out": "Check-out",
+      "guests": "Guests",
+      "night_rate": "Rate per night",
+      "nights_selected": "Nights selected",
+      "subtotal": "Subtotal (lodging)",
+      "cleaning": "Cleaning & services",
+      "taxes": "Taxes (12%)",
+      "total_estimated": "Total estimate",
+      "deposit_info": "Security deposit: $500 USD (refundable)",
+      "book_now": "BOOK NOW"
+    },
+    "description": {
+      "title": "Your Private Oasis Awaits",
+      "text": "Located in a privileged corner, Villa Lisanna combines architectural elegance with modern comforts. Designed for those seeking absolute disconnection without sacrificing essential luxuries: next-generation satellite connectivity, spacious spaces and breathtaking views.",
+      "capacity": "Max Capacity",
+      "bathrooms": "Premium Bathrooms",
+      "concierge": "Concierge 24/7",
+      "mbps": "Mbps Starlink"
+    },
+    "gallery": {
+      "title": "Explore Every Corner",
+      "subtitle": "Professional photography of each space",
+      "view_full": "View Full Gallery"
+    },
+    "amenities": {
+      "title": "Premium Amenities",
+      "subtitle": "Everything you need for an unforgettable experience",
+      "jacuzzi": "Heated Jacuzzi",
+      "jacuzzi_desc": "Premium heated jacuzzi with ocean views",
+      "starlink": "100+ Mbps Starlink",
+      "starlink_desc": "Ultra-fast satellite internet for seamless connectivity",
+      "golf_cart": "Private Golf Cart 24/7",
+      "golf_cart_desc": "Exclusive transport around the island",
+      "pool": "Salt Water Pool",
+      "pool_desc": "Olympic-size pool with premium filtration",
+      "kitchen": "Gourmet Kitchen",
+      "kitchen_desc": "Professional equipment for culinary enthusiasts",
+      "concierge": "Personal Concierge",
+      "concierge_desc": "Round-the-clock assistance for reservations and services"
+    },
+    "location": {
+      "title": "Gasparilla Island Paradise",
+      "subtitle": "Exclusive island retreat on Florida's Gulf Coast"
+    },
+    "contact": {
+      "title": "Get In Touch",
+      "subtitle": "We're here to help with your inquiries",
+      "name_label": "Your Name",
+      "email_label": "Your Email",
+      "phone_label": "Phone Number",
+      "message_label": "Your Message",
+      "send_button": "Send Message"
+    },
+    "booking_modal": {
+      "title": "Complete Your Reservation",
+      "full_name": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "check_in": "Check-in",
+      "check_out": "Check-out",
+      "guests": "Guests",
+      "age_confirm": "I confirm I am 25 years old or older",
+      "submit": "Submit Booking",
+      "close": "Close"
+    },
+    "offers": {
+      "title": "Seasonal Specials",
+      "subtitle": "Exclusive rates for your luxury getaway"
+    }
+  },
+  "es": {
+    "header": {
+      "nav_inicio": "Inicio",
+      "nav_galeria": "Galería",
+      "nav_amenidades": "Amenidades",
+      "nav_ubicacion": "Ubicación",
+      "nav_contacto": "Contacto",
+      "info_reserva": "💎 INFO & RESERVA"
+    },
+    "calendar": {
+      "select_dates": "Selecciona tus fechas",
+      "available": "Disponible",
+      "occupied": "Ocupado",
+      "check_in": "Entrada",
+      "check_out": "Salida",
+      "guests": "Huéspedes",
+      "night_rate": "Tarifa por noche",
+      "nights_selected": "Noches seleccionadas",
+      "subtotal": "Subtotal (alojamiento)",
+      "cleaning": "Limpieza y servicios",
+      "taxes": "Impuestos (12%)",
+      "total_estimated": "Total estimado",
+      "deposit_info": "Depósito de seguridad: $500 USD (reembolsable)",
+      "book_now": "RESERVAR AHORA"
+    },
+    "description": {
+      "title": "Tu Oasis Privado Te Espera",
+      "text": "Ubicada en una zona privilegiada, Villa Lisanna combina elegancia arquitectónica con comodidades modernas. Diseñada para aquellos que buscan una desconexión absoluta sin sacrificar lujos esenciales: conectividad satelital de nueva generación, espacios amplios y vistas impresionantes.",
+      "capacity": "Capacidad Máxima",
+      "bathrooms": "Baños Premium",
+      "concierge": "Concierge 24/7",
+      "mbps": "Mbps Starlink"
+    },
+    "gallery": {
+      "title": "Explora Cada Rincón",
+      "subtitle": "Fotografía profesional de cada espacio",
+      "view_full": "Ver Galería Completa"
+    },
+    "amenities": {
+      "title": "Amenidades Premium",
+      "subtitle": "Todo lo que necesitas para una experiencia inolvidable",
+      "jacuzzi": "Jacuzzi Climatizado",
+      "jacuzzi_desc": "Jacuzzi premium climatizado con vistas al océano",
+      "starlink": "Starlink 100+ Mbps",
+      "starlink_desc": "Internet satelital ultra rápido para conectividad fluida",
+      "golf_cart": "Golf Cart Privado 24/7",
+      "golf_cart_desc": "Transporte exclusivo alrededor de la isla",
+      "pool": "Piscina de Agua Salada",
+      "pool_desc": "Piscina de tamaño olímpico con filtración premium",
+      "kitchen": "Cocina Gourmet",
+      "kitchen_desc": "Equipamiento profesional para entusiastas culinarios",
+      "concierge": "Concierge Personal",
+      "concierge_desc": "Asistencia disponible las 24 horas para reservas y servicios"
+    },
+    "location": {
+      "title": "Paraíso de Gasparilla Island",
+      "subtitle": "Retiro exclusivo en la costa del Golfo de Florida"
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "subtitle": "Estamos aquí para ayudarte con tus consultas",
+      "name_label": "Tu Nombre",
+      "email_label": "Tu Email",
+      "phone_label": "Número de Teléfono",
+      "message_label": "Tu Mensaje",
+      "send_button": "Enviar Mensaje"
+    },
+    "booking_modal": {
+      "title": "Completa Tu Reserva",
+      "full_name": "Nombre completo",
+      "email": "Email",
+      "phone": "Teléfono",
+      "check_in": "Entrada",
+      "check_out": "Salida",
+      "guests": "Huéspedes",
+      "age_confirm": "Confirmo que tengo 25 años o más",
+      "submit": "Confirmar Reserva",
+      "close": "Cerrar"
+    },
+    "offers": {
+      "title": "Ofertas Especiales",
+      "subtitle": "Tarifas exclusivas para tu estadía de lujo"
+    }
+  }
+};
+</script>
+
+<script src="/js/i18n.js" defer></script>
 <script>
 function initializeMap() {
   const gasparillaLocation = [26.5895, -82.2597];
@@ -687,10 +917,12 @@ document.addEventListener('DOMContentLoaded', initializeMap);
       <div class="form-group">
         <label for="bookingCheckIn" data-i18n="booking_modal.check_in">Check-in</label>
         <input type="text" id="bookingCheckIn" name="check_in" readonly placeholder="Select from calendar">
+        <input type="hidden" id="bookingCheckInISO" name="check_in_iso">
       </div>
       <div class="form-group">
         <label for="bookingCheckOut" data-i18n="booking_modal.check_out">Check-out</label>
         <input type="text" id="bookingCheckOut" name="check_out" readonly placeholder="Select from calendar">
+        <input type="hidden" id="bookingCheckOutISO" name="check_out_iso">
       </div>
       <div class="form-group">
         <label for="bookingGuests" data-i18n="booking_modal.guests">Guests</label>
@@ -708,6 +940,86 @@ document.addEventListener('DOMContentLoaded', initializeMap);
   </div>
 </div>
 
-<script src="js/app.js"></script>
+<script>
+// Load and display special offers
+async function loadOffers() {
+  try {
+    const response = await fetch('/api/offers');
+    const data = await response.json();
+    const lang = window.currentLanguage || 'en';
+    const isES = lang === 'es';
+
+    const offersSection = document.getElementById('ofertas');
+    if (data.success && data.offers && data.offers.length > 0) {
+      offersSection.style.display = 'block';
+      const container = document.getElementById('offersContainer');
+      container.innerHTML = '';
+
+      data.offers.forEach(offer => {
+        const dateLocale = isES ? 'es-ES' : 'en-US';
+        const startDate = new Date(offer.start_date).toLocaleDateString(dateLocale, { month: 'short', day: 'numeric' });
+        const endDate = new Date(offer.end_date).toLocaleDateString(dateLocale, { month: 'short', day: 'numeric' });
+        const perNightText = isES ? 'por noche' : 'per night';
+        const bookText = isES ? 'RESERVAR' : 'BOOK';
+
+        const offerBadge = document.createElement('div');
+        offerBadge.style.cssText = `
+          background: white;
+          border: 1px solid #ddd;
+          color: #1a1a1a;
+          padding: 12px 20px;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          transition: all 0.3s ease;
+          cursor: pointer;
+          min-width: 320px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        `;
+
+        offerBadge.onmouseover = () => {
+          offerBadge.style.background = '#faf9f7';
+          offerBadge.style.borderColor = '#F5A623';
+          offerBadge.style.boxShadow = '0 4px 8px rgba(245, 166, 35, 0.1)';
+        };
+        offerBadge.onmouseout = () => {
+          offerBadge.style.background = 'white';
+          offerBadge.style.borderColor = '#ddd';
+          offerBadge.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+        };
+        offerBadge.onclick = () => document.getElementById('infoPanelToggle').click();
+
+        offerBadge.innerHTML = `
+          <div style="flex-shrink: 0;">
+            <div style="font-size: 28px; font-weight: 700; color: #F5A623;">$${offer.nightly_rate.toFixed(0)}</div>
+            <div style="font-size: 11px; color: #666;">${perNightText}</div>
+          </div>
+          <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px;">${offer.name}</div>
+            <div style="font-size: 11px; color: #F5A623;">✓ ${startDate} – ${endDate}</div>
+          </div>
+          <div style="flex-shrink: 0; background: #F5A623; color: white; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">${bookText}</div>
+        `;
+
+        container.appendChild(offerBadge);
+      });
+    } else {
+      offersSection.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('Error loading offers:', error);
+    const container = document.getElementById('offersContainer');
+    const lang = window.currentLanguage || 'en';
+    const errorText = lang === 'es' ? 'Error al cargar ofertas.' : 'No special offers available.';
+    container.innerHTML = `<p style="color: #666; font-size: 14px;">${errorText}</p>`;
+  }
+}
+
+// Load offers when page loads
+document.addEventListener('DOMContentLoaded', loadOffers);
+</script>
+
+<script src="js/app.js" defer></script>
 </body>
 </html>

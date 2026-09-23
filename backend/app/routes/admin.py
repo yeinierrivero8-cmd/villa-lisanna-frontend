@@ -108,6 +108,65 @@ def approve_booking(booking_id):
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@admin.route('/bookings/<int:booking_id>/deposit-link', methods=['POST'])
+@login_required
+def generate_deposit_link(booking_id):
+    try:
+        booking = Booking.query.get_or_404(booking_id)
+
+        if booking.status != 'approved':
+            return jsonify({'success': False, 'error': 'Booking is not approved'}), 400
+
+        frontend_url = current_app.config.get('FRONTEND_URL', 'http://localhost:3000')
+        return_url = f"{frontend_url}/booking/{booking.confirmation_code}"
+
+        result = StripeService.create_deposit_checkout(booking, return_url)
+
+        if result['success']:
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'checkout_url': result['url'],
+                'session_id': result['session_id']
+            })
+        else:
+            return jsonify({'success': False, 'error': result['error']}), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@admin.route('/bookings/<int:booking_id>/balance-link', methods=['POST'])
+@login_required
+def generate_balance_link(booking_id):
+    try:
+        booking = Booking.query.get_or_404(booking_id)
+
+        if booking.status not in ['confirmed', 'approved']:
+            return jsonify({'success': False, 'error': 'Booking is not eligible for balance payment'}), 400
+
+        if booking.balance_paid:
+            return jsonify({'success': False, 'error': 'Balance already paid'}), 400
+
+        frontend_url = current_app.config.get('FRONTEND_URL', 'http://localhost:3000')
+        return_url = f"{frontend_url}/booking/{booking.confirmation_code}"
+
+        result = StripeService.create_balance_checkout(booking, return_url)
+
+        if result['success']:
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'checkout_url': result['url'],
+                'session_id': result['session_id']
+            })
+        else:
+            return jsonify({'success': False, 'error': result['error']}), 400
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @admin.route('/bookings/<int:booking_id>/reject', methods=['POST'])
 @login_required
 def reject_booking(booking_id):

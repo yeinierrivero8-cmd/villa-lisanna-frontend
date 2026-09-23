@@ -1,12 +1,29 @@
 from flask import Blueprint, request, jsonify, current_app
 from datetime import datetime, date, timedelta
 from app.extensions import db
-from app.models import Booking, BlockedDate, Inquiry, PricingConfig
+from app.models import Booking, BlockedDate, Inquiry, PricingConfig, SeasonalOffer
 from app.services.pricing import PricingService
 from app.services.email_service import EmailService
 from app.services.stripe_service import StripeService
 
 api = Blueprint('api', __name__, url_prefix='/api')
+
+@api.route('/offers', methods=['GET'])
+def get_active_offers():
+    try:
+        today = date.today()
+        offers = SeasonalOffer.query.filter(
+            SeasonalOffer.active == True,
+            SeasonalOffer.start_date <= today,
+            SeasonalOffer.end_date >= today
+        ).all()
+
+        return jsonify({
+            'success': True,
+            'offers': [o.to_dict() for o in offers]
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @api.route('/availability', methods=['GET'])
 def get_availability():
@@ -35,9 +52,12 @@ def get_availability():
 def get_quote():
     try:
         data = request.json
-        check_in = data.get('check_in')
-        check_out = data.get('check_out')
+        check_in = data.get('check_in') or data.get('check_in_date')
+        check_out = data.get('check_out') or data.get('check_out_date')
         guest_count = int(data.get('guest_count', 1))
+
+        if not check_in or not check_out:
+            return jsonify({'success': False, 'error': 'Missing check_in_date or check_out_date'}), 400
 
         quote = PricingService.calculate_quote(check_in, check_out, guest_count)
 
@@ -46,7 +66,7 @@ def get_quote():
 
         return jsonify({
             'success': True,
-            'quote': quote
+            **quote
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -55,14 +75,24 @@ def get_quote():
 def create_booking():
     try:
         data = request.json
+        print(f"[DEBUG] Received booking data: {data}")
 
-        required_fields = ['guest_name', 'guest_email', 'guest_phone', 'check_in', 'check_out', 'guest_count']
+        required_fields = ['guest_name', 'guest_email', 'guest_phone', 'guest_count']
         for field in required_fields:
             if not data.get(field):
+                print(f"[ERROR] Missing required field: {field}")
                 return jsonify({'success': False, 'error': f'Campo requerido: {field}'}), 400
 
-        check_in = datetime.strptime(data['check_in'], '%Y-%m-%d').date()
-        check_out = datetime.strptime(data['check_out'], '%Y-%m-%d').date()
+        check_in_str = data.get('check_in') or data.get('check_in_date')
+        check_out_str = data.get('check_out') or data.get('check_out_date')
+        print(f"[DEBUG] check_in_str={check_in_str}, check_out_str={check_out_str}")
+
+        if not check_in_str or not check_out_str:
+            print(f"[ERROR] Missing dates: check_in_str={check_in_str}, check_out_str={check_out_str}")
+            return jsonify({'success': False, 'error': 'Campo requerido: check_in_date or check_out_date'}), 400
+
+        check_in = datetime.strptime(check_in_str, '%Y-%m-%d').date()
+        check_out = datetime.strptime(check_out_str, '%Y-%m-%d').date()
         guest_count = int(data['guest_count'])
 
         quote = PricingService.calculate_quote(check_in, check_out, guest_count)
@@ -92,8 +122,28 @@ def create_booking():
         db.session.add(booking)
         db.session.commit()
 
-        EmailService.send_booking_confirmation(booking)
-        EmailService.send_admin_notification(booking)
+        try:
+            EmailService.send_booking_confirmation(booking)
+        except Exception as email_err:
+            print(f"[ERROR] send_booking_confirmation failed: {str(email_err)}")
+
+        try:
+            EmailService.send_admin_notification(booking)
+        except Exception as email_err:
+            print(f"[ERROR] send_admin_notification failed: {str(email_err)}")
+
+        checkout_url = None
+        try:
+            return_url = request.host_url.rstrip('/') + '/booking-success'
+            stripe_result = StripeService.create_deposit_checkout(booking, return_url)
+            if stripe_result['success']:
+                checkout_url = stripe_result['url']
+                db.session.commit()
+                print(f"[SUCCESS] Stripe checkout created: {checkout_url}")
+            else:
+                print(f"[ERROR] Stripe checkout failed: {stripe_result.get('error')}")
+        except Exception as stripe_err:
+            print(f"[ERROR] create_deposit_checkout failed: {str(stripe_err)}")
 
         return jsonify({
             'success': True,
@@ -101,11 +151,50 @@ def create_booking():
                 'id': booking.id,
                 'confirmation_code': booking.confirmation_code,
                 'status': booking.status
-            }
+            },
+            'checkout_url': checkout_url
         }), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@api.route('/booking-success', methods=['GET'])
+def booking_success():
+    from flask import render_template_string
+
+    session_id = request.args.get('session')
+    status = request.args.get('status')
+
+    if not session_id or status != 'success':
+        return '<h1>Invalid session</h1>', 400
+
+    try:
+        stripe_result = StripeService.retrieve_session(session_id)
+        if not stripe_result['success']:
+            return '<h1>Session not found</h1>', 404
+
+        session = stripe_result['session']
+        booking = Booking.query.get(int(session.metadata.get('booking_id')))
+
+        if not booking:
+            return '<h1>Booking not found</h1>', 404
+
+        if session.payment_status == 'paid':
+            booking.deposit_paid = True
+            booking.status = 'confirmed'
+            db.session.commit()
+            print(f"[SUCCESS] Booking {booking.id} marked as confirmed")
+
+        html = f'''<html><body style="font-family: Arial; text-align: center; padding: 50px;">
+        <h1>✅ Reserva Confirmada</h1>
+        <p>¡Gracias por tu pago!</p>
+        <p>Código: <strong>{booking.confirmation_code}</strong></p>
+        <p><a href="/">Volver</a></p>
+        </body></html>'''
+        return html
+    except Exception as e:
+        print(f"[ERROR] booking_success: {str(e)}")
+        return f'<h1>Error: {str(e)}</h1>', 500
 
 @api.route('/bookings/<code>/status', methods=['GET'])
 def get_booking_status(code):

@@ -1,0 +1,162 @@
+{
+  "en": {
+    "header": {
+      "nav_inicio": "Home",
+      "nav_galeria": "Gallery",
+      "nav_amenidades": "Amenities",
+      "nav_ubicacion": "Location",
+      "nav_contacto": "Contact",
+      "info_reserva": "💎 INFO & BOOK"
+    },
+    "calendar": {
+      "select_dates": "Select your dates",
+      "available": "Available",
+      "occupied": "Occupied",
+      "check_in": "Check-in",
+      "check_out": "Check-out",
+      "guests": "Guests",
+      "night_rate": "Rate per night",
+      "nights_selected": "Nights selected",
+      "subtotal": "Subtotal (lodging)",
+      "cleaning": "Cleaning & services",
+      "taxes": "Taxes (12%)",
+      "total_estimated": "Total estimate",
+      "deposit_info": "Security deposit: $500 USD (refundable)",
+      "book_now": "BOOK NOW"
+    },
+    "description": {
+      "title": "Your Private Oasis Awaits",
+      "text": "Located in a privileged corner, Villa Lisanna combines architectural elegance with modern comforts. Designed for those seeking absolute disconnection without sacrificing essential luxuries: next-generation satellite connectivity, spacious spaces and breathtaking views.",
+      "capacity": "Max Capacity",
+      "bathrooms": "Premium Bathrooms",
+      "concierge": "Concierge 24/7",
+      "mbps": "Mbps Starlink"
+    },
+    "gallery": {
+      "title": "Explore Every Corner",
+      "subtitle": "Professional photography of each space",
+      "view_full": "View Full Gallery"
+    },
+    "amenities": {
+      "title": "Premium Amenities",
+      "subtitle": "Everything you need for an unforgettable experience",
+      "jacuzzi": "Heated Jacuzzi",
+      "jacuzzi_desc": "Premium heated jacuzzi with ocean views",
+      "starlink": "100+ Mbps Starlink",
+      "starlink_desc": "Ultra-fast satellite internet for seamless connectivity",
+      "golf_cart": "Private Golf Cart 24/7",
+      "golf_cart_desc": "Exclusive transport around the island",
+      "pool": "Salt Water Pool",
+      "pool_desc": "Olympic-size pool with premium filtration",
+      "kitchen": "Gourmet Kitchen",
+      "kitchen_desc": "Professional equipment for culinary enthusiasts",
+      "concierge": "Personal Concierge",
+      "concierge_desc": "Round-the-clock assistance for reservations and services"
+    },
+    "location": {
+      "title": "Gasparilla Island Paradise",
+      "subtitle": "Exclusive island retreat on Florida's Gulf Coast"
+    },
+    "contact": {
+      "title": "Get In Touch",
+      "subtitle": "We're here to help with your inquiries",
+      "name_label": "Your Name",
+      "email_label": "Your Email",
+      "phone_label": "Phone Number",
+      "message_label": "Your Message",
+      "send_button": "Send Message"
+    },
+    "booking_modal": {
+      "title": "Complete Your Reservation",
+      "full_name": "Full name",
+      "email": "Email",
+      "phone": "Phone",
+      "check_in": "Check-in",
+      "check_out": "Check-out",
+      "guests": "Guests",
+      "age_confirm": "I confirm I am 25 years old or older",
+      "submit": "Submit Booking",
+      "close": "Close"
+    }
+  },
+  "es": {
+    "header": {
+      "nav_inicio": "Inicio",
+      "nav_galeria": "Galería",
+      "nav_amenidades": "Amenidades",
+      "nav_ubicacion": "Ubicación",
+      "nav_contacto": "Contacto",
+      "info_reserva": "💎 INFO & RESERVA"
+    },
+    "calendar": {
+      "select_dates": "Selecciona tus fechas",
+      "available": "Disponible",
+      "occupied": "Ocupado",
+      "check_in": "Entrada",
+      "check_out": "Salida",
+      "guests": "Huéspedes",
+      "night_rate": "Tarifa por noche",
+      "nights_selected": "Noches seleccionadas",
+      "subtotal": "Subtotal (alojamiento)",
+      "cleaning": "Limpieza y servicios",
+      "taxes": "Impuestos (12%)",
+      "total_estimated": "Total estimado",
+      "deposit_info": "Depósito de seguridad: $500 USD (reembolsable)",
+      "book_now": "RESERVAR AHORA"
+    },
+    "description": {
+      "title": "Tu Oasis Privado Te Espera",
+      "text": "Ubicada en una zona privilegiada, Villa Lisanna combina elegancia arquitectónica con comodidades modernas. Diseñada para aquellos que buscan una desconexión absoluta sin sacrificar lujos esenciales: conectividad satelital de nueva generación, espacios amplios y vistas impresionantes.",
+      "capacity": "Capacidad Máxima",
+      "bathrooms": "Baños Premium",
+      "concierge": "Concierge 24/7",
+      "mbps": "Mbps Starlink"
+    },
+    "gallery": {
+      "title": "Explora Cada Rincón",
+      "subtitle": "Fotografía profesional de cada espacio",
+      "view_full": "Ver Galería Completa"
+    },
+    "amenities": {
+      "title": "Amenidades Premium",
+      "subtitle": "Todo lo que necesitas para una experiencia inolvidable",
+      "jacuzzi": "Jacuzzi Climatizado",
+      "jacuzzi_desc": "Jacuzzi premium climatizado con vistas al océano",
+      "starlink": "Starlink 100+ Mbps",
+      "starlink_desc": "Internet satelital ultra rápido para conectividad fluida",
+      "golf_cart": "Golf Cart Privado 24/7",
+      "golf_cart_desc": "Transporte exclusivo alrededor de la isla",
+      "pool": "Piscina de Agua Salada",
+      "pool_desc": "Piscina de tamaño olímpico con filtración premium",
+      "kitchen": "Cocina Gourmet",
+      "kitchen_desc": "Equipamiento profesional para entusiastas culinarios",
+      "concierge": "Concierge Personal",
+      "concierge_desc": "Asistencia disponible las 24 horas para reservas y servicios"
+    },
+    "location": {
+      "title": "Paraíso de Gasparilla Island",
+      "subtitle": "Retiro exclusivo en la costa del Golfo de Florida"
+    },
+    "contact": {
+      "title": "Contáctanos",
+      "subtitle": "Estamos aquí para ayudarte con tus consultas",
+      "name_label": "Tu Nombre",
+      "email_label": "Tu Email",
+      "phone_label": "Número de Teléfono",
+      "message_label": "Tu Mensaje",
+      "send_button": "Enviar Mensaje"
+    },
+    "booking_modal": {
+      "title": "Completa Tu Reserva",
+      "full_name": "Nombre completo",
+      "email": "Email",
+      "phone": "Teléfono",
+      "check_in": "Entrada",
+      "check_out": "Salida",
+      "guests": "Huéspedes",
+      "age_confirm": "Confirmo que tengo 25 años o más",
+      "submit": "Confirmar Reserva",
+      "close": "Cerrar"
+    }
+  }
+}

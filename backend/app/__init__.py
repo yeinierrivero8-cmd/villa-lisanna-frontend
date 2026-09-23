@@ -55,12 +55,12 @@ def init_db(app):
                 admin.set_password('admin123')
                 db.session.add(admin)
                 db.session.commit()
-                print("✅ Admin user created: admin@villalisanna.com / admin123")
+                print("[OK] Admin user created: admin@villalisanna.com / admin123")
 
             if PricingConfig.query.count() == 0:
                 config_obj = PricingConfig()
                 db.session.add(config_obj)
                 db.session.commit()
-                print("✅ Pricing config initialized")
+                print("[OK] Pricing config initialized")
         except Exception as e:
-            print(f"⚠️  DB init warning: {str(e)}")
+            print(f"[WARNING] DB init warning: {str(e)}")

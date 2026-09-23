@@ -85,6 +85,7 @@
             <a href="/admin/bookings">Reservas</a>
             <a href="/admin/pricing">Precios</a>
             <a href="/admin/calendar">Calendario</a>
+            <a href="/admin/ofertas">Ofertas</a>
             <a href="/admin/logout" onclick="event.preventDefault(); fetch('/admin/logout', {method: 'POST'}).then(() => location.href='/admin/login')">Logout</a>
         </div>
     </nav>
@@ -152,17 +153,55 @@
                     <div class="detail-value">${{ "%.2f"|format(booking.taxes) }}</div>
                 </div>
                 <div class="detail-item">
+                    <div class="detail-label">Damage Deposit (Reembolsable)</div>
+                    <div class="detail-value">${{ "%.2f"|format(booking.damage_deposit) }}</div>
+                </div>
+                <div class="detail-item">
                     <div class="detail-label">Total</div>
                     <div class="detail-value" style="color: #667eea;">${{ "%.2f"|format(booking.total_amount) }}</div>
                 </div>
             </div>
         </div>
 
+        <div class="detail-card">
+            <h2>Pagos (Stripe)</h2>
+            <div class="detail-grid">
+                {% set deposit_color = '#27ae60' if booking.deposit_paid else '#e74c3c' %}
+                <div class="detail-item" style="border-left: 4px solid {{ deposit_color }};">
+                    <div class="detail-label">Depósito (50%)</div>
+                    <div class="detail-value">${{ "%.2f"|format(booking.deposit_amount) }}</div>
+                    <div class="detail-label" style="margin-top: 10px; color: {{ deposit_color }};">
+                        {% if booking.deposit_paid %}✅ PAGADO{% else %}⏳ PENDIENTE{% endif %}
+                    </div>
+                </div>
+                {% set balance_color = '#27ae60' if booking.balance_paid else '#999' %}
+                <div class="detail-item" style="border-left: 4px solid {{ balance_color }};">
+                    <div class="detail-label">Saldo (50%)</div>
+                    <div class="detail-value">${{ "%.2f"|format(booking.balance_amount) }}</div>
+                    <div class="detail-label" style="margin-top: 10px; color: {{ balance_color }};">
+                        {% if booking.balance_paid %}✅ PAGADO{% elif booking.status == 'completed' %}🔔 PRÓXIMO{% else %}⏳ PENDIENTE{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
         {% if booking.status == 'pending' %}
         <div class="detail-card">
-            <h2>Acciones</h2>
+            <h2>Acciones Disponibles</h2>
             <button onclick="approveBooking()">✅ Aprobar Reserva</button>
             <button class="danger" onclick="rejectBooking()">❌ Rechazar Reserva</button>
+        </div>
+        {% elif booking.status == 'approved' and not booking.deposit_paid %}
+        <div class="detail-card">
+            <h2>Generar Link de Pago</h2>
+            <p style="margin-bottom: 15px; color: #666;">Envía este link al cliente para cobrar el depósito</p>
+            <button onclick="generateDepositLink()">💳 Generar Link de Depósito</button>
+        </div>
+        {% elif booking.status == 'confirmed' and not booking.balance_paid %}
+        <div class="detail-card">
+            <h2>Generar Link de Pago - Saldo</h2>
+            <p style="margin-bottom: 15px; color: #666;">El cliente debe pagar el saldo 30 días antes del check-in</p>
+            <button onclick="generateBalanceLink()">💳 Generar Link de Saldo</button>
         </div>
         {% endif %}
     </div>
@@ -196,6 +235,49 @@
                     }
                 });
             }
+        }
+
+        function generateDepositLink() {
+            const depositAmount = {{ booking.deposit_amount|safe }};
+            fetch('/admin/bookings/{{ booking.id }}/deposit-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(r => r.json()).then(d => {
+                if (d.success) {
+                    const link = d.checkout_url;
+                    const text = `Link de Pago Depósito - Villa Lisanna\n\nMonto: $${depositAmount.toFixed(2)}\n\nLink: ${link}\n\nCopia y envía este link al cliente para pagar el depósito.`;
+
+                    // Copiar al clipboard
+                    navigator.clipboard.writeText(link).then(() => {
+                        alert('Link de pago copiado al clipboard!\n\n' + text);
+                    }).catch(() => {
+                        alert(text);
+                    });
+                } else {
+                    alert('Error: ' + d.error);
+                }
+            });
+        }
+
+        function generateBalanceLink() {
+            const balanceAmount = {{ booking.balance_amount|safe }};
+            fetch('/admin/bookings/{{ booking.id }}/balance-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            }).then(r => r.json()).then(d => {
+                if (d.success) {
+                    const link = d.checkout_url;
+                    const text = `Link de Pago Saldo - Villa Lisanna\n\nMonto: $${balanceAmount.toFixed(2)}\n\nLink: ${link}\n\nCopia y envía este link al cliente para pagar el saldo.`;
+
+                    navigator.clipboard.writeText(link).then(() => {
+                        alert('Link de saldo copiado al clipboard!\n\n' + text);
+                    }).catch(() => {
+                        alert(text);
+                    });
+                } else {
+                    alert('Error: ' + d.error);
+                }
+            });
         }
     </script>
 </body>

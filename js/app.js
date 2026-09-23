@@ -1,3 +1,6 @@
+// API Base URL Configuration
+const API_BASE_URL = 'https://188.245.80.35';
+
 // Info Panel Toggle
 const infoPanelToggle = document.getElementById('infoPanelToggle');
 const infoPanel = document.getElementById('infoPanel');
@@ -53,7 +56,7 @@ function initializeFlatpickr() {
 
   async function loadAvailability() {
     try {
-      const response = await fetch('/api/availability');
+      const response = await fetch(API_BASE_URL + '/api/availability');
       if (response.ok) {
         const data = await response.json();
         occupiedDates = data.unavailable_dates || [];
@@ -108,7 +111,7 @@ function initializeFlatpickr() {
     const checkOut = selectedDates[1].toISOString().split('T')[0];
 
     try {
-      const response = await fetch('/api/quote', {
+      const response = await fetch(API_BASE_URL + '/api/quote', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -496,9 +499,51 @@ function openBookingModal() {
   const checkIn = dates[0].trim();
   const checkOut = dates[1].trim();
 
+  // Store display dates
   document.getElementById('bookingCheckIn').value = checkIn;
   document.getElementById('bookingCheckOut').value = checkOut;
   document.getElementById('bookingGuests').value = guestCount;
+
+  // Parse and store ISO dates for API
+  // Handle multiple formats: "22/9/2026", "22 Sep 2026", "22 de septiembre de 2026"
+  const parseESDate = (dateStr) => {
+    const cleanStr = dateStr.trim();
+
+    // Try format: day/month/year (22/9/2026)
+    const slashParts = cleanStr.split('/');
+    if (slashParts.length === 3) {
+      const day = slashParts[0];
+      const month = slashParts[1];
+      const year = slashParts[2];
+      return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+
+    // Try format: day Mon year (25 Sep 2026)
+    const spaceParts = cleanStr.split(' ');
+    if (spaceParts.length === 3 && spaceParts[2].length === 4) {
+      const day = spaceParts[0];
+      const monthStr = spaceParts[1];
+      const year = spaceParts[2];
+      const monthMap = {
+        'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
+        'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12',
+        'Ene': '01', 'Feb': '02', 'Mar': '03', 'Abr': '04', 'May': '05', 'Jun': '06',
+        'Jul': '07', 'Ago': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dic': '12'
+      };
+      const month = monthMap[monthStr];
+      if (month) {
+        return `${year}-${month}-${String(day).padStart(2, '0')}`;
+      }
+    }
+
+    return '';
+  };
+
+  const checkInISO = parseESDate(checkIn);
+  const checkOutISO = parseESDate(checkOut);
+
+  document.getElementById('bookingCheckInISO').value = checkInISO;
+  document.getElementById('bookingCheckOutISO').value = checkOutISO;
 
   bookingModal.classList.remove('hidden');
 }
@@ -551,21 +596,29 @@ if (bookingForm) {
       submitBtn.disabled = true;
       submitBtn.textContent = '⏳ Sending...';
 
-      // Convert dates to YYYY-MM-DD format if needed
-      let checkInDate = checkIn;
-      let checkOutDate = checkOut;
+      // Use ISO dates from hidden fields
+      let checkInDate = document.getElementById('bookingCheckInISO').value;
+      let checkOutDate = document.getElementById('bookingCheckOutISO').value;
 
-      // Parse dates in case they're in d M Y format
-      if (!checkInDate.includes('-')) {
-        const dateObj = new Date(checkInDate);
-        checkInDate = dateObj.toISOString().split('T')[0];
-      }
-      if (!checkOutDate.includes('-')) {
-        const dateObj = new Date(checkOutDate);
-        checkOutDate = dateObj.toISOString().split('T')[0];
+      // Fallback: parse from display dates if ISO fields are empty
+      if (!checkInDate || !checkOutDate) {
+        console.warn('ISO dates not found, parsing from display dates');
+        const parseESDate = (dateStr) => {
+          const cleanStr = dateStr.replace(/\s+de\s+/g, ' ').trim();
+          const parts = cleanStr.split('/');
+          if (parts.length === 3) {
+            const day = parts[0];
+            const month = parts[1];
+            const year = parts[2];
+            return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          }
+          return '';
+        };
+        checkInDate = checkInDate || parseESDate(checkIn);
+        checkOutDate = checkOutDate || parseESDate(checkOut);
       }
 
-      const response = await fetch('/api/bookings', {
+      const response = await fetch(API_BASE_URL + '/api/bookings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -584,12 +637,21 @@ if (bookingForm) {
       const data = await response.json();
 
       if (response.ok) {
-        bookingMessage.textContent = '✅ Booking sent! We will contact you soon.';
-        bookingMessage.classList.remove('error');
-        bookingMessage.classList.add('success');
-        setTimeout(() => {
-          closeBookingModal();
-        }, 2000);
+        if (data.checkout_url) {
+          bookingMessage.textContent = '✅ Redirecting to payment...';
+          bookingMessage.classList.remove('error');
+          bookingMessage.classList.add('success');
+          setTimeout(() => {
+            window.location.href = data.checkout_url;
+          }, 1000);
+        } else {
+          bookingMessage.textContent = '✅ Booking sent! We will contact you soon.';
+          bookingMessage.classList.remove('error');
+          bookingMessage.classList.add('success');
+          setTimeout(() => {
+            closeBookingModal();
+          }, 2000);
+        }
       } else {
         bookingMessage.textContent = `❌ ${data.error || 'Error sending booking'}`;
         bookingMessage.classList.add('error');

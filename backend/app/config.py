@@ -3,8 +3,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Usar ruta absoluta fija (Windows)
-instance_path = os.path.abspath(r'E:\web de villa lisanna\backend\instance')
+# Usar ruta absoluta fija (Windows) - Temporal: C:\ para estabilidad de SQLite
+# TODO: Cambiar de vuelta a E:\ cuando se resuelva el problema de I/O en discos externos
+instance_path = os.path.abspath(r'C:\Users\yeini\.villa_lisanna_tmp')
 os.makedirs(instance_path, exist_ok=True)
 
 # Crear archivo de BD
@@ -33,9 +34,9 @@ class Config:
 
     VILLA_OWNER_EMAIL = os.getenv('VILLA_OWNER_EMAIL', 'liset@villalisanna.com')
     VILLA_OWNER_NAME = os.getenv('VILLA_OWNER_NAME', 'Liset')
-    NIGHTLY_RATE = float(os.getenv('NIGHTLY_RATE', 400))
-    CLEANING_FEE = float(os.getenv('CLEANING_FEE', 295))
-    DAMAGE_DEPOSIT = float(os.getenv('DAMAGE_DEPOSIT', 500))
+    NIGHTLY_RATE = float(os.getenv('NIGHTLY_RATE', 5))
+    CLEANING_FEE = float(os.getenv('CLEANING_FEE', 0))
+    DAMAGE_DEPOSIT = float(os.getenv('DAMAGE_DEPOSIT', 0))
     SALES_TAX_RATE = float(os.getenv('SALES_TAX_RATE', 0.12))
     MIN_NIGHTS = int(os.getenv('MIN_NIGHTS', 3))
     MAX_NIGHTS = int(os.getenv('MAX_NIGHTS', 28))

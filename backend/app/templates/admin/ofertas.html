@@ -1,318 +1,164 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ofertas Especiales - Admin Villa Lisanna</title>
+    <title>Gestionar Ofertas - Villa Lisanna Admin</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-        }
-        nav {
-            background: #2c3e50;
-            color: white;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: #f5f5f5; }
+        nav { background: #2c3e50; color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; }
         nav h1 { font-size: 22px; }
-        nav a {
-            color: white;
-            text-decoration: none;
-            margin-left: 30px;
-        }
+        nav a { color: white; text-decoration: none; margin-left: 30px; }
         nav a:hover { color: #00E5FF; }
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-        h2 {
-            margin-bottom: 10px;
-            color: #333;
-        }
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        .card {
-            background: white;
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 30px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-            font-family: inherit;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        button {
-            background: #667eea;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s;
-        }
-        button:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-        }
-        .alert {
-            padding: 15px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .alert.success {
-            background: #d1e7dd;
-            color: #0a3622;
-            border: 1px solid #badbcc;
-        }
-        .alert.error {
-            background: #f8d7da;
-            color: #842029;
-            border: 1px solid #f5c2c7;
-        }
-        .oferta-item {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-            border-left: 4px solid #667eea;
-        }
-        .oferta-item h3 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 18px;
-        }
-        .oferta-meta {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        .oferta-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        .btn-secondary {
-            background: #6c757d;
-            padding: 8px 16px;
-            font-size: 13px;
-        }
-        .btn-secondary:hover {
-            background: #5a6268;
-        }
-        .btn-danger {
-            background: #e74c3c;
-            padding: 8px 16px;
-            font-size: 13px;
-        }
-        .btn-danger:hover {
-            background: #c0392b;
-        }
-        .badge {
-            display: inline-block;
-            background: #667eea;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-        .badge.active {
-            background: #27ae60;
-        }
-        .badge.inactive {
-            background: #95a5a6;
-        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        h2 { margin-bottom: 10px; color: #333; }
+        .subtitle { color: #666; margin-bottom: 30px; font-size: 14px; }
+        .form-card { background: white; padding: 30px; margin-bottom: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        .form-section h3 { font-size: 16px; color: #5B9CA6; margin-bottom: 15px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn { padding: 12px 24px; background: #5B9CA6; color: white; border: none; cursor: pointer; border-radius: 4px; margin-right: 10px; }
+        .btn:hover { background: #4a8a94; }
+        .btn.danger { background: #e74c3c; }
+        .btn.danger:hover { background: #c0392b; }
+        .alert { padding: 15px; margin-bottom: 20px; display: none; border-radius: 4px; }
+        .alert.success { background: #d1fae5; color: #065f46; display: block; }
+        .alert.error { background: #fee2e2; color: #991b1b; display: block; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #2c3e50; color: white; padding: 15px; text-align: left; font-weight: 600; }
+        td { padding: 15px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f9f9f9; }
+        .status { display: inline-block; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .status.active { background: #d1e7dd; color: #0a3622; }
+        .status.inactive { background: #f8d7da; color: #842029; }
+        .empty { background: white; padding: 40px; text-align: center; border-radius: 8px; color: #999; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        .action-buttons { display: flex; gap: 8px; }
     </style>
 </head>
 <body>
     <nav>
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <img src="/static/images/villa-lisanna-logo.png" alt="Villa Lisanna" style="height: 45px; width: auto;">
-            <h1 style="margin: 0;">Villa Lisanna Admin</h1>
-        </div>
+        <h1>🎁 Gestionar Ofertas</h1>
         <div>
-            <a href="/admin/dashboard">Dashboard</a>
             <a href="/admin/bookings">Reservas</a>
             <a href="/admin/pricing">Precios</a>
-            <a href="/admin/ofertas">Ofertas</a>
             <a href="/admin/calendar">Calendario</a>
+            <a href="/admin/ofertas">Ofertas</a>
             <a href="/admin/logout" onclick="event.preventDefault(); fetch('/admin/logout', {method: 'POST'}).then(() => location.href='/admin/login')">Logout</a>
         </div>
     </nav>
 
     <div class="container">
-        <h2>Ofertas Especiales</h2>
-        <p class="subtitle">Crea y gestiona las ofertas promocionales del sitio</p>
+        <h2>Ofertas Estacionales</h2>
+        <p class="subtitle">Crea y gestiona ofertas especiales para atraer más reservas</p>
 
-        <div id="alert" class="alert"></div>
+        <div id="alertBox" class="alert"></div>
 
-        <div class="card">
-            <h3 style="margin-bottom: 20px;">Nueva Oferta</h3>
-            <form id="ofertaForm">
-                <div class="form-group">
-                    <label for="nombre">Nombre de la Oferta *</label>
-                    <input type="text" id="nombre" name="nombre" placeholder="Ej: Baja Temporada Oct-Nov" required>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="start_date">Fecha de Inicio *</label>
-                        <input type="date" id="start_date" name="start_date" required>
+        <div class="form-card">
+            <div class="form-section">
+                <h3>➕ Crear Nueva Oferta</h3>
+                <form id="offerForm">
+                    <div class="form-row">
+                        <div>
+                            <label for="name">Nombre de la Oferta</label>
+                            <input type="text" id="name" name="name" placeholder="Ej: Verano 2026" required>
+                        </div>
+                        <div>
+                            <label for="discount_type">Tipo de Descuento</label>
+                            <select id="discount_type" name="discount_type" required>
+                                <option value="fixed">Tarifa Fija ($)</option>
+                                <option value="percentage">Porcentaje (%)</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="end_date">Fecha de Fin *</label>
-                        <input type="date" id="end_date" name="end_date" required>
+
+                    <div class="form-row">
+                        <div>
+                            <label for="start_date">Fecha Inicio</label>
+                            <input type="date" id="start_date" name="start_date" required>
+                        </div>
+                        <div>
+                            <label for="end_date">Fecha Fin</label>
+                            <input type="date" id="end_date" name="end_date" required>
+                        </div>
                     </div>
-                </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="nightly_rate">Precio Especial por Noche ($) *</label>
-                        <input type="number" id="nightly_rate" name="nightly_rate" min="0" placeholder="450" step="0.01" required>
+                    <div class="form-row">
+                        <div>
+                            <label for="nightly_rate">Tarifa Noche</label>
+                            <input type="number" id="nightly_rate" name="nightly_rate" step="0.01" placeholder="Ej: 399" required>
+                        </div>
+                        <div>
+                            <label for="active">Estado</label>
+                            <select id="active" name="active" required>
+                                <option value="true">✅ Activa</option>
+                                <option value="false">❌ Inactiva</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="discount_type">Tipo de Tarifa</label>
-                        <select id="discount_type" name="discount_type">
-                            <option value="fixed">Precio Fijo</option>
-                            <option value="percentage">Porcentaje</option>
-                        </select>
-                    </div>
-                </div>
 
-                <div class="form-group">
-                    <label>
-                        <input type="checkbox" id="active" name="active" checked style="width: auto; margin-right: 8px;">
-                        <span>Oferta Activa</span>
-                    </label>
-                </div>
-
-                <button type="submit">💾 Crear Oferta</button>
-            </form>
-        </div>
-
-        <div class="card">
-            <h3 style="margin-bottom: 20px;">Ofertas Creadas</h3>
-            <div id="ofertasContainer">
-                <p style="color: #999;">Cargando ofertas...</p>
+                    <button type="submit" class="btn">🎁 Crear Oferta</button>
+                </form>
             </div>
         </div>
+
+        {% if offers %}
+        <div class="offers-table">
+            <h3 style="padding: 20px 15px; background: #f9f9f9; margin: 0;">📋 Ofertas</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Tarifa/Noche</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for offer in offers %}
+                    <tr>
+                        <td><strong>{{ offer.name }}</strong></td>
+                        <td>{{ offer.start_date.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ offer.end_date.strftime('%d/%m/%Y') }}</td>
+                        <td>${{ "%.2f"|format(offer.nightly_rate) }}</td>
+                        <td>{% if offer.discount_type == 'fixed' %}Tarifa Fija{% else %}Porcentaje{% endif %}</td>
+                        <td><span class="status {% if offer.active %}active{% else %}inactive{% endif %}">{% if offer.active %}✅ Activa{% else %}❌ Inactiva{% endif %}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn" onclick="editOffer({{ offer.id }})">✏️ Editar</button>
+                                <button class="btn danger" onclick="deleteOffer({{ offer.id }})">🗑️ Eliminar</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty"><p>📭 No hay ofertas. ¡Crea una!</p></div>
+        {% endif %}
     </div>
 
     <script>
         function showAlert(message, type) {
-            const alert = document.getElementById('alert');
+            const alert = document.getElementById('alertBox');
             alert.textContent = message;
             alert.className = `alert ${type}`;
-            alert.style.display = 'block';
-            setTimeout(() => alert.style.display = 'none', 5000);
+            setTimeout(() => alert.className = 'alert', 5000);
         }
 
-        function formatDate(dateStr) {
-            const date = new Date(dateStr + 'T00:00:00');
-            return date.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
-        }
-
-        function loadOfertas() {
-            fetch('/admin/api/ofertas')
-                .then(r => r.json())
-                .then(data => {
-                    const container = document.getElementById('ofertasContainer');
-                    if (data.success && data.offers && data.offers.length > 0) {
-                        container.innerHTML = data.offers.map(oferta => `
-                            <div class="oferta-item">
-                                <div style="display: flex; justify-content: space-between; align-items: start;">
-                                    <div style="flex: 1;">
-                                        <h3>${oferta.name}</h3>
-                                        <div class="oferta-meta">
-                                            <strong>$${oferta.nightly_rate.toFixed(2)}/noche</strong> •
-                                            ${formatDate(oferta.start_date)} al ${formatDate(oferta.end_date)}
-                                        </div>
-                                    </div>
-                                    <span class="badge ${oferta.active ? 'active' : 'inactive'}">
-                                        ${oferta.active ? '✓ Activa' : '○ Inactiva'}
-                                    </span>
-                                </div>
-                                <div class="oferta-actions">
-                                    <button class="btn-secondary" onclick="editarOferta(${oferta.id})">Editar</button>
-                                    <button class="btn-danger" onclick="eliminarOferta(${oferta.id})">Eliminar</button>
-                                </div>
-                            </div>
-                        `).join('');
-                    } else {
-                        container.innerHTML = '<p style="color: #999; text-align: center;">No hay ofertas creadas aún.</p>';
-                    }
-                })
-                .catch(err => showAlert('Error al cargar ofertas: ' + err.message, 'error'));
-        }
-
-        function editarOferta(id) {
-            alert('Función de edición en desarrollo');
-        }
-
-        function eliminarOferta(id) {
-            if (confirm('¿Estás seguro de que deseas eliminar esta oferta?')) {
-                fetch(`/admin/api/ofertas/${id}`, { method: 'DELETE' })
-                    .then(r => r.json())
-                    .then(data => {
-                        if (data.success) {
-                            showAlert('✅ Oferta eliminada', 'success');
-                            loadOfertas();
-                        } else {
-                            showAlert('❌ Error: ' + data.error, 'error');
-                        }
-                    });
-            }
-        }
-
-        document.getElementById('ofertaForm').addEventListener('submit', async (e) => {
+        document.getElementById('offerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const data = {
-                name: document.getElementById('nombre').value,
+                name: document.getElementById('name').value,
                 start_date: document.getElementById('start_date').value,
                 end_date: document.getElementById('end_date').value,
                 nightly_rate: parseFloat(document.getElementById('nightly_rate').value),
                 discount_type: document.getElementById('discount_type').value,
-                active: document.getElementById('active').checked
+                active: document.getElementById('active').value === 'true'
             };
 
             try {
@@ -324,18 +170,35 @@
 
                 const result = await response.json();
                 if (result.success) {
-                    showAlert('✅ Oferta creada correctamente', 'success');
+                    showAlert('✅ Oferta creada', 'success');
                     e.target.reset();
-                    loadOfertas();
+                    setTimeout(() => location.reload(), 1500);
                 } else {
-                    showAlert('❌ ' + result.error, 'error');
+                    showAlert('❌ Error: ' + result.error, 'error');
                 }
             } catch (error) {
                 showAlert('❌ Error: ' + error.message, 'error');
             }
         });
 
-        loadOfertas();
+        function deleteOffer(offerId) {
+            if (confirm('¿Eliminar esta oferta?')) {
+                fetch(`/admin/api/ofertas/${offerId}`, {
+                    method: 'DELETE'
+                }).then(r => r.json()).then(d => {
+                    if (d.success) {
+                        showAlert('✅ Oferta eliminada', 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showAlert('❌ Error: ' + d.error, 'error');
+                    }
+                });
+            }
+        }
+
+        function editOffer(offerId) {
+            alert('Edición en progreso. Elimina y crea una nueva.');
+        }
     </script>
 </body>
 </html>
