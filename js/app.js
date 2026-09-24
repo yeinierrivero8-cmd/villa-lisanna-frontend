@@ -1,5 +1,5 @@
 // API Base URL Configuration
-const API_BASE_URL = 'https://188.245.80.35';
+const API_BASE_URL = 'https://web-production-2bf83.up.railway.app';
 
 // Info Panel Toggle
 const infoPanelToggle = document.getElementById('infoPanelToggle');
@@ -342,7 +342,7 @@ function initPriceCalculator() {
     const checkInStr = checkIn.toISOString().split('T')[0];
     const checkOutStr = checkOut.toISOString().split('T')[0];
 
-    fetch('/api/quote', {
+    fetch(API_BASE_URL + '/api/quote', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
