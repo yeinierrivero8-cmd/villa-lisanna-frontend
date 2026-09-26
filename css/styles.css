@@ -56,12 +56,17 @@ body::before {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 999;
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(91, 156, 166, 0.2);
   transition: all 0.3s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  pointer-events: none;
+}
+
+.header * {
+  pointer-events: auto;
 }
 
 .header.is-scrolled {
@@ -78,6 +83,7 @@ body::before {
   align-items: center;
   height: 70px;
   gap: 24px;
+  pointer-events: none;
 }
 
 .logo {
@@ -115,6 +121,7 @@ body::before {
   letter-spacing: 0.3px;
   text-transform: uppercase;
   tracking: 0.05em;
+  pointer-events: auto;
 }
 
 .nav-link::after {
@@ -144,6 +151,7 @@ body::before {
   border: none;
   cursor: pointer;
   padding: 8px;
+  pointer-events: auto;
 }
 
 .nav-toggle span {
@@ -208,6 +216,7 @@ body::before {
   inset: 0;
   background: transparent;
   backdrop-filter: none;
+  pointer-events: none;
 }
 
 .hero-content {
@@ -392,6 +401,14 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 28px;
+}
+
+/* Allow clicks on interactive elements */
+.info-panel-content input,
+.info-panel-content button,
+.info-panel-content select,
+.info-panel-content textarea {
+  pointer-events: auto;
 }
 
 .calendar-section {
@@ -2088,6 +2105,8 @@ a:focus-visible {
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(4px);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .modal-content {
@@ -2970,9 +2989,6 @@ a:focus-visible {
   display: block;
 }
 
-  display: none;
-}
-
 @media (max-width: 768px) {
   .gallery-preview-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -3210,4 +3226,43 @@ a:focus-visible {
   .gallery-carousel-next {
     right: 10px;
   }
+}
+
+/* ========== RADICAL FIX: Botón BOOK NOW clickeable ========== */
+
+/* Deshabilitar pointer-events en TODO excepto el botón */
+* {
+  pointer-events: auto;
+}
+
+#bookingBtn {
+  position: relative !important;
+  z-index: 99999 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+#bookingBtn:hover,
+#bookingBtn:active,
+#bookingBtn:focus {
+  pointer-events: auto !important;
+}
+
+/* Permitir interacción en formulario y modal */
+.modal,
+.modal *,
+#bookingForm,
+#bookingForm *,
+button,
+input,
+select,
+textarea,
+a {
+  pointer-events: auto !important;
+}
+
+/* Último recurso: overlay que podría estar bloqueando */
+.modal-overlay {
+  pointer-events: none !important;
+  z-index: -1 !important;
 }

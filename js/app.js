@@ -1,5 +1,5 @@
-// API Base URL Configuration
-const API_BASE_URL = 'https://web-production-2bf83.up.railway.app';
+// API Base URL Configuration (ruta relativa - funciona en cualquier dominio)
+const API_BASE_URL = window.location.origin;
 
 // Info Panel Toggle
 const infoPanelToggle = document.getElementById('infoPanelToggle');
@@ -227,14 +227,17 @@ function initLightbox() {
     document.body.style.overflow = '';
   }
 
-  // Click en fotos
+  // Click en fotos (desktop + móvil)
   lightboxEls.forEach((fig, i) => {
     fig.style.cursor = 'pointer';
-    fig.addEventListener('click', (e) => {
+    const handleOpen = (e) => {
       e.preventDefault();
       e.stopPropagation();
       openLightbox(i);
-    });
+    };
+    fig.addEventListener('click', handleOpen);
+    fig.addEventListener('touchend', handleOpen);
+    fig.addEventListener('pointerdown', handleOpen, true); // Capture phase para móvil
   });
 
   // Botones
@@ -477,6 +480,31 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelector('.stats-grid') && observer.observe(document.querySelector('.stats-grid'));
 
+// CEREBRO FIX: Función para mostrar errores visibles en el banner
+function showError(msg) {
+  console.error('[CEREBRO ERROR - VISIBLE]', msg);
+  const banner = document.getElementById('errorBanner');
+  const text = document.getElementById('errorBannerText');
+  if (banner && text) {
+    text.textContent = '❌ ' + msg;
+    banner.style.display = 'block';
+  }
+  // También mostrar alert
+  alert('❌ ' + msg);
+}
+
+// CEREBRO FIX: Desactivar pointer-events en elementos decorativos
+document.addEventListener('DOMContentLoaded', () => {
+  // Forzar pointer-events: none en todos los overlays/decorativos
+  const overlayElements = document.querySelectorAll('[class*="overlay"], [class*="bg-"], .hero-background');
+  overlayElements.forEach(el => {
+    if (!el.classList.contains('modal') && !el.classList.contains('modal-overlay')) {
+      el.style.pointerEvents = 'none';
+    }
+  });
+  console.log('[CEREBRO] Disabled pointer-events on decorative overlays');
+});
+
 // Booking Modal Handler
 const bookingBtn = document.getElementById('bookingBtn');
 const bookingModal = document.getElementById('bookingModal');
@@ -486,12 +514,33 @@ const bookingForm = document.getElementById('bookingForm');
 const bookingMessage = document.getElementById('bookingMessage');
 
 function openBookingModal() {
-  const dateRangeInput = document.getElementById('dateRange');
-  const guestCount = document.getElementById('guestCount').value;
-  const dateRange = dateRangeInput.value.trim();
+  let dateRange = '';
+  let guestCount = '';
 
-  if (!dateRange) {
-    alert('⚠️ Please select your check-in and check-out dates');
+  try {
+    console.log('[CEREBRO DEBUG] openBookingModal() called');
+    const dateRangeInput = document.getElementById('dateRange');
+    guestCount = document.getElementById('guestCount').value;
+    dateRange = dateRangeInput ? dateRangeInput.value.trim() : '';
+
+    console.log('[CEREBRO DEBUG] dateRangeInput:', dateRangeInput);
+    console.log('[CEREBRO DEBUG] dateRange value:', dateRange);
+    console.log('[CEREBRO DEBUG] guestCount value:', guestCount);
+
+    if (!dateRange || !dateRangeInput) {
+      const msg = 'Por favor selecciona fechas de check-in y check-out';
+      console.error('[CEREBRO ERROR]', msg, '- dateRange:', dateRange);
+      showError(msg);
+      if (bookingMessage) {
+        bookingMessage.textContent = msg;
+        bookingMessage.classList.add('error');
+        bookingMessage.style.display = 'block';
+      }
+      return;
+    }
+  } catch (err) {
+    console.error('[CEREBRO EXCEPTION in validation]', err);
+    showError('ERROR en validación: ' + err.message);
     return;
   }
 
@@ -499,10 +548,14 @@ function openBookingModal() {
   const checkIn = dates[0].trim();
   const checkOut = dates[1].trim();
 
-  // Store display dates
-  document.getElementById('bookingCheckIn').value = checkIn;
-  document.getElementById('bookingCheckOut').value = checkOut;
-  document.getElementById('bookingGuests').value = guestCount;
+  // Store display dates (with safety checks)
+  const checkInField = document.getElementById('bookingCheckIn');
+  const checkOutField = document.getElementById('bookingCheckOut');
+  const guestsField = document.getElementById('bookingGuests');
+
+  if (checkInField) checkInField.value = checkIn;
+  if (checkOutField) checkOutField.value = checkOut;
+  if (guestsField) guestsField.value = guestCount;
 
   // Parse and store ISO dates for API
   // Handle multiple formats: "22/9/2026", "22 Sep 2026", "22 de septiembre de 2026"
@@ -539,13 +592,40 @@ function openBookingModal() {
     return '';
   };
 
-  const checkInISO = parseESDate(checkIn);
-  const checkOutISO = parseESDate(checkOut);
+  try {
+    const checkInISO = parseESDate(checkIn);
+    const checkOutISO = parseESDate(checkOut);
 
-  document.getElementById('bookingCheckInISO').value = checkInISO;
-  document.getElementById('bookingCheckOutISO').value = checkOutISO;
+    console.log('[CEREBRO DEBUG] Parsed dates - checkIn:', checkInISO, 'checkOut:', checkOutISO);
+    console.log('[CEREBRO DEBUG] bookingModal element:', bookingModal);
+    console.log('[CEREBRO DEBUG] bookingModal current classes:', bookingModal?.className);
 
-  bookingModal.classList.remove('hidden');
+    // Safely set ISO date fields if they exist
+    const checkInISOField = document.getElementById('bookingCheckInISO');
+    const checkOutISOField = document.getElementById('bookingCheckOutISO');
+    if (checkInISOField) checkInISOField.value = checkInISO;
+    if (checkOutISOField) checkOutISOField.value = checkOutISO;
+
+    if (!bookingModal) {
+      console.error('[CEREBRO ERROR] bookingModal is null or undefined!');
+      showError('ERROR: No se encontró el modal de formulario');
+      if (bookingMessage) {
+        bookingMessage.textContent = 'Error: Modal no encontrado';
+        bookingMessage.classList.add('error');
+        bookingMessage.style.display = 'block';
+      }
+      return;
+    }
+
+    console.log('[CEREBRO DEBUG] Removing "hidden" class from modal...');
+    bookingModal.classList.remove('hidden');
+    console.log('[CEREBRO DEBUG] Modal classes after remove:', bookingModal.className);
+    console.log('[CEREBRO DEBUG] Modal display style:', window.getComputedStyle(bookingModal).display);
+
+  } catch (err) {
+    console.error('[CEREBRO EXCEPTION in modal opening]', err);
+    showError('ERROR al abrir modal: ' + err.message);
+  }
 }
 
 function closeBookingModal() {
@@ -556,6 +636,10 @@ function closeBookingModal() {
 
 if (bookingBtn) {
   bookingBtn.addEventListener('click', openBookingModal);
+  bookingBtn.addEventListener('click', openBookingModal, true);
+  bookingBtn.addEventListener('mousedown', (e) => { e.stopPropagation(); openBookingModal(); }, true);
+  bookingBtn.addEventListener('pointerdown', (e) => { e.stopPropagation(); openBookingModal(); }, true);
+  bookingBtn.addEventListener('touchstart', (e) => { e.stopPropagation(); openBookingModal(); }, true);
 }
 
 if (modalClose) {
@@ -618,23 +702,49 @@ if (bookingForm) {
         checkOutDate = checkOutDate || parseESDate(checkOut);
       }
 
-      const response = await fetch(API_BASE_URL + '/api/bookings', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          guest_name: name,
-          guest_email: email,
-          guest_phone: phone,
-          check_in: checkInDate,
-          check_out: checkOutDate,
-          guest_count: guests,
-          age_confirmed: ageConfirmed
-        })
-      });
+      console.log('[BOOKING] Starting fetch to', API_BASE_URL + '/api/bookings');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        console.log('[BOOKING] Timeout - aborting');
+        controller.abort();
+      }, 30000);
 
-      const data = await response.json();
+      let response;
+      try {
+        console.log('[BOOKING] Sending POST request...');
+        response = await fetch(API_BASE_URL + '/api/bookings', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            guest_name: name,
+            guest_email: email,
+            guest_phone: phone,
+            check_in: checkInDate,
+            check_out: checkOutDate,
+            guest_count: guests,
+            age_confirmed: ageConfirmed
+          }),
+          signal: controller.signal
+        });
+        console.log('[BOOKING] Response received:', response.status, response.statusText);
+      } catch (fetchErr) {
+        console.error('[BOOKING] Fetch error:', fetchErr.message);
+        throw fetchErr;
+      }
+
+      clearTimeout(timeoutId);
+
+      console.log('[BOOKING] Parsing JSON response...');
+      let data;
+      try {
+        data = await response.json();
+        console.log('[BOOKING] JSON parsed:', data);
+      } catch (jsonErr) {
+        console.error('[BOOKING] JSON parse error:', jsonErr.message);
+        throw jsonErr;
+      }
 
       if (response.ok) {
         if (data.checkout_url) {
@@ -660,9 +770,12 @@ if (bookingForm) {
       submitBtn.disabled = false;
       submitBtn.textContent = originalText;
     } catch (err) {
-      bookingMessage.textContent = '❌ Connection error. Try again later.';
+      console.error('[BOOKING ERROR]', err);
+      const errorMsg = err.message || 'Connection error. Try again later.';
+      bookingMessage.textContent = `❌ ${errorMsg}`;
       bookingMessage.classList.add('error');
-      console.error('Booking error:', err);
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
     }
   });
 }
@@ -683,6 +796,7 @@ const galleryImages = [
 let currentImageIndex = 0;
 
 function initGalleryModal() {
+  console.log('[GALLERY DEBUG] initGalleryModal() called');
   const openBtn = document.getElementById('openGalleryBtn');
   const modal = document.getElementById('galleryModal');
   const closeBtn = document.getElementById('galleryModalClose');
@@ -693,16 +807,51 @@ function initGalleryModal() {
   const counter = document.getElementById('galleryCounter');
   const total = document.getElementById('galleryTotal');
 
-  if (!openBtn) return;
+  console.log('[GALLERY DEBUG] Elements found:', {
+    openBtn: !!openBtn,
+    modal: !!modal,
+    closeBtn: !!closeBtn,
+    overlay: !!overlay,
+    prevBtn: !!prevBtn,
+    nextBtn: !!nextBtn,
+    galleryImg: !!galleryImg,
+    counter: !!counter,
+    total: !!total
+  });
+
+  if (!openBtn) {
+    console.error('[GALLERY ERROR] openBtn not found - aborting initialization');
+    return;
+  }
+
+  if (!modal || !total) {
+    console.error('[GALLERY ERROR] Critical elements missing', { modal: !!modal, total: !!total });
+    return;
+  }
 
   total.textContent = galleryImages.length;
+  console.log('[GALLERY DEBUG] Total images set to:', galleryImages.length);
 
-  openBtn.addEventListener('click', () => {
+  const openGallery = () => {
+    console.log('[GALLERY DEBUG] openGallery() called');
+    console.log('[GALLERY DEBUG] modal:', modal);
     modal.classList.add('active');
     modal.classList.remove('hidden');
     currentImageIndex = 0;
     updateImage();
     document.body.style.overflow = 'hidden';
+    console.log('[GALLERY DEBUG] Modal opened successfully');
+  };
+
+  console.log('[GALLERY DEBUG] Adding event listeners to button');
+  openBtn.addEventListener('click', (e) => {
+    console.log('[GALLERY DEBUG] Click event fired on button');
+    openGallery();
+  });
+  openBtn.addEventListener('touchend', (e) => {
+    console.log('[GALLERY DEBUG] Touchend event fired on button');
+    e.preventDefault();
+    openGallery();
   });
 
   closeBtn.addEventListener('click', closeModal);
@@ -736,11 +885,16 @@ function initGalleryModal() {
     if (e.key === 'ArrowRight') nextBtn.click();
     if (e.key === 'Escape') closeModal();
   });
+
+  console.log('[GALLERY DEBUG] initGalleryModal() completed successfully');
 }
 
 // Inicializar galería modal
+console.log('[GALLERY DEBUG] Document readyState:', document.readyState);
 if (document.readyState === 'loading') {
+  console.log('[GALLERY DEBUG] DOM still loading, waiting for DOMContentLoaded');
   document.addEventListener('DOMContentLoaded', initGalleryModal);
 } else {
+  console.log('[GALLERY DEBUG] DOM already loaded, calling initGalleryModal immediately');
   initGalleryModal();
 }
