@@ -1,8 +1,9 @@
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, jsonify, request
 from flask_cors import CORS
 from app.config import config
 from app.extensions import db, login_manager
 import os
+import traceback
 
 def create_app(config_name='development'):
     app = Flask(__name__, static_folder='static', static_url_path='/static')
@@ -10,6 +11,31 @@ def create_app(config_name='development'):
     app.config.from_object(config[config_name])
 
     CORS(app)
+
+    # Global error handler for API routes - always return JSON
+    @app.errorhandler(Exception)
+    def handle_api_error(error):
+        # Log the error with full traceback for debugging
+        error_type = type(error).__name__
+        print(f"[ERROR] Unhandled {error_type}: {str(error)}")
+        print(f"[ERROR] Traceback:\n{traceback.format_exc()}")
+        print(f"[ERROR] Request path: {request.path}")
+        print(f"[ERROR] Request method: {request.method}")
+        print(f"[ERROR] Request remote_addr: {request.remote_addr}")
+        print(f"[ERROR] Request host_url: {request.host_url}")
+        print(f"[ERROR] Request user_agent: {request.user_agent}")
+        print(f"[ERROR] Content-Type: {request.content_type}")
+        print(f"[ERROR] Content-Length: {request.content_length}")
+
+        # For API routes, always return JSON
+        if request.path.startswith('/api/'):
+            return jsonify({
+                'success': False,
+                'error': f'Server error - {error_type}: {str(error)}'
+            }), 500
+
+        # For other routes, use default error handling
+        raise error
 
     db.init_app(app)
     login_manager.init_app(app)

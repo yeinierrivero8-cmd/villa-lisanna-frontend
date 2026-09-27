@@ -1,4 +1,7 @@
 import stripe
+import qrcode
+from io import BytesIO
+import base64
 from flask import current_app, url_for
 from app.models import Booking
 
@@ -108,5 +111,22 @@ class StripeService:
                 booking.status = 'completed'
 
             return {'success': True, 'booking': booking}
+        except Exception as e:
+            return {'success': False, 'error': str(e)}
+
+    @staticmethod
+    def generate_payment_qr(booking_code, payment_url):
+        try:
+            qr = qrcode.QRCode(version=1, box_size=10, border=4)
+            qr.add_data(payment_url)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="black", back_color="white")
+
+            img_io = BytesIO()
+            img.save(img_io, 'PNG')
+            img_io.seek(0)
+            img_base64 = base64.b64encode(img_io.getvalue()).decode()
+
+            return {'success': True, 'qr_base64': img_base64, 'qr_data_uri': f'data:image/png;base64,{img_base64}'}
         except Exception as e:
             return {'success': False, 'error': str(e)}

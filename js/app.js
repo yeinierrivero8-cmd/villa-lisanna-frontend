@@ -59,7 +59,11 @@ function initializeFlatpickr() {
       const response = await fetch(API_BASE_URL + '/api/availability');
       if (response.ok) {
         const data = await response.json();
-        occupiedDates = data.unavailable_dates || [];
+        // Convert ISO date strings to Date objects for Flatpickr to parse correctly
+        occupiedDates = (data.unavailable_dates || []).map(dateStr => {
+          return new Date(dateStr + 'T00:00:00Z');
+        });
+        console.log('[CALENDAR] Loaded unavailable dates:', occupiedDates.length, 'dates');
         initializeCalendar();
       } else {
         console.warn('Could not load availability, using fallback');
@@ -674,9 +678,18 @@ if (bookingForm) {
       return;
     }
 
+    // Define submitBtn outside try so it's always accessible
+    const submitBtn = bookingForm.querySelector('button[type="submit"]');
+    if (!submitBtn) {
+      console.error('[BOOKING ERROR] Submit button not found');
+      bookingMessage.textContent = '❌ Error: Submit button not found';
+      bookingMessage.classList.add('error');
+      return;
+    }
+
+    const originalText = submitBtn.textContent;
+
     try {
-      const submitBtn = bookingForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.textContent;
       submitBtn.disabled = true;
       submitBtn.textContent = '⏳ Sending...';
 
@@ -702,80 +715,137 @@ if (bookingForm) {
         checkOutDate = checkOutDate || parseESDate(checkOut);
       }
 
-      console.log('[BOOKING] Starting fetch to', API_BASE_URL + '/api/bookings');
+      const bookingUrl = API_BASE_URL + '/api/bookings';
+      console.log('[BOOKING] Starting fetch to', bookingUrl);
+      console.log('[BOOKING] API_BASE_URL:', API_BASE_URL);
+      console.log('[BOOKING] window.location.origin:', window.location.origin);
+      console.log('[BOOKING] Device info - User-Agent:', navigator.userAgent);
+      console.log('[BOOKING] Device info - Viewport:', window.innerWidth, 'x', window.innerHeight);
+      console.log('[BOOKING] Device info - Platform:', navigator.platform);
+      console.log('[BOOKING] Network info - Effective Type:', navigator.connection?.effectiveType || 'unknown');
+      console.log('[BOOKING] Network info - Online:', navigator.onLine);
+
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
-        console.log('[BOOKING] Timeout - aborting');
+        console.log('[BOOKING] Timeout (90s) - aborting');
         controller.abort();
-      }, 30000);
+      }, 90000);
 
       let response;
       try {
-        console.log('[BOOKING] Sending POST request...');
-        response = await fetch(API_BASE_URL + '/api/bookings', {
+        const bookingBody = {
+          guest_name: name,
+          guest_email: email,
+          guest_phone: phone,
+          check_in: checkInDate,
+          check_out: checkOutDate,
+          guest_count: guests,
+          age_confirmed: ageConfirmed
+        };
+        const bodyStr = JSON.stringify(bookingBody);
+
+        console.log('[BOOKING] Request body size:', bodyStr.length, 'bytes');
+        console.log('[BOOKING] Sending POST request to:', bookingUrl);
+        response = await fetch(bookingUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            guest_name: name,
-            guest_email: email,
-            guest_phone: phone,
-            check_in: checkInDate,
-            check_out: checkOutDate,
-            guest_count: guests,
-            age_confirmed: ageConfirmed
-          }),
+          body: bodyStr,
           signal: controller.signal
         });
         console.log('[BOOKING] Response received:', response.status, response.statusText);
+        console.log('[BOOKING] Response headers - Content-Type:', response.headers.get('Content-Type'));
       } catch (fetchErr) {
         console.error('[BOOKING] Fetch error:', fetchErr.message);
+        clearTimeout(timeoutId);
         throw fetchErr;
       }
 
       clearTimeout(timeoutId);
 
       console.log('[BOOKING] Parsing JSON response...');
-      let data;
+      let data = {};
       try {
-        data = await response.json();
+        const responseText = await response.text();
+        console.log('[BOOKING] Raw response text (first 500 chars):', responseText.substring(0, 500));
+        console.log('[BOOKING] Response length:', responseText.length);
+
+        // Try to parse as JSON
+        data = JSON.parse(responseText);
         console.log('[BOOKING] JSON parsed:', data);
       } catch (jsonErr) {
         console.error('[BOOKING] JSON parse error:', jsonErr.message);
-        throw jsonErr;
+        console.error('[BOOKING] Response status:', response.status);
+        console.error('[BOOKING] Response headers:', {
+          'content-type': response.headers.get('Content-Type'),
+          'content-length': response.headers.get('Content-Length')
+        });
+        data = { error: 'Invalid response from server' };
+        addDebugLog(`[BOOKING ERROR] JSON parse failed - ${jsonErr.message}`, 'error');
+        showDebugPanel();
       }
 
-      if (response.ok) {
+      if (response.ok && data.success) {
+        // Stripe checkout URL should always be present on success
         if (data.checkout_url) {
           bookingMessage.textContent = '✅ Redirecting to payment...';
           bookingMessage.classList.remove('error');
           bookingMessage.classList.add('success');
-          setTimeout(() => {
+          addDebugLog('[BOOKING] Redirecting to Stripe checkout', 'info');
+          console.log('[BOOKING] Redirecting to:', data.checkout_url);
+
+          // iOS/Safari fix: Do NOT use setTimeout for navigation
+          // setTimeout creates an async context that Safari blocks for security
+          // Use window.location.replace directly instead
+          // Fallback to href if replace fails
+          try {
+            window.location.replace(data.checkout_url);
+          } catch (navError) {
+            console.warn('[BOOKING] location.replace failed, trying href:', navError.message);
             window.location.href = data.checkout_url;
-          }, 1000);
+          }
         } else {
+          // This shouldn't happen if backend is fixed, but handle gracefully
+          console.warn('[BOOKING WARNING] No checkout_url returned even though success is true');
           bookingMessage.textContent = '✅ Booking sent! We will contact you soon.';
           bookingMessage.classList.remove('error');
           bookingMessage.classList.add('success');
+          addDebugLog('[BOOKING] Booking created but no payment URL', 'warning');
           setTimeout(() => {
             closeBookingModal();
           }, 2000);
         }
       } else {
-        bookingMessage.textContent = `❌ ${data.error || 'Error sending booking'}`;
+        // Error case - payment setup or validation failed
+        const errorMsg = data.error || data.stripe_error || 'Error sending booking';
+        console.error('[BOOKING] Error response:', errorMsg);
+        bookingMessage.textContent = `❌ ${errorMsg}`;
         bookingMessage.classList.add('error');
+        addDebugLog(`[BOOKING ERROR] ${errorMsg}`, 'error');
+      }
+    } catch (err) {
+      console.error('[BOOKING ERROR] Full error:', err);
+      console.error('[BOOKING ERROR] Error name:', err.name);
+      console.error('[BOOKING ERROR] Error message:', err.message);
+      console.error('[BOOKING ERROR] Error stack:', err.stack);
+
+      let errorMsg = 'Connection error. Try again later.';
+      if (err.name === 'AbortError') {
+        errorMsg = 'Request timeout - connection slow. Try again.';
+      } else if (err instanceof TypeError) {
+        errorMsg = 'Network error. Check your internet connection.';
       }
 
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalText;
-    } catch (err) {
-      console.error('[BOOKING ERROR]', err);
-      const errorMsg = err.message || 'Connection error. Try again later.';
       bookingMessage.textContent = `❌ ${errorMsg}`;
       bookingMessage.classList.add('error');
+      addDebugLog(`[BOOKING ERROR] ${errorMsg}`, 'error');
+      showDebugPanel();
+    } finally {
+      // ALWAYS reset button, even if there's an error
       submitBtn.disabled = false;
       submitBtn.textContent = originalText;
+      console.log('[BOOKING] Button reset - disabled:', submitBtn.disabled, 'text:', submitBtn.textContent);
     }
   });
 }
@@ -790,7 +860,43 @@ const galleryImages = [
   '/img/golf-cart.jpg',
   '/img/bed.jpg',
   '/img/cocina-1.jpg',
-  '/img/cocina-2.jpg'
+  '/img/cocina-2.jpg',
+  '/img/gallery-extra-1.jpg',
+  '/img/gallery-extra-2.jpg',
+  '/img/gallery-extra-3.jpg',
+  '/img/gallery-extra-4.jpg',
+  '/img/gallery-extra-5.jpg',
+  '/img/gallery-extra-6.jpg',
+  '/img/gallery-extra-7.jpg',
+  '/img/gallery-extra-8.jpg',
+  '/img/gallery-extra-9.jpg',
+  '/img/gallery-extra-10.jpg',
+  '/img/gallery-extra-11.jpg',
+  '/img/gallery-extra-12.jpg',
+  '/img/gallery-extra-13.jpg',
+  '/img/gallery-extra-14.jpg',
+  '/img/gallery-extra-15.jpg',
+  '/img/gallery-extra-16.jpg',
+  '/img/gallery-extra-17.jpg',
+  '/img/gallery-extra-18.jpg',
+  '/img/gallery-extra-19.jpg',
+  '/img/gallery-extra-20.jpg',
+  '/img/gallery-extra-21.jpg',
+  '/img/gallery-extra-22.jpg',
+  '/img/gallery-extra-23.jpg',
+  '/img/gallery-extra-24.jpg',
+  '/img/gallery-extra-25.jpg',
+  '/img/gallery-extra-26.jpg',
+  '/img/gallery-extra-27.jpg',
+  '/img/gallery-extra-28.jpg',
+  '/img/gallery-extra-29.jpg',
+  '/img/gallery-extra-30.jpg',
+  '/img/gallery-extra-31.jpg',
+  '/img/gallery-extra-32.jpg',
+  '/img/gallery-extra-33.jpg',
+  '/img/gallery-extra-34.jpg',
+  '/img/gallery-extra-35.jpg',
+  '/img/gallery-extra-36.jpg'
 ];
 
 let currentImageIndex = 0;
@@ -819,6 +925,16 @@ function initGalleryModal() {
     total: !!total
   });
 
+  if (openBtn) {
+    console.log('[GALLERY DEBUG] openBtn computed styles:', {
+      display: window.getComputedStyle(openBtn).display,
+      visibility: window.getComputedStyle(openBtn).visibility,
+      pointerEvents: window.getComputedStyle(openBtn).pointerEvents,
+      zIndex: window.getComputedStyle(openBtn).zIndex,
+      cursor: window.getComputedStyle(openBtn).cursor
+    });
+  }
+
   if (!openBtn) {
     console.error('[GALLERY ERROR] openBtn not found - aborting initialization');
     return;
@@ -834,6 +950,12 @@ function initGalleryModal() {
 
   const openGallery = () => {
     console.log('[GALLERY DEBUG] openGallery() called');
+    const infoPanel = document.getElementById('infoPanel');
+    const infoPanelToggle = document.getElementById('infoPanelToggle');
+    if (infoPanel && infoPanel.classList.contains('is-open')) {
+      infoPanel.classList.remove('is-open');
+      if (infoPanelToggle) infoPanelToggle.setAttribute('aria-expanded', 'false');
+    }
     console.log('[GALLERY DEBUG] modal:', modal);
     modal.classList.add('active');
     modal.classList.remove('hidden');
@@ -845,13 +967,22 @@ function initGalleryModal() {
 
   console.log('[GALLERY DEBUG] Adding event listeners to button');
   openBtn.addEventListener('click', (e) => {
-    console.log('[GALLERY DEBUG] Click event fired on button');
+    console.log('[GALLERY DEBUG] CLICK event fired', { isTrusted: e.isTrusted, button: e.button, detail: e.detail });
+    e.preventDefault();
+    e.stopPropagation();
     openGallery();
   });
+  openBtn.addEventListener('touchstart', (e) => {
+    console.log('[GALLERY DEBUG] TOUCHSTART event fired', { touches: e.touches.length, isTrusted: e.isTrusted });
+  });
   openBtn.addEventListener('touchend', (e) => {
-    console.log('[GALLERY DEBUG] Touchend event fired on button');
+    console.log('[GALLERY DEBUG] TOUCHEND event fired', { touches: e.touches.length, changedTouches: e.changedTouches.length, isTrusted: e.isTrusted });
     e.preventDefault();
+    e.stopPropagation();
     openGallery();
+  });
+  openBtn.addEventListener('pointerdown', (e) => {
+    console.log('[GALLERY DEBUG] POINTERDOWN event fired', { pointerType: e.pointerType, isPrimary: e.isPrimary });
   });
 
   closeBtn.addEventListener('click', closeModal);
@@ -887,6 +1018,83 @@ function initGalleryModal() {
   });
 
   console.log('[GALLERY DEBUG] initGalleryModal() completed successfully');
+}
+
+// DEBUG PANEL: Show logs on page for mobile debugging
+const debugLogs = [];
+const originalLog = console.log;
+const originalError = console.error;
+
+function addDebugLog(msg, type = 'log') {
+  debugLogs.push({ msg, type, time: new Date().toLocaleTimeString() });
+  if (debugLogs.length > 50) debugLogs.shift();
+
+  // Also show in browser console
+  if (type === 'error') {
+    originalError(msg);
+  } else {
+    originalLog(msg);
+  }
+}
+
+// Override console.log for debug messages
+console.log = function(...args) {
+  const msg = args.join(' ');
+  if (msg.includes('[GALLERY') || msg.includes('[BOOKING')) {
+    addDebugLog(msg, 'log');
+  }
+  originalLog.apply(console, args);
+};
+
+console.error = function(...args) {
+  const msg = args.join(' ');
+  if (msg.includes('[GALLERY') || msg.includes('[BOOKING')) {
+    addDebugLog(msg, 'error');
+  }
+  originalError.apply(console, args);
+};
+
+// Create debug panel
+function createDebugPanel() {
+  const panel = document.createElement('div');
+  panel.id = 'debug-panel';
+  panel.style.cssText = `
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    width: 280px;
+    max-height: 200px;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid #5B9CA6;
+    border-radius: 8px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 10px;
+    color: #0f0;
+    overflow-y: auto;
+    z-index: 99999;
+    display: none;
+  `;
+
+  document.body.appendChild(panel);
+
+  return panel;
+}
+
+const debugPanel = createDebugPanel();
+
+// Show debug panel only when there are errors
+function showDebugPanel() {
+  const hasErrors = debugLogs.some(log => log.type === 'error');
+  if (hasErrors) {
+    debugPanel.style.display = 'block';
+    debugPanel.innerHTML = debugLogs.map(log =>
+      `<div style="color: ${log.type === 'error' ? '#f00' : '#0f0'}">${log.time}: ${log.msg}</div>`
+    ).join('');
+    debugPanel.scrollTop = debugPanel.scrollHeight;
+  } else {
+    debugPanel.style.display = 'none';
+  }
 }
 
 // Inicializar galería modal

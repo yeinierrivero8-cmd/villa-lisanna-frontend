@@ -3,9 +3,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Usar ruta absoluta fija (Windows) - Temporal: C:\ para estabilidad de SQLite
-# TODO: Cambiar de vuelta a E:\ cuando se resuelva el problema de I/O en discos externos
-instance_path = os.path.abspath(r'C:\Users\yeini\.villa_lisanna_tmp')
+# Usar ruta relativa (funciona en Windows y Linux)
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+instance_path = os.path.join(base_dir, 'instance')
 os.makedirs(instance_path, exist_ok=True)
 
 # Crear archivo de BD
@@ -16,7 +16,7 @@ if not os.path.exists(db_file_path):
     open(db_file_path, 'a').close()
 
 class Config:
-    # SQLite con ruta absoluta en formato Windows
+    # SQLite con ruta relativa (compatible con Windows y Linux)
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{db_file_path.replace(chr(92), "/")}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')

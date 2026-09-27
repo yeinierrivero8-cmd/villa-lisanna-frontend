@@ -8,10 +8,14 @@ class EmailService:
     @staticmethod
     def send_email(to_email, subject, html_content, text_content=None):
         try:
+            print(f"[DEBUG] send_email() iniciado para: {to_email}")
+            print(f"[DEBUG] Asunto: {subject}")
+
             msg = MIMEMultipart('alternative')
             msg['Subject'] = subject
             msg['From'] = f"{current_app.config['SMTP_FROM_NAME']} <{current_app.config['SMTP_FROM_EMAIL']}>"
             msg['To'] = to_email
+            print(f"[DEBUG] Mensaje creado. From: {msg['From']}")
 
             if text_content:
                 part1 = MIMEText(text_content, 'plain')
@@ -19,24 +23,39 @@ class EmailService:
 
             part2 = MIMEText(html_content, 'html')
             msg.attach(part2)
+            print(f"[DEBUG] Contenido HTML adjuntado")
 
             port = current_app.config['SMTP_PORT']
+            smtp_server = current_app.config['SMTP_SERVER']
+            smtp_user = current_app.config['SMTP_USER']
+            print(f"[DEBUG] Configuración SMTP: {smtp_server}:{port}, usuario: {smtp_user}")
 
             # Use SSL_SMTP for port 465, regular SMTP + STARTTLS for 587
             if port == 465:
-                with smtplib.SMTP_SSL(current_app.config['SMTP_SERVER'], port) as server:
-                    server.login(current_app.config['SMTP_USER'], current_app.config['SMTP_PASSWORD'])
+                print(f"[DEBUG] Usando SMTP_SSL (puerto {port})")
+                with smtplib.SMTP_SSL(smtp_server, port, timeout=30) as server:
+                    print(f"[DEBUG] Conexión SSL establecida")
+                    server.login(smtp_user, current_app.config['SMTP_PASSWORD'])
+                    print(f"[DEBUG] Login exitoso")
                     server.send_message(msg)
+                    print(f"[DEBUG] Mensaje enviado")
             else:
-                with smtplib.SMTP(current_app.config['SMTP_SERVER'], port) as server:
+                print(f"[DEBUG] Usando SMTP + STARTTLS (puerto {port})")
+                with smtplib.SMTP(smtp_server, port, timeout=30) as server:
+                    print(f"[DEBUG] Conexión SMTP establecida")
                     server.starttls()
-                    server.login(current_app.config['SMTP_USER'], current_app.config['SMTP_PASSWORD'])
+                    print(f"[DEBUG] STARTTLS completado")
+                    server.login(smtp_user, current_app.config['SMTP_PASSWORD'])
+                    print(f"[DEBUG] Login exitoso")
                     server.send_message(msg)
+                    print(f"[DEBUG] Mensaje enviado")
 
-            print(f"[SUCCESS] Email enviado a {to_email}")
+            print(f"[SUCCESS] Email enviado exitosamente a {to_email}")
             return {'success': True}
         except Exception as e:
+            import traceback
             print(f"[ERROR] Error enviando email a {to_email}: {str(e)}")
+            print(f"[ERROR] Traceback: {traceback.format_exc()}")
             return {'success': False, 'error': str(e)}
 
     @staticmethod
@@ -78,7 +97,23 @@ class EmailService:
 
     @staticmethod
     def send_admin_notification(booking):
+        from app.services.stripe_service import StripeService
+
         subject = f"Nueva Solicitud de Reserva: {booking.confirmation_code}"
+
+        payment_qr_url = f"{current_app.config.get('BASE_URL', 'https://www.villalisanna.com')}/api/bookings/{booking.confirmation_code}/balance-checkout"
+        qr_result = StripeService.generate_payment_qr(booking.confirmation_code, payment_qr_url)
+
+        qr_image = ""
+        if qr_result['success']:
+            qr_image = f"""
+            <h3 style="color: #FFD700;">Código QR para Pago de Saldo</h3>
+            <p style="font-size: 12px; color: #666;">Muéstrale este QR al cliente el día del check-in. Él escanea y paga el saldo restante.</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="{qr_result['qr_data_uri']}" alt="QR Pago Saldo" style="width: 250px; height: 250px; border: 2px solid #FFD700; padding: 10px; background: #fff;">
+            </div>
+            <p style="font-size: 12px; color: #666;"><strong>Link directo (si el QR no funciona):</strong><br>{payment_qr_url}</p>
+            """
 
         html_content = f"""
         <html>
@@ -105,17 +140,56 @@ class EmailService:
                         <li>Limpieza: ${booking.cleaning_fee:,.2f}</li>
                         <li>Impuestos: ${booking.taxes:,.2f}</li>
                         <li>Total: ${booking.total_amount:,.2f}</li>
-                        <li>Depósito Requerido: ${booking.deposit_amount:,.2f}</li>
-                        <li>Saldo: ${booking.balance_amount:,.2f}</li>
+                        <li><strong>Depósito (50%): ${booking.deposit_amount:,.2f}</strong></li>
+                        <li><strong>Saldo (50%): ${booking.balance_amount:,.2f}</strong></li>
                     </ul>
 
-                    <p><strong>Acción Requerida:</strong> Accede al panel de admin para aprobar o rechazar esta solicitud.</p>
+                    {qr_image}
+
+                    <p style="color: #999; font-size: 12px;">Este es un email automático. Por favor no respondas a este correo.</p>
                 </div>
             </body>
         </html>
         """
 
         return EmailService.send_email(current_app.config['VILLA_OWNER_EMAIL'], subject, html_content)
+
+    @staticmethod
+    def send_booking_balance_receipt(booking):
+        subject = f"Saldo Pagado - Reserva {booking.confirmation_code}"
+
+        html_content = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif; background-color: #f5f5f5;">
+                <div style="background-color: #fff; padding: 20px; border-radius: 8px; max-width: 600px;">
+                    <h2 style="color: #2D7A9F;">✅ ¡Pago Completo Recibido!</h2>
+                    <p>Hola {booking.guest_name},</p>
+                    <p>Hemos recibido el pago del saldo de tu reserva. Tu reserva está confirmada.</p>
+
+                    <h3 style="color: #00E5FF;">Código de Reserva: {booking.confirmation_code}</h3>
+
+                    <p><strong>Detalles de tu reserva:</strong></p>
+                    <ul>
+                        <li>Check-in: {booking.check_in_date.strftime('%d/%m/%Y')}</li>
+                        <li>Check-out: {booking.check_out_date.strftime('%d/%m/%Y')}</li>
+                        <li>Noches: {booking.nights}</li>
+                        <li>Huéspedes: {booking.guest_count}</li>
+                        <li>Depósito Pagado: ${booking.deposit_amount:,.2f}</li>
+                        <li>Saldo Pagado: ${booking.balance_amount:,.2f}</li>
+                        <li>Total: ${booking.total_amount:,.2f}</li>
+                    </ul>
+
+                    <p><strong>¡Tu apartamento está listo para recibirte!</strong></p>
+                    <p>Si tienes alguna pregunta, no dudes en contactarnos.</p>
+                    <p>Gracias por elegir Villa Lisanna.</p>
+
+                    <p style="color: #999; font-size: 12px;">Este es un email automático. Por favor no respondas a este correo.</p>
+                </div>
+            </body>
+        </html>
+        """
+
+        return EmailService.send_email(booking.guest_email, subject, html_content)
 
     @staticmethod
     def send_deposit_payment_link(booking, payment_url):
