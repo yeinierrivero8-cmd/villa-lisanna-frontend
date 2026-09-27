@@ -1,6 +1,6 @@
 # Villa Lisanna - Backend Flask
 
-Sistema de reservas profesional para Villa Lisanna Gasparilla Island, Florida.
+Sistema de reservas profesional para Villa Lisanna Little Gasparilla Island, Florida.
 
 ## Instalación
 

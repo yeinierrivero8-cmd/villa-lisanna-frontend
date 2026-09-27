@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Villa Lisanna — Luxury and Comfort in Private Paradise</title>
-  <meta name="description" content="Rent Villa Lisanna luxury vacation rental on Gasparilla Island, Florida. Premium 10-guest beach house with heated jacuzzi, 100+ Mbps Starlink, private golf cart & 24/7 concierge. Ideal for holidays, events & remote work.">
-  <meta name="keywords" content="villa rental Florida, luxury vacation home, Gasparilla Island vacation rental, beach house rental, private villa rental, vacation home Florida, luxury accommodation, villa with hot tub, vacation rental with concierge">
+  <meta name="description" content="Rent Villa Lisanna luxury vacation rental on Little Gasparilla Island, Florida. Premium 10-guest beach house with heated jacuzzi, 100+ Mbps Starlink, private golf cart & 24/7 concierge. Ideal for holidays, events & remote work.">
+  <meta name="keywords" content="villa rental Florida, luxury vacation home, Little Gasparilla Island vacation rental, beach house rental, private villa rental, vacation home Florida, luxury accommodation, villa with hot tub, vacation rental with concierge">
   <meta name="theme-color" content="#F5F3F0">
   <meta property="og:title" content="Villa Lisanna — Your Luxury Escape">
   <meta property="og:description" content="Experience luxury villa with premium amenities: Starlink, Jacuzzi, Pool, Golf Cart.">
@@ -40,13 +40,13 @@
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "Villa Lisanna",
-    "description": "Luxury vacation rental villa on private Gasparilla Island, Florida",
+    "description": "Luxury vacation rental villa on private Little Gasparilla Island, Florida",
     "url": "https://www.villalisanna.com",
     "telephone": "+1-832-763-5760",
     "email": "liset.garcell05@gmail.com",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Gasparilla Island",
+      "streetAddress": "Little Gasparilla Island",
       "addressLocality": "Boca Grande",
       "addressRegion": "FL",
       "postalCode": "33921",
@@ -73,7 +73,7 @@
     "telephone": "+1-832-763-5760",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Gasparilla Island",
+      "streetAddress": "Little Gasparilla Island",
       "addressLocality": "Boca Grande",
       "addressRegion": "FL",
       "postalCode": "33921",
@@ -97,6 +97,12 @@
   </script>
 </head>
 <body>
+
+<!-- Error Banner (CEREBRO DEBUG) -->
+<div id="errorBanner" style="display:none; position:fixed; top:0; left:0; right:0; background:#ff4444; color:white; padding:15px 20px; z-index:100000; font-weight:bold; text-align:center; border-bottom:2px solid #cc0000;">
+  <span id="errorBannerText"></span>
+  <button onclick="document.getElementById('errorBanner').style.display='none'" style="float:right; background:white; color:#ff4444; border:none; padding:5px 10px; cursor:pointer; font-weight:bold;">✕</button>
+</div>
 
 <!-- Header -->
 <header id="siteHeader" class="header">
@@ -265,13 +271,13 @@
     <p class="section-subtitle" data-i18n="gallery.subtitle">Professional photography of each space</p>
 
     <div class="gallery-preview-grid">
-      <figure class="gallery-preview-item">
+      <figure class="gallery-preview-item" data-lightbox>
         <img src="/img/sala-1.jpg" alt="Main room of Villa Lisanna with gray sofa and ocean views" loading="lazy">
       </figure>
-      <figure class="gallery-preview-item">
+      <figure class="gallery-preview-item" data-lightbox>
         <img src="/img/sala-2.jpg" alt="Detail of decoration and living room furniture with plants" loading="lazy">
       </figure>
-      <figure class="gallery-preview-item">
+      <figure class="gallery-preview-item" data-lightbox>
         <img src="/img/sala-3.jpg" alt="Living room with large windows and view to garden and beach" loading="lazy">
       </figure>
     </div>
@@ -439,7 +445,7 @@
       <div id="map" class="map-container"></div>
       <div class="location-info">
         <div class="location-card">
-          <h3 data-i18n="location.location_name">Gasparilla Island, Florida</h3>
+          <h3 data-i18n="location.location_name">Little Gasparilla Island, Florida</h3>
           <p data-i18n="location.location_text">Located on a dreamlike private island, Villa Lisanna offers absolute privacy with easy access to services. Virgin beaches, exclusive community and the retreat you've always dreamed of.</p>
           <ul class="location-list">
             <li><i class="fas fa-map-marker-alt"></i> <span data-i18n="location.private_beach">Private island with virgin beaches</span></li>
@@ -542,7 +548,7 @@
           <i class="fas fa-chevron-down accordion-toggle"></i>
         </button>
         <div class="accordion-content">
-          <p data-i18n="faq.beach_a">Yes. Gasparilla Island is a private island with virgin beaches. The private golf cart is available 24/7 for free exploration.</p>
+          <p data-i18n="faq.beach_a">Yes. Little Gasparilla Island is a private island with virgin beaches. The private golf cart is available 24/7 for free exploration.</p>
         </div>
       </div>
 
@@ -648,7 +654,7 @@
       </div>
       <div class="footer-section">
         <h4 data-i18n="footer.location">Location</h4>
-        <p>Gasparilla Island<br>Florida, United States</p>
+        <p>Little Gasparilla Island<br>Florida, United States</p>
       </div>
     </div>
     <div class="footer-bottom">
@@ -755,7 +761,7 @@ window.translations = {
       "concierge_desc": "Round-the-clock assistance for reservations and services"
     },
     "location": {
-      "title": "Gasparilla Island Paradise",
+      "title": "Little Gasparilla Island Paradise",
       "subtitle": "Exclusive island retreat on Florida's Gulf Coast"
     },
     "contact": {
@@ -839,7 +845,7 @@ window.translations = {
       "concierge_desc": "Asistencia disponible las 24 horas para reservas y servicios"
     },
     "location": {
-      "title": "Paraíso de Gasparilla Island",
+      "title": "Paraíso de Little Gasparilla Island",
       "subtitle": "Retiro exclusivo en la costa del Golfo de Florida"
     },
     "contact": {
@@ -882,7 +888,7 @@ function initializeMap() {
   }).addTo(map);
 
   const marker = L.marker(gasparillaLocation).addTo(map);
-  marker.bindPopup('<b>Villa Lisanna</b><br>Gasparilla Island, Florida');
+  marker.bindPopup('<b>Villa Lisanna</b><br>Little Gasparilla Island, Florida');
 }
 
 document.addEventListener('DOMContentLoaded', initializeMap);
