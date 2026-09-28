@@ -39,12 +39,26 @@ if (infoPanelToggle && infoPanel) {
   }, { passive: true });
 }
 
-// Guest Count Selector
+// Guest Count Selector - FIX para iOS (sin picker nativo)
 const guestSelector = document.getElementById('guestCount');
 if (guestSelector) {
-  guestSelector.addEventListener('change', (e) => {
-    const selectedGuests = parseInt(e.target.value) || 2;
+  // Validar entrada numérica
+  guestSelector.addEventListener('input', (e) => {
+    let val = e.target.value.replace(/[^0-9]/g, '');
+    if (val === '') val = '2';
+    const num = parseInt(val);
+    if (num < 1) val = '1';
+    if (num > 10) val = '10';
+    e.target.value = val;
+    const selectedGuests = parseInt(val) || 2;
     console.log(`✅ Guests selected: ${selectedGuests}`);
+  });
+
+  // Prevenir caracteres no numéricos
+  guestSelector.addEventListener('keydown', (e) => {
+    if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+      e.preventDefault();
+    }
   });
 }
 
