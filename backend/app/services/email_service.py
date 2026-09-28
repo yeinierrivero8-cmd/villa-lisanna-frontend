@@ -2,6 +2,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask import current_app, render_template_string
+from html import escape
 
 class EmailService:
 
@@ -66,15 +67,19 @@ class EmailService:
 
         subject = f"Solicitud de Reserva #{booking.confirmation_code} - Villa Lisanna"
 
+        # Escapar datos del usuario para prevenir HTML injection
+        guest_name = escape(booking.guest_name)
+        confirmation_code = escape(booking.confirmation_code)
+
         html_content = f"""
         <html>
             <body style="font-family: Arial, sans-serif; background-color: #f5f5f5;">
                 <div style="background-color: #fff; padding: 20px; border-radius: 8px; max-width: 600px;">
                     <h2 style="color: #2D7A9F;">¡Solicitud Recibida!</h2>
-                    <p>Hola {booking.guest_name},</p>
+                    <p>Hola {guest_name},</p>
                     <p>Hemos recibido tu solicitud de reserva. Liset revisará tu solicitud y se pondrá en contacto contigo pronto.</p>
 
-                    <h3 style="color: #00E5FF;">Código de Confirmación: {booking.confirmation_code}</h3>
+                    <h3 style="color: #00E5FF;">Código de Confirmación: {confirmation_code}</h3>
 
                     <p><strong>Detalles de tu solicitud:</strong></p>
                     <ul>
@@ -99,10 +104,16 @@ class EmailService:
     def send_admin_notification(booking):
         from app.services.stripe_service import StripeService
 
-        subject = f"Nueva Solicitud de Reserva: {booking.confirmation_code}"
+        # Escapar datos del usuario
+        guest_name = escape(booking.guest_name)
+        guest_email = escape(booking.guest_email)
+        guest_phone = escape(booking.guest_phone)
+        confirmation_code = escape(booking.confirmation_code)
 
-        payment_qr_url = f"{current_app.config.get('BASE_URL', 'https://www.villalisanna.com')}/api/bookings/{booking.confirmation_code}/balance-checkout"
-        qr_result = StripeService.generate_payment_qr(booking.confirmation_code, payment_qr_url)
+        subject = f"Nueva Solicitud de Reserva: {confirmation_code}"
+
+        payment_qr_url = f"{current_app.config.get('BASE_URL', 'https://www.villalisanna.com')}/api/bookings/{confirmation_code}/balance-checkout"
+        qr_result = StripeService.generate_payment_qr(confirmation_code, payment_qr_url)
 
         qr_image = ""
         if qr_result['success']:
@@ -121,10 +132,10 @@ class EmailService:
                 <div style="background-color: #fff; padding: 20px; border-radius: 8px; max-width: 600px; border-left: 4px solid #FFD700;">
                     <h2 style="color: #FFD700;">Nueva Solicitud de Reserva</h2>
 
-                    <p><strong>Cliente:</strong> {booking.guest_name}</p>
-                    <p><strong>Email:</strong> {booking.guest_email}</p>
-                    <p><strong>Teléfono:</strong> {booking.guest_phone}</p>
-                    <p><strong>Código de Confirmación:</strong> {booking.confirmation_code}</p>
+                    <p><strong>Cliente:</strong> {guest_name}</p>
+                    <p><strong>Email:</strong> {guest_email}</p>
+                    <p><strong>Teléfono:</strong> {guest_phone}</p>
+                    <p><strong>Código de Confirmación:</strong> {confirmation_code}</p>
 
                     <h3 style="color: #FFD700;">Detalles de la Reserva</h3>
                     <ul>
@@ -156,17 +167,21 @@ class EmailService:
 
     @staticmethod
     def send_booking_balance_receipt(booking):
-        subject = f"Saldo Pagado - Reserva {booking.confirmation_code}"
+        # Escapar datos del usuario
+        guest_name = escape(booking.guest_name)
+        confirmation_code = escape(booking.confirmation_code)
+
+        subject = f"Saldo Pagado - Reserva {confirmation_code}"
 
         html_content = f"""
         <html>
             <body style="font-family: Arial, sans-serif; background-color: #f5f5f5;">
                 <div style="background-color: #fff; padding: 20px; border-radius: 8px; max-width: 600px;">
                     <h2 style="color: #2D7A9F;">✅ ¡Pago Completo Recibido!</h2>
-                    <p>Hola {booking.guest_name},</p>
+                    <p>Hola {guest_name},</p>
                     <p>Hemos recibido el pago del saldo de tu reserva. Tu reserva está confirmada.</p>
 
-                    <h3 style="color: #00E5FF;">Código de Reserva: {booking.confirmation_code}</h3>
+                    <h3 style="color: #00E5FF;">Código de Reserva: {confirmation_code}</h3>
 
                     <p><strong>Detalles de tu reserva:</strong></p>
                     <ul>
@@ -184,36 +199,6 @@ class EmailService:
                     <p>Gracias por elegir Villa Lisanna.</p>
 
                     <p style="color: #999; font-size: 12px;">Este es un email automático. Por favor no respondas a este correo.</p>
-                </div>
-            </body>
-        </html>
-        """
-
-        return EmailService.send_email(booking.guest_email, subject, html_content)
-
-    @staticmethod
-    def send_deposit_payment_link(booking, payment_url):
-        subject = f"Enlace de Pago - Depósito Reserva #{booking.confirmation_code}"
-
-        html_content = f"""
-        <html>
-            <body style="font-family: Arial, sans-serif; background-color: #f5f5f5;">
-                <div style="background-color: #fff; padding: 20px; border-radius: 8px; max-width: 600px;">
-                    <h2 style="color: #2D7A9F;">Tu Reserva fue Aprobada</h2>
-                    <p>¡Excelente! Tu solicitud de reserva ha sido aprobada.</p>
-
-                    <h3 style="color: #00E5FF;">Próximo Paso: Paga el Depósito</h3>
-                    <p>Depósito requerido: <strong>${booking.deposit_amount:,.2f}</strong></p>
-
-                    <p>
-                        <a href="{payment_url}"
-                           style="display: inline-block; background-color: #00E5FF; color: #000; padding: 12px 24px;
-                                  text-decoration: none; border-radius: 4px; font-weight: bold;">
-                            Pagar Depósito Ahora
-                        </a>
-                    </p>
-
-                    <p style="color: #999; font-size: 12px;">Este enlace expira en 48 horas. Si no pagas en ese tiempo, la reserva será cancelada.</p>
                 </div>
             </body>
         </html>

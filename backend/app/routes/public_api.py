@@ -5,9 +5,36 @@ from app.models import Booking, BlockedDate, Inquiry, PricingConfig, SeasonalOff
 from app.services.pricing import PricingService
 from app.services.email_service import EmailService
 from app.services.stripe_service import StripeService
+from app import limiter
+from email_validator import validate_email, EmailNotValidError
 import threading
 
 api = Blueprint('api', __name__, url_prefix='/api')
+
+def check_booking_overlap(check_in_date, check_out_date, exclude_booking_id=None):
+    """Verifica si hay solapamiento con reservas confirmadas."""
+    conflicting = Booking.query.filter(
+        Booking.status.in_(['approved', 'confirmed', 'completed']),
+        Booking.check_in_date < check_out_date,
+        Booking.check_out_date > check_in_date
+    ).first()
+
+    if conflicting:
+        return True, conflicting
+    return False, None
+
+def check_blocked_dates(check_in_date, check_out_date):
+    """Verifica si hay fechas bloqueadas en el rango de reserva."""
+    blocked_dates = BlockedDate.query.filter(
+        BlockedDate.date >= check_in_date,
+        BlockedDate.date < check_out_date
+    ).all()
+
+    if blocked_dates:
+        blocked_list = [bd.date.isoformat() for bd in blocked_dates]
+        return True, blocked_list
+
+    return False, []
 
 @api.route('/offers', methods=['GET'])
 def get_active_offers():
@@ -67,7 +94,11 @@ def get_quote():
         if not check_in or not check_out:
             return jsonify({'success': False, 'error': 'Missing check_in_date or check_out_date'}), 400
 
-        quote = PricingService.calculate_quote(check_in, check_out, guest_count)
+        try:
+            quote = PricingService.calculate_quote(check_in, check_out, guest_count)
+        except ValueError as e:
+            print(f"[ERROR] Invalid date format in quote: {str(e)}")
+            return jsonify({'success': False, 'error': 'Invalid date format - use YYYY-MM-DD'}), 400
 
         if 'error' in quote:
             return jsonify({'success': False, 'error': quote['error']}), 400
@@ -80,6 +111,7 @@ def get_quote():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @api.route('/bookings', methods=['POST'])
+@limiter.limit("5 per hour")  # Max 5 bookings per hour per IP
 def create_booking():
     try:
         # Handle both JSON and missing/invalid content-type safely
@@ -97,10 +129,12 @@ def create_booking():
                 print(f"[ERROR] Missing required field: {field}")
                 return jsonify({'success': False, 'error': f'Campo requerido: {field}'}), 400
 
-        import re
-        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-        if not re.match(email_regex, data.get('guest_email', '')):
-            print(f"[ERROR] Invalid email format: {data.get('guest_email')}")
+        # Validar email con librería email-validator (más robusta que regex)
+        try:
+            valid_email = validate_email(data.get('guest_email', ''))
+            guest_email = valid_email.normalized
+        except EmailNotValidError as e:
+            print(f"[ERROR] Invalid email format: {data.get('guest_email')} - {str(e)}")
             return jsonify({'success': False, 'error': 'Email inválido'}), 400
 
         check_in_str = data.get('check_in') or data.get('check_in_date')
@@ -119,9 +153,40 @@ def create_booking():
         if 'error' in quote:
             return jsonify({'success': False, 'error': quote['error']}), 400
 
+        # VALIDACIÓN: Verificar overlaps con otras reservas
+        is_overlap, conflicting = check_booking_overlap(check_in, check_out)
+        if is_overlap:
+            print(f"[ERROR] Booking overlap detected with booking {conflicting.id}")
+            return jsonify({
+                'success': False,
+                'error': f'Las fechas se solapan con reserva existente ({conflicting.confirmation_code})'
+            }), 409
+
+        # VALIDACIÓN: Verificar fechas bloqueadas
+        has_blocked, blocked_list = check_blocked_dates(check_in, check_out)
+        if has_blocked:
+            print(f"[ERROR] Booking contains blocked dates: {blocked_list}")
+            return jsonify({
+                'success': False,
+                'error': f'Estas fechas no están disponibles (bloqueadas): {", ".join(blocked_list)}'
+            }), 409
+
+        # VALIDACIÓN DE SEGURIDAD: Verificar montos recalculados
+        # Si el cliente envió montos, compararlos con los calculados en backend
+        if data.get('deposit_amount'):
+            client_deposit = float(data.get('deposit_amount', 0))
+            calculated_deposit = quote['deposit_amount']
+            # Permitir diferencia de 1 centavo por redondeo
+            if abs(client_deposit - calculated_deposit) > 0.01:
+                print(f"[SECURITY WARNING] Deposit amount mismatch: client={client_deposit}, calculated={calculated_deposit}")
+                return jsonify({
+                    'success': False,
+                    'error': 'Quote mismatch - please recalculate'
+                }), 400
+
         booking = Booking(
             guest_name=data['guest_name'],
-            guest_email=data['guest_email'],
+            guest_email=guest_email,  # Usar email validado y normalizado
             guest_phone=data['guest_phone'],
             guest_count=guest_count,
             guest_age_confirmed=data.get('age_confirmed', False),
@@ -242,6 +307,7 @@ def booking_success():
         return f'<h1>Error: {str(e)}</h1>', 500
 
 @api.route('/bookings/<code>/status', methods=['GET'])
+@limiter.limit("10 per minute")  # Max 10 status checks per minute per IP
 def get_booking_status(code):
     try:
         booking = Booking.query.filter_by(confirmation_code=code).first()

@@ -1,5 +1,8 @@
-// API Base URL Configuration (ruta relativa - funciona en cualquier dominio)
-const API_BASE_URL = window.location.origin;
+// API Base URL Configuration
+// En localhost usa port 5000 (backend), en producción usa ruta relativa
+const API_BASE_URL = window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : window.location.origin;
 
 // Info Panel Toggle
 const infoPanelToggle = document.getElementById('infoPanelToggle');
@@ -40,7 +43,7 @@ if (infoPanelToggle && infoPanel) {
 const guestSelector = document.getElementById('guestCount');
 if (guestSelector) {
   guestSelector.addEventListener('change', (e) => {
-    const selectedGuests = e.target.value;
+    const selectedGuests = parseInt(e.target.value) || 2;
     console.log(`✅ Guests selected: ${selectedGuests}`);
   });
 }
@@ -60,8 +63,10 @@ function initializeFlatpickr() {
       if (response.ok) {
         const data = await response.json();
         // Convert ISO date strings to Date objects for Flatpickr to parse correctly
+        // Use local timezone (no Z suffix) to avoid timezone offset issues
         occupiedDates = (data.unavailable_dates || []).map(dateStr => {
-          return new Date(dateStr + 'T00:00:00Z');
+          const [year, month, day] = dateStr.split('-');
+          return new Date(year, parseInt(month) - 1, day);
         });
         console.log('[CALENDAR] Loaded unavailable dates:', occupiedDates.length, 'dates');
         initializeCalendar();
@@ -110,7 +115,7 @@ function initializeFlatpickr() {
   async function updateQuotePreview(selectedDates) {
     if (selectedDates.length !== 2) return;
 
-    const guestCount = document.getElementById('guestCount').value || 2;
+    const guestCount = parseInt(document.getElementById('guestCount').value) || 2;
     const checkIn = selectedDates[0].toISOString().split('T')[0];
     const checkOut = selectedDates[1].toISOString().split('T')[0];
 
@@ -121,7 +126,7 @@ function initializeFlatpickr() {
         body: JSON.stringify({
           check_in_date: checkIn,
           check_out_date: checkOut,
-          guest_count: parseInt(guestCount)
+          guest_count: guestCount
         })
       });
 
@@ -345,7 +350,7 @@ function initPriceCalculator() {
     const checkOut = parseDate(dates[1]);
     if (!checkIn || !checkOut) return;
 
-    const guestCount = document.getElementById('guestCount')?.value || 2;
+    const guestCount = parseInt(document.getElementById('guestCount')?.value) || 2;
     const checkInStr = checkIn.toISOString().split('T')[0];
     const checkOutStr = checkOut.toISOString().split('T')[0];
 
@@ -355,7 +360,7 @@ function initPriceCalculator() {
       body: JSON.stringify({
         check_in_date: checkInStr,
         check_out_date: checkOutStr,
-        guest_count: parseInt(guestCount)
+        guest_count: guestCount
       })
     }).then(r => r.ok ? r.json() : null).then(quote => {
       if (!quote) return;
@@ -417,7 +422,7 @@ if (contactForm) {
 
     // Encode for WhatsApp
     const encodedMessage = encodeURIComponent(whatsappMessage);
-    const whatsappUrl = `https://wa.me/18327635760?text=${encodedMessage}`;
+    const whatsappUrl = `https://wa.me/19418000120?text=${encodedMessage}`;
 
     // Open WhatsApp
     window.open(whatsappUrl, '_blank');
@@ -524,7 +529,7 @@ function openBookingModal() {
   try {
     console.log('[CEREBRO DEBUG] openBookingModal() called');
     const dateRangeInput = document.getElementById('dateRange');
-    guestCount = document.getElementById('guestCount').value;
+    guestCount = parseInt(document.getElementById('guestCount').value) || 2;
     dateRange = dateRangeInput ? dateRangeInput.value.trim() : '';
 
     console.log('[CEREBRO DEBUG] dateRangeInput:', dateRangeInput);
@@ -957,8 +962,16 @@ function initGalleryModal() {
       if (infoPanelToggle) infoPanelToggle.setAttribute('aria-expanded', 'false');
     }
     console.log('[GALLERY DEBUG] modal:', modal);
+
+    // iOS Safari fix: Remove hidden class BEFORE adding active
+    if (modal.classList.contains('hidden')) {
+      modal.classList.remove('hidden');
+    }
+
+    // Force layout recalculation
+    void modal.offsetHeight;
+
     modal.classList.add('active');
-    modal.classList.remove('hidden');
     currentImageIndex = 0;
     updateImage();
     document.body.style.overflow = 'hidden';
@@ -966,31 +979,47 @@ function initGalleryModal() {
   };
 
   console.log('[GALLERY DEBUG] Adding event listeners to button');
-  openBtn.addEventListener('click', (e) => {
-    console.log('[GALLERY DEBUG] CLICK event fired', { isTrusted: e.isTrusted, button: e.button, detail: e.detail });
+
+  // Primary handler: touchend (iOS) + click (desktop)
+  const handleOpen = (e) => {
+    console.log('[GALLERY DEBUG] Event fired:', { type: e.type, isTrusted: e.isTrusted });
     e.preventDefault();
     e.stopPropagation();
     openGallery();
-  });
-  openBtn.addEventListener('touchstart', (e) => {
-    console.log('[GALLERY DEBUG] TOUCHSTART event fired', { touches: e.touches.length, isTrusted: e.isTrusted });
-  });
-  openBtn.addEventListener('touchend', (e) => {
-    console.log('[GALLERY DEBUG] TOUCHEND event fired', { touches: e.touches.length, changedTouches: e.changedTouches.length, isTrusted: e.isTrusted });
-    e.preventDefault();
-    e.stopPropagation();
-    openGallery();
-  });
-  openBtn.addEventListener('pointerdown', (e) => {
-    console.log('[GALLERY DEBUG] POINTERDOWN event fired', { pointerType: e.pointerType, isPrimary: e.isPrimary });
-  });
+    return false;
+  };
+
+  // iOS prefers touchend over click
+  openBtn.addEventListener('touchend', handleOpen, false);
+
+  // Desktop fallback
+  openBtn.addEventListener('click', handleOpen, false);
+
+  // Pointer events for hybrid devices
+  openBtn.addEventListener('pointerup', (e) => {
+    if (e.pointerType !== 'mouse') {
+      console.log('[GALLERY DEBUG] POINTERUP event fired', { pointerType: e.pointerType });
+      e.preventDefault();
+      e.stopPropagation();
+      openGallery();
+    }
+  }, false);
+
+  // Ensure button is always accessible
+  openBtn.style.pointerEvents = 'auto';
+  openBtn.style.touchAction = 'manipulation';
 
   closeBtn.addEventListener('click', closeModal);
   overlay.addEventListener('click', closeModal);
 
   function closeModal() {
+    console.log('[GALLERY DEBUG] closeModal() called');
     modal.classList.remove('active');
-    setTimeout(() => modal.classList.add('hidden'), 300);
+    // iOS Safari fix: Add hidden class with delay to allow opacity transition
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      console.log('[GALLERY DEBUG] Modal hidden after transition');
+    }, 300);
     document.body.style.overflow = '';
   }
 
@@ -1097,12 +1126,149 @@ function showDebugPanel() {
   }
 }
 
-// Inicializar galería modal
-console.log('[GALLERY DEBUG] Document readyState:', document.readyState);
+// Inicializar galería modal (ANTIGUA - MANTENER SIN CAMBIOS)
+// DESHABILITADO: Gallery modal legacy code (replaced with expandable gallery)
+// console.log('[GALLERY DEBUG] Document readyState:', document.readyState);
+// if (document.readyState === 'loading') {
+//   console.log('[GALLERY DEBUG] DOM still loading, waiting for DOMContentLoaded');
+//   document.addEventListener('DOMContentLoaded', initGalleryModal);
+// } else {
+//   console.log('[GALLERY DEBUG] DOM already loaded, calling initGalleryModal immediately');
+//   initGalleryModal();
+// }
+
+// ============================================
+// NUEVA GALERÍA EXPANDIBLE (FUNCIONA EN SAFARI)
+// ============================================
+
+const galleryExpandBtn = document.getElementById('openGalleryBtn');
+const galleryExpandedSection = document.getElementById('galleryExpanded');
+const galleryCloseBtn = document.getElementById('closeGalleryBtn');
+const photoOverlay = document.getElementById('photoOverlay');
+const photoOverlayClose = document.getElementById('photoOverlayClose');
+const overlayImg = document.getElementById('overlayImg');
+const galleryGrid = document.getElementById('galleryGrid');
+
+// Todas las imágenes de la galería
+const allGalleryImages = [
+  '/img/sala-1.jpg', '/img/sala-2.jpg', '/img/sala-3.jpg', '/img/sala-4.jpg',
+  '/img/gallery-extra-1.jpg', '/img/gallery-extra-2.jpg', '/img/gallery-extra-3.jpg',
+  '/img/gallery-extra-4.jpg', '/img/gallery-extra-5.jpg', '/img/gallery-extra-6.jpg',
+  '/img/gallery-extra-7.jpg', '/img/gallery-extra-8.jpg', '/img/gallery-extra-9.jpg',
+  '/img/gallery-extra-10.jpg', '/img/gallery-extra-11.jpg', '/img/gallery-extra-12.jpg',
+  '/img/gallery-extra-13.jpg', '/img/gallery-extra-14.jpg', '/img/gallery-extra-15.jpg',
+  '/img/gallery-extra-16.jpg', '/img/gallery-extra-17.jpg', '/img/gallery-extra-18.jpg',
+  '/img/gallery-extra-19.jpg', '/img/gallery-extra-20.jpg', '/img/gallery-extra-21.jpg',
+  '/img/gallery-extra-22.jpg', '/img/gallery-extra-23.jpg', '/img/gallery-extra-24.jpg',
+  '/img/gallery-extra-25.jpg', '/img/gallery-extra-26.jpg', '/img/gallery-extra-27.jpg',
+  '/img/gallery-extra-28.jpg', '/img/gallery-extra-29.jpg', '/img/gallery-extra-30.jpg',
+  '/img/gallery-extra-31.jpg', '/img/gallery-extra-32.jpg', '/img/gallery-extra-33.jpg',
+  '/img/gallery-extra-34.jpg', '/img/gallery-extra-35.jpg', '/img/gallery-extra-36.jpg'
+];
+
+function initExpandableGallery() {
+  console.log('[GALLERY] Initializing expandable gallery...');
+  console.log('[GALLERY] galleryExpandBtn:', galleryExpandBtn);
+  console.log('[GALLERY] galleryGrid:', galleryGrid);
+
+  if (!galleryExpandBtn || !galleryGrid || !galleryExpandedSection) {
+    console.error('[GALLERY] ERROR: Required elements not found!', {
+      btn: !!galleryExpandBtn,
+      grid: !!galleryGrid,
+      section: !!galleryExpandedSection
+    });
+    return;
+  }
+
+  // Remover listeners antiguos del botón (de initGalleryModal)
+  const btnParent = galleryExpandBtn.parentNode;
+  if (btnParent) {
+    const newBtn = galleryExpandBtn.cloneNode(true);
+    btnParent.replaceChild(newBtn, galleryExpandBtn);
+  }
+
+  const expandBtn = document.getElementById('openGalleryBtn');
+  if (!expandBtn) {
+    console.error('[GALLERY] ERROR: Could not find expandBtn after clone!');
+    return;
+  }
+
+  // Limpiar grid por si acaso tiene elementos viejos
+  galleryGrid.innerHTML = '';
+
+  // Crear grid con todas las imágenes
+  console.log('[GALLERY] Loading', allGalleryImages.length, 'images...');
+  let loadedCount = 0;
+  allGalleryImages.forEach((imgSrc, index) => {
+    const img = document.createElement('img');
+    img.src = imgSrc;
+    img.alt = `Gallery photo ${index + 1}`;
+    img.dataset.index = index;
+    img.style.cursor = 'pointer';
+    img.onclick = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      openPhotoOverlay(imgSrc);
+    };
+    galleryGrid.appendChild(img);
+    loadedCount++;
+  });
+  console.log('[GALLERY] Loaded ' + loadedCount + ' images into grid');
+
+  // Evento: Abrir galería expandida
+  expandBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    galleryExpandedSection.classList.remove('hidden');
+    galleryExpandedSection.classList.add('active');
+    expandBtn.style.display = 'none';
+    document.body.style.overflow = 'hidden';
+  });
+
+  // Evento: Cerrar galería expandida
+  galleryCloseBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    galleryExpandedSection.classList.add('hidden');
+    galleryExpandedSection.classList.remove('active');
+    expandBtn.style.display = 'inline-flex';
+    document.body.style.overflow = '';
+  });
+
+  // Evento: Cerrar overlay de foto
+  photoOverlayClose.addEventListener('click', () => {
+    closePhotoOverlay();
+  });
+
+  // Evento: Click en overlay cierra también
+  photoOverlay.addEventListener('click', (e) => {
+    if (e.target === photoOverlay) {
+      closePhotoOverlay();
+    }
+  });
+}
+
+function openPhotoOverlay(imgSrc) {
+  overlayImg.src = imgSrc;
+  photoOverlay.classList.remove('hidden');
+  photoOverlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePhotoOverlay() {
+  photoOverlay.classList.add('hidden');
+  photoOverlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+// Inicializar galería expandible cuando el DOM esté listo
+console.log('[GALLERY] Document readyState:', document.readyState);
 if (document.readyState === 'loading') {
-  console.log('[GALLERY DEBUG] DOM still loading, waiting for DOMContentLoaded');
-  document.addEventListener('DOMContentLoaded', initGalleryModal);
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('[GALLERY] DOMContentLoaded fired, initializing expandable gallery...');
+    setTimeout(initExpandableGallery, 100); // Pequeño delay para asegurar que todos los elementos están listos
+  });
 } else {
-  console.log('[GALLERY DEBUG] DOM already loaded, calling initGalleryModal immediately');
-  initGalleryModal();
+  console.log('[GALLERY] DOM already loaded, initializing expandable gallery...');
+  setTimeout(initExpandableGallery, 100);
 }

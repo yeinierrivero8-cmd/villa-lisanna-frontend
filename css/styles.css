@@ -2985,6 +2985,11 @@ a:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: 44px;
+  min-width: 44px;
+  pointer-events: auto;
+  -webkit-user-select: none;
+  user-select: none;
   margin: 0 auto;
   display: block;
 }
@@ -3008,26 +3013,36 @@ a:focus-visible {
     right: 10px;
   }
 }
-/* Gallery Modal - FULLSCREEN */
+/* Gallery Modal - FULLSCREEN - iOS Safari compatible */
 .gallery-modal {
   position: fixed;
   top: 0;
   left: 0;
+  width: 100%;
+  height: 100%;
   width: 100vw;
   height: 100vh;
   z-index: 1000;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease;
   background: black;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  will-change: opacity;
+  -webkit-font-smoothing: antialiased;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .gallery-modal.active {
+  display: flex;
   opacity: 1;
-  visibility: visible;
+}
+
+.gallery-modal.hidden {
+  display: none !important;
+  opacity: 0 !important;
 }
 
 .gallery-modal-overlay {
@@ -3037,6 +3052,8 @@ a:focus-visible {
   width: 100%;
   height: 100%;
   background: black;
+  z-index: 0;
+  cursor: pointer;
 }
 
 .gallery-modal-content {
@@ -3129,10 +3146,6 @@ a:focus-visible {
   border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
-}
-
-.gallery-modal.hidden {
-  display: none;
 }
 
 /* Check-in / Check-out Info */
@@ -3265,4 +3278,375 @@ a {
 .modal-overlay {
   pointer-events: none !important;
   z-index: -1 !important;
+}
+
+/* Flatpickr - Fechas bloqueadas en rojo - iOS Safari fix */
+.flatpickr-calendar .flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled {
+  background-color: #fee2e2 !important;
+  color: #dc2626 !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+  cursor: not-allowed !important;
+  border-radius: 4px;
+  -webkit-appearance: none;
+  text-decoration: none;
+  pointer-events: none !important;
+}
+
+.flatpickr-calendar .flatpickr-day.flatpickr-disabled:hover,
+.flatpickr-day.flatpickr-disabled:hover {
+  background-color: #fecaca !important;
+  color: #b91c1c !important;
+}
+
+/* Fechas seleccionables */
+.flatpickr-day:not(.flatpickr-disabled):not(.other-month):hover {
+  background-color: #5B9CA6 !important;
+  color: white !important;
+}
+
+/* iOS Safari: Force red color on disabled dates */
+@supports (-webkit-appearance: none) {
+  .flatpickr-day.flatpickr-disabled {
+    background-color: #fee2e2 !important;
+    color: #dc2626 !important;
+  }
+}
+
+/* GALERÍA EXPANDIBLE - Nueva galería sin modal */
+.gallery-expanded {
+  display: none;
+  margin-top: 30px;
+  padding: 20px 0;
+}
+
+.gallery-expanded.active {
+  display: block;
+}
+
+.gallery-expanded.hidden {
+  display: none !important;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.gallery-grid img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.gallery-grid img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.gallery-grid img:active {
+  transform: scale(0.98);
+}
+
+/* Overlay para foto grande */
+.photo-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 2000;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+}
+
+.photo-overlay.active {
+  display: flex;
+}
+
+.photo-overlay.hidden {
+  display: none !important;
+}
+
+.photo-overlay-img {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.photo-overlay-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: white;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.photo-overlay-close:active {
+  transform: scale(0.95);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+}
+
+/* ============================================
+   GALLERY: Compact Grid + Expandible (NEW)
+   ============================================ */
+
+.gallery-section-compact .container {
+  max-width: 1200px;
+}
+
+.gallery-section-compact h2 {
+  max-width: 800px;
+  margin: 0 auto 12px;
+}
+
+/* GRID COMPACTO (2x2 inicial) */
+.gallery-compact-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  max-width: 900px;
+  margin: 0 auto 40px;
+}
+
+.gallery-compact-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #F0F0F0;
+  border: 1px solid rgba(91, 156, 166, 0.1);
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.gallery-compact-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gallery-compact-item:hover {
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+.gallery-compact-item:hover img {
+  transform: scale(1.08);
+}
+
+.gallery-item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.1));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gallery-compact-item:hover .gallery-item-overlay {
+  opacity: 1;
+}
+
+/* GRID EXPANDIDO (3-4 columnas, 20+ fotos) */
+.gallery-expanded {
+  display: none;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.gallery-expanded.active {
+  display: block;
+}
+
+.gallery-expanded.hidden {
+  display: none;
+}
+
+.gallery-expanded-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto 40px;
+}
+
+.gallery-expanded-grid img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid rgba(91, 156, 166, 0.1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  aspect-ratio: 1 / 1;
+}
+
+.gallery-expanded-grid img:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px) scale(1.04);
+  border-color: rgba(91, 156, 166, 0.3);
+}
+
+/* OVERLAY FOTO GRANDE (Full Screen) */
+.photo-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  box-sizing: border-box;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.photo-overlay.hidden {
+  display: none;
+}
+
+.photo-overlay.active {
+  display: flex;
+}
+
+.photo-overlay-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 28px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 2001;
+}
+
+.photo-overlay-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.photo-overlay-img {
+  max-width: 100%;
+  max-height: 90vh;
+  object-fit: contain;
+}
+
+/* RESPONSIVE GALLERY */
+@media (max-width: 1024px) {
+  .gallery-compact-grid {
+    gap: 16px;
+  }
+
+  .gallery-expanded-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .gallery-section-compact {
+    padding: 60px 20px;
+  }
+
+  .gallery-compact-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .gallery-expanded-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .photo-overlay-close {
+    width: 44px;
+    height: 44px;
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 640px) {
+  .gallery-section-compact {
+    padding: 32px 12px;
+  }
+
+  .gallery-compact-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .gallery-expanded-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .btn-large {
+    padding: 12px 20px;
+    font-size: 12px;
+  }
+
+  .photo-overlay {
+    padding: 12px;
+  }
+
+  .photo-overlay-close {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    top: 12px;
+    right: 12px;
+  }
+
+  .photo-overlay-img {
+    max-height: 85vh;
+  }
 }

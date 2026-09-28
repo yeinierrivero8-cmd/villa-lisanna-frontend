@@ -1,0 +1,27 @@
+# Villa Lisanna robots.txt
+# Generated: 2026-09-27
+
+# Allow all bots to crawl public content
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api
+Disallow: /static/admin
+
+# Specific rules for search engines
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+User-agent: Bingbot
+Allow: /
+Disallow: /admin
+Disallow: /api
+
+# Sitemap location
+Sitemap: https://villalisanna.com/sitemap.xml
+
+# Crawl delay (in seconds) - be respectful
+Crawl-delay: 1
+Request-rate: 30/60

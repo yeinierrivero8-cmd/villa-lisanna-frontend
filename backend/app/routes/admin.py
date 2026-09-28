@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for, session, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from datetime import datetime, date
+from html import escape
 from app.extensions import db, login_manager
 from app.models import AdminUser, Booking, BlockedDate, PricingConfig, SeasonalOffer
 from app.services.stripe_service import StripeService
@@ -185,7 +186,7 @@ def reject_booking(booking_id):
         EmailService.send_email(
             booking.guest_email,
             'Solicitud de Reserva Rechazada',
-            f'<p>Lo sentimos, tu solicitud de reserva #{booking.confirmation_code} ha sido rechazada.</p><p>Razón: {reason}</p>'
+            f'<p>Lo sentimos, tu solicitud de reserva #{escape(booking.confirmation_code)} ha sido rechazada.</p><p>Razón: {escape(reason)}</p>'
         )
 
         return jsonify({'success': True})

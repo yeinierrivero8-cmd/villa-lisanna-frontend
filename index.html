@@ -8,7 +8,7 @@
   <meta name="keywords" content="villa rental Florida, luxury vacation home, Little Gasparilla Island vacation rental, beach house rental, private villa rental, vacation home Florida, luxury accommodation, villa with hot tub, vacation rental with concierge">
   <meta name="theme-color" content="#F5F3F0">
   <meta property="og:title" content="Villa Lisanna — Your Luxury Escape">
-  <meta property="og:description" content="Experience luxury villa with premium amenities: Starlink, Jacuzzi, Pool, Golf Cart.">
+  <meta property="og:description" content="Experience luxury villa with premium amenities: Starlink, Heated Jacuzzi, Golf Cart, 24/7 Concierge.">
   <meta property="og:image" content="img/hero.jpg">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
@@ -17,8 +17,8 @@
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" as="style">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-  <!-- Lazy-load Flatpickr CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css" media="print" onload="this.media='all'">
+  <!-- Load Flatpickr CSS immediately (iOS Safari fix) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
   <link rel="stylesheet" href="/css/styles.css">
   <style>
     .language-switcher { display: flex; gap: 8px; align-items: center; }
@@ -42,8 +42,8 @@
     "name": "Villa Lisanna",
     "description": "Luxury vacation rental villa on private Little Gasparilla Island, Florida",
     "url": "https://www.villalisanna.com",
-    "telephone": "+1-832-763-5760",
-    "email": "liset.garcell05@gmail.com",
+    "telephone": "+1-941-800-0120",
+    "email": "reservations@villalisanna.com",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Little Gasparilla Island",
@@ -70,7 +70,7 @@
     "url": "https://www.villalisanna.com",
     "description": "Luxury private villa rental with heated jacuzzi, Starlink internet, golf cart & concierge",
     "image": "https://www.villalisanna.com/img/hero.jpg",
-    "telephone": "+1-832-763-5760",
+    "telephone": "+1-941-800-0120",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Little Gasparilla Island",
@@ -92,7 +92,7 @@
     "occupancy": "1-10 guests",
     "petsAllowed": false,
     "checkInTime": "16:00",
-    "checkOutTime": "11:00"
+    "checkOutTime": "10:00"
   }
   </script>
 </head>
@@ -142,6 +142,9 @@
       <div class="calendar-info">
         <span class="calendar-dot available"></span> <span data-i18n="calendar.available">Available</span>
         <span class="calendar-dot occupied"></span> <span data-i18n="calendar.occupied">Occupied</span>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ddd; font-size: 13px; color: #e74c3c; font-weight: 600;">
+          <span data-i18n="calendar.min_nights">Minimum 3 nights stay required</span>
+        </div>
       </div>
     </div>
 
@@ -156,22 +159,11 @@
       </div>
       <div class="info-item">
         <span class="info-label" data-i18n="calendar.check_out">Check-out</span>
-        <span class="info-value">11:00 AM</span>
+        <span class="info-value">10:00 AM</span>
       </div>
       <div class="info-item">
         <span class="info-label" data-i18n="calendar.guests">Guests</span>
-        <select id="guestCount" class="guest-selector">
-          <option value="1">1 guest</option>
-          <option value="2" selected>2 guests</option>
-          <option value="3">3 guests</option>
-          <option value="4">4 guests</option>
-          <option value="5">5 guests</option>
-          <option value="6">6 guests</option>
-          <option value="7">7 guests</option>
-          <option value="8">8 guests</option>
-          <option value="9">9 guests</option>
-          <option value="10">10 guests</option>
-        </select>
+        <input type="number" id="guestCount" class="guest-selector" value="2" min="1" max="10">
       </div>
     </div>
 
@@ -191,7 +183,7 @@
       </div>
       <div class="price-row">
         <span class="price-label" data-i18n="calendar.cleaning">Cleaning & services</span>
-        <span class="price-value">$295 USD</span>
+        <span class="price-value">$300 USD</span>
       </div>
       <div class="price-row">
         <span class="price-label" data-i18n="calendar.taxes">Taxes (12%)</span>
@@ -210,7 +202,7 @@
     <button id="bookingBtn" class="btn btn-primary btn-full" data-i18n="calendar.book_now">BOOK NOW</button>
 
     <div class="social-links">
-      <a href="https://wa.me/18327635760" class="social-link" title="WhatsApp" target="_blank" rel="noopener noreferrer">
+      <a href="https://wa.me/19418000120" class="social-link" title="WhatsApp" target="_blank" rel="noopener noreferrer">
         <i class="fab fa-whatsapp"></i>
       </a>
       <!-- Instagram: Enlace comentado hasta configurar perfil
@@ -264,54 +256,58 @@
   </div>
 </section>
 
-<!-- Galería Compacta -->
+<!-- Galería Compacta + Expandible (Grid Sin Modal) -->
 <section id="galeria" class="gallery-section-compact">
   <div class="container">
     <h2 data-i18n="gallery.title">Explore Every Corner</h2>
     <p class="section-subtitle" data-i18n="gallery.subtitle">Professional photography of each space</p>
 
-    <div class="gallery-preview-grid">
-      <figure class="gallery-preview-item" data-lightbox>
-        <img src="/img/sala-1.jpg" alt="Main room of Villa Lisanna with gray sofa and ocean views" loading="lazy">
-      </figure>
-      <figure class="gallery-preview-item" data-lightbox>
-        <img src="/img/sala-2.jpg" alt="Detail of decoration and living room furniture with plants" loading="lazy">
-      </figure>
-      <figure class="gallery-preview-item" data-lightbox>
-        <img src="/img/sala-3.jpg" alt="Living room with large windows and view to garden and beach" loading="lazy">
-      </figure>
-      <figure class="gallery-preview-item" data-lightbox>
-        <img src="/img/sala-4.jpg" alt="Additional view of Villa Lisanna interior" loading="lazy">
-      </figure>
+    <!-- Grid Compacto (2x2 por defecto) -->
+    <div class="gallery-compact-grid">
+      <div class="gallery-compact-item">
+        <img src="/img/sala-1.jpg" alt="Main living room with ocean views" loading="lazy">
+        <div class="gallery-item-overlay"></div>
+      </div>
+      <div class="gallery-compact-item">
+        <img src="/img/sala-2.jpg" alt="Living room detail with plants" loading="lazy">
+        <div class="gallery-item-overlay"></div>
+      </div>
+      <div class="gallery-compact-item">
+        <img src="/img/sala-3.jpg" alt="Living room with windows and garden view" loading="lazy">
+        <div class="gallery-item-overlay"></div>
+      </div>
+      <div class="gallery-compact-item">
+        <img src="/img/sala-4.jpg" alt="Interior view of Villa Lisanna" loading="lazy">
+        <div class="gallery-item-overlay"></div>
+      </div>
     </div>
 
-    <button id="openGalleryBtn" class="btn btn-secondary btn-large">
+    <!-- Botón Expandir -->
+    <button id="openGalleryBtn" class="btn btn-secondary btn-large" style="margin-top: 32px;">
       <i class="fas fa-images"></i> <span data-i18n="gallery.view_full">View Full Gallery</span>
     </button>
-  </div>
-</section>
 
-<!-- Modal Galería -->
-<div id="galleryModal" class="gallery-modal hidden">
-  <div class="gallery-modal-overlay" id="galleryModalOverlay"></div>
-  <div class="gallery-modal-content">
-    <button id="galleryModalClose" class="gallery-modal-close">
-      <i class="fas fa-times"></i>
-    </button>
+    <!-- Grid Expandido (Oculto por defecto - 20+ fotos) -->
+    <div id="galleryExpanded" class="gallery-expanded hidden">
+      <div class="gallery-expanded-grid" id="galleryGrid">
+        <!-- Se llena dinámicamente con JavaScript -->
+      </div>
 
-    <div class="gallery-carousel">
-      <img id="galleryCarouselImg" src="" alt="Foto de galería" class="gallery-carousel-img">
-      <button id="galleryPrev" class="gallery-carousel-btn gallery-carousel-prev">
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <button id="galleryNext" class="gallery-carousel-btn gallery-carousel-next">
-        <i class="fas fa-chevron-right"></i>
-      </button>
-      <div class="gallery-carousel-counter">
-        <span id="galleryCounter">1</span> / <span id="galleryTotal">1</span>
+      <div style="display: flex; gap: 12px; justify-content: center; margin-top: 32px; flex-wrap: wrap;">
+        <button id="closeGalleryBtn" class="btn btn-secondary">
+          <i class="fas fa-times"></i> <span data-i18n="gallery.close">Close Gallery</span>
+        </button>
       </div>
     </div>
   </div>
+</section>
+
+<!-- Overlay Foto Grande (Full Screen - Sin Modal) -->
+<div id="photoOverlay" class="photo-overlay hidden">
+  <button class="photo-overlay-close" id="photoOverlayClose" aria-label="Close">
+    <i class="fas fa-times"></i>
+  </button>
+  <img id="overlayImg" src="" alt="Full size photo" class="photo-overlay-img">
 </div>
 
 <!-- Amenidades Premium -->
@@ -337,7 +333,7 @@
       </div>
       <div class="amenity-card" data-animate>
         <div class="amenity-image-container">
-          <img src="/img/bed.jpg" alt="Premium king size beds" class="amenity-img" loading="lazy">
+          <img src="/img/cama-king-premium.jpg" alt="Premium king size beds" class="amenity-img" loading="lazy">
         </div>
         <h3 data-i18n="amenities.bed_title">🛏️ Premium King Beds</h3>
         <p data-i18n="amenities.bed_text">5-star memory foam mattresses + 1000 thread Egyptian cotton sheets. Luxury hotel sleep every night.</p>
@@ -625,10 +621,10 @@
         <h3 data-i18n="faq.questions">Additional questions?</h3>
         <p data-i18n="faq.questions_text">Our team responds in minutes by WhatsApp or email.</p>
         <div class="contact-buttons">
-          <a href="https://wa.me/18327635760?text=Hi,%20I%20have%20a%20question%20about%20Villa%20Lisanna" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
+          <a href="https://wa.me/19418000120?text=Hi,%20I%20have%20a%20question%20about%20Villa%20Lisanna" class="btn btn-primary" target="_blank" rel="noopener noreferrer">
             <i class="fab fa-whatsapp"></i> <span data-i18n="faq.chat_whatsapp">Chat on WhatsApp</span>
           </a>
-          <a href="mailto:liset.garcell05@gmail.com" class="btn btn-secondary">
+          <a href="mailto:reservations@villalisanna.com" class="btn btn-secondary">
             <i class="fas fa-envelope"></i> <span data-i18n="faq.send_email">Send Email</span>
           </a>
         </div>
@@ -652,8 +648,8 @@
       </div>
       <div class="footer-section">
         <h4 data-i18n="footer.contact">Contact</h4>
-        <p><a href="tel:+18327635760">+1 832 763 5760</a></p>
-        <p><a href="mailto:liset.garcell05@gmail.com">liset.garcell05@gmail.com</a></p>
+        <p><a href="tel:+19418000120">+1 941 800 0120</a></p>
+        <p><a href="mailto:reservations@villalisanna.com">reservations@villalisanna.com</a></p>
       </div>
       <div class="footer-section">
         <h4 data-i18n="footer.location">Location</h4>
@@ -725,6 +721,7 @@ window.translations = {
       "check_in": "Check-in",
       "check_out": "Check-out",
       "guests": "Guests",
+      "min_nights": "Minimum 3 nights stay required",
       "night_rate": "Rate per night",
       "nights_selected": "Nights selected",
       "subtotal": "Subtotal (lodging)",
@@ -878,6 +875,7 @@ window.translations = {
       "check_in": "Check-in",
       "check_out": "Check-out",
       "guests": "Huéspedes",
+      "min_nights": "Mínimo 3 noches de estadía requeridas",
       "night_rate": "Tarifa por noche",
       "nights_selected": "Noches seleccionadas",
       "subtotal": "Subtotal (hospedaje)",
@@ -1036,7 +1034,7 @@ document.addEventListener('DOMContentLoaded', initializeMap);
 </script>
 
 <!-- Floating WhatsApp Button -->
-<a href="https://wa.me/18327635760?text=Hi,%20I'm%20interested%20in%20learning%20more%20about%20Villa%20Lisanna" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Contact us on WhatsApp">
+<a href="https://wa.me/19418000120?text=Hi,%20I'm%20interested%20in%20learning%20more%20about%20Villa%20Lisanna" class="whatsapp-float" target="_blank" rel="noopener noreferrer" title="Contact us on WhatsApp">
   <i class="fab fa-whatsapp"></i>
 </a>
 

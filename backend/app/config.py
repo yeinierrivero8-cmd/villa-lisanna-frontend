@@ -1,4 +1,5 @@
 import os
+import secrets
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -19,7 +20,10 @@ class Config:
     # SQLite con ruta relativa (compatible con Windows y Linux)
     SQLALCHEMY_DATABASE_URI = f'sqlite:///{db_file_path.replace(chr(92), "/")}'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+    SECRET_KEY = os.getenv('SECRET_KEY', secrets.token_hex(32))
+
+    # Base URL para emails y URLs internas
+    BASE_URL = os.getenv('BASE_URL', 'http://localhost:5000')
 
     STRIPE_PUBLIC_KEY = os.getenv('STRIPE_PUBLIC_KEY')
     STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
@@ -57,6 +61,10 @@ class TestingConfig(Config):
 class ProductionConfig(Config):
     DEBUG = False
     TESTING = False
+    PREFERRED_URL_SCHEME = 'https'
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
 
 config = {
     'development': DevelopmentConfig,

@@ -43,7 +43,7 @@ class PricingConfig(db.Model):
     sales_tax_rate = db.Column(db.Float, nullable=False, default=0.12)
 
     # Restrictions
-    min_nights = db.Column(db.Integer, nullable=False, default=2)
+    min_nights = db.Column(db.Integer, nullable=False, default=3)
     max_nights = db.Column(db.Integer, nullable=False, default=28)
     max_guests = db.Column(db.Integer, nullable=False, default=10)
     min_age = db.Column(db.Integer, nullable=False, default=25)
@@ -164,9 +164,16 @@ class Booking(db.Model):
         import secrets
         import string
         chars = string.ascii_uppercase + string.digits
-        code = ''.join(secrets.choice(chars) for _ in range(12))
-        self.confirmation_code = code
-        return code
+        max_retries = 5
+
+        for attempt in range(max_retries):
+            code = ''.join(secrets.choice(chars) for _ in range(12))
+            existing = Booking.query.filter_by(confirmation_code=code).first()
+            if not existing:
+                self.confirmation_code = code
+                return code
+
+        raise RuntimeError(f"Could not generate unique confirmation code after {max_retries} retries")
 
     def set_deposit_hold(self, hours):
         self.deposit_hold_until = datetime.utcnow() + timedelta(hours=hours)

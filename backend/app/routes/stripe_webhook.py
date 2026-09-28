@@ -8,6 +8,8 @@ webhook = Blueprint('webhook', __name__, url_prefix='/api')
 
 @webhook.route('/stripe/webhook', methods=['POST'])
 def stripe_webhook():
+    # CSRF protection is exempted at app initialization level for this route
+    # (see __init__.py csrf.exempt_list)
     payload = request.get_data(as_text=True)
     sig_header = request.headers.get('Stripe-Signature')
 
