@@ -3322,11 +3322,11 @@ a {
 }
 
 .gallery-expanded.active {
-  display: block;
+  display: block !important;
 }
 
 .gallery-expanded.hidden {
-  display: none !important;
+  display: none;
 }
 
 .gallery-grid {
@@ -3370,12 +3370,12 @@ a {
   padding: 40px 20px;
 }
 
-.photo-overlay.active {
-  display: flex;
+.photo-overlay.hidden {
+  display: none;
 }
 
-.photo-overlay.hidden {
-  display: none !important;
+.photo-overlay.active {
+  display: flex !important;
 }
 
 .photo-overlay-img {

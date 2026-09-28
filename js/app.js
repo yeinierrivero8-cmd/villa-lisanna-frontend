@@ -42,21 +42,33 @@ if (infoPanelToggle && infoPanel) {
 // Guest Count Selector - FIX para iOS (sin picker nativo)
 const guestSelector = document.getElementById('guestCount');
 if (guestSelector) {
-  // Validar entrada numérica
+  // Store original value to prevent clearing
+  const originalValue = guestSelector.value || '2';
+
+  // Validar entrada numérica - SOLO valida el rango, no limpia caracteres
   guestSelector.addEventListener('input', (e) => {
-    let val = e.target.value.replace(/[^0-9]/g, '');
-    if (val === '') val = '2';
-    const num = parseInt(val);
-    if (num < 1) val = '1';
-    if (num > 10) val = '10';
+    // Solo permitir números, si hay caracteres no numéricos, mantener valor anterior
+    if (!/^\d*$/.test(e.target.value)) {
+      e.target.value = originalValue;
+      return;
+    }
+
+    let val = e.target.value.trim();
+    if (val === '') {
+      val = '2';
+    } else {
+      const num = parseInt(val);
+      if (num < 1) val = '1';
+      if (num > 10) val = '10';
+    }
     e.target.value = val;
     const selectedGuests = parseInt(val) || 2;
     console.log(`✅ Guests selected: ${selectedGuests}`);
   });
 
-  // Prevenir caracteres no numéricos
+  // Prevenir caracteres no numéricos en keydown
   guestSelector.addEventListener('keydown', (e) => {
-    if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+    if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
       e.preventDefault();
     }
   });
