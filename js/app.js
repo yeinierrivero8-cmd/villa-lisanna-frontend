@@ -1,4 +1,4 @@
-// API Base URL Configuration
+﻿// API Base URL Configuration
 // En localhost usa port 5000 (backend), en producción usa ruta relativa
 const API_BASE_URL = window.location.hostname === 'localhost'
   ? 'http://localhost:5000'
@@ -42,38 +42,27 @@ if (infoPanelToggle && infoPanel) {
 // Guest Count Selector - FIX para iOS (sin picker nativo)
 const guestSelector = document.getElementById('guestCount');
 if (guestSelector) {
-  // Store original value to prevent clearing
-  const originalValue = guestSelector.value || '2';
-
-  // Validar entrada numérica - SOLO valida el rango, no limpia caracteres
   guestSelector.addEventListener('input', (e) => {
-    // Solo permitir números, si hay caracteres no numéricos, mantener valor anterior
-    if (!/^\d*$/.test(e.target.value)) {
-      e.target.value = originalValue;
-      return;
-    }
-
-    let val = e.target.value.trim();
-    if (val === '') {
-      val = '2';
-    } else {
-      const num = parseInt(val);
-      if (num < 1) val = '1';
-      if (num > 10) val = '10';
-    }
+    let val = e.target.value;
+    val = val.replace(/[^0-9]/g, '');
+    if (val === '') val = '2';
+    const num = parseInt(val);
+    if (num < 1) val = '1';
+    if (num > 10) val = '10';
     e.target.value = val;
-    const selectedGuests = parseInt(val) || 2;
-    console.log(`✅ Guests selected: ${selectedGuests}`);
+    console.log('Guests: ' + val);
   });
 
-  // Prevenir caracteres no numéricos en keydown
   guestSelector.addEventListener('keydown', (e) => {
-    if (!/[0-9]/.test(e.key) && !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(e.key)) {
+    const ok = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'];
+    if (!/[0-9]/.test(e.key) && !ok.includes(e.key)) {
       e.preventDefault();
     }
   });
-}
 
+  guestSelector.style.pointerEvents = 'auto';
+  guestSelector.style.touchAction = 'manipulation';
+}
 // Calendario Flatpickr - Configuración dinámica de disponibilidad (Lazy-loaded)
 function initializeFlatpickr() {
   if (typeof flatpickr === 'undefined') {
@@ -1342,3 +1331,4 @@ if (document.readyState === 'loading') {
   console.log('[GALLERY] DOM already loaded, initializing expandable gallery...');
   setTimeout(initExpandableGallery, 100);
 }
+
