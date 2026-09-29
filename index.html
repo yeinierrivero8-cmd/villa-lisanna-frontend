@@ -1151,64 +1151,29 @@ document.addEventListener('DOMContentLoaded', loadOffers);
 <script src="js/app.js" defer></script>
 <script src="js/gallery.js" defer></script>
 
-<!-- DEBUG: Error console overlay -->
+<!-- DEBUG: Simple error console -->
 <script>
-  const debugPanel = document.createElement('div');
-  debugPanel.id = 'debug-panel';
-  debugPanel.style.cssText = `
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0,0,0,0.9);
-    color: #FF0000;
-    font-family: monospace;
-    font-size: 12px;
-    padding: 10px;
-    max-height: 150px;
-    overflow-y: auto;
-    z-index: 9999;
-    border-top: 2px solid red;
-  `;
-  document.body.appendChild(debugPanel);
+  window.dbg = window.dbg || {};
+  window.dbg.logs = [];
 
-  // Capture console logs
-  const originalLog = console.log;
-  const originalError = console.error;
-  const originalWarn = console.warn;
+  window.addEventListener('DOMContentLoaded', () => {
+    const panel = document.createElement('div');
+    panel.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#000;color:#0F0;font-family:monospace;font-size:11px;padding:5px;max-height:100px;overflow-y:auto;z-index:99999;border-top:2px solid red';
+    document.body.appendChild(panel);
 
-  const addLog = (msg, color = '#00FF00') => {
-    const line = document.createElement('div');
-    line.style.color = color;
-    line.textContent = `[LOG] ${msg}`;
-    debugPanel.appendChild(line);
-    debugPanel.scrollTop = debugPanel.scrollHeight;
-  };
+    window.dbg.show = (msg) => {
+      const line = document.createElement('div');
+      line.textContent = msg;
+      panel.appendChild(line);
+      panel.scrollTop = panel.scrollHeight;
+    };
 
-  console.log = function(...args) {
-    originalLog.apply(console, args);
-    addLog(args.join(' '), '#00FF00');
-  };
-
-  console.error = function(...args) {
-    originalError.apply(console, args);
-    addLog(args.join(' '), '#FF0000');
-  };
-
-  console.warn = function(...args) {
-    originalWarn.apply(console, args);
-    addLog(args.join(' '), '#FFB400');
-  };
-
-  // Capture JavaScript errors
-  window.addEventListener('error', (e) => {
-    addLog(`ERROR: ${e.message} at ${e.filename}:${e.lineno}`, '#FF0000');
+    window.dbg.show('[START] Page loaded');
   });
 
-  // Log when scripts load
-  addLog('Debug panel initialized', '#00FF00');
-  addLog(`DOM ready: ${document.readyState}`, '#00FF00');
-  addLog(`Gallery.js loaded: ${typeof initGallery}`, '#00FF00');
+  window.addEventListener('error', (e) => {
+    if (window.dbg.show) window.dbg.show('[ERROR] ' + e.message);
+  });
 </script>
 
 </body>
