@@ -1206,16 +1206,10 @@ function initExpandableGallery() {
     return;
   }
 
-  // Remover listeners antiguos del botón (de initGalleryModal)
-  const btnParent = galleryExpandBtn.parentNode;
-  if (btnParent) {
-    const newBtn = galleryExpandBtn.cloneNode(true);
-    btnParent.replaceChild(newBtn, galleryExpandBtn);
-  }
-
+  // Get button reference directly - NO CLONING (causes issues in iPhone Safari)
   const expandBtn = document.getElementById('openGalleryBtn');
   if (!expandBtn) {
-    console.error('[GALLERY] ERROR: Could not find expandBtn after clone!');
+    console.error('[GALLERY] ERROR: Could not find expandBtn!');
     return;
   }
 
@@ -1241,29 +1235,75 @@ function initExpandableGallery() {
   });
   console.log('[GALLERY] Loaded ' + loadedCount + ' images into grid');
 
-  // Evento: Abrir galería expandida
-  expandBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // Función para abrir galería
+  const openGallery = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    console.log('[GALLERY] Opening gallery...');
     galleryExpandedSection.classList.remove('hidden');
     galleryExpandedSection.classList.add('active');
     expandBtn.style.display = 'none';
     document.body.style.overflow = 'hidden';
+    console.log('[GALLERY] Gallery opened');
+  };
+
+  // Evento: Abrir galería expandida (múltiples listeners para compatibilidad iOS)
+  expandBtn.addEventListener('click', openGallery);
+  expandBtn.addEventListener('touchend', openGallery);
+  expandBtn.addEventListener('pointerup', (e) => {
+    if (e.pointerType !== 'mouse') {
+      openGallery(e);
+    }
   });
 
-  // Evento: Cerrar galería expandida
-  galleryCloseBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // Ensure button can receive events in iOS
+  expandBtn.style.pointerEvents = 'auto';
+  expandBtn.style.touchAction = 'manipulation';
+
+  // Función para cerrar galería
+  const closeGallery = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    console.log('[GALLERY] Closing gallery...');
     galleryExpandedSection.classList.add('hidden');
     galleryExpandedSection.classList.remove('active');
     expandBtn.style.display = 'inline-flex';
     document.body.style.overflow = '';
+    console.log('[GALLERY] Gallery closed');
+  };
+
+  // Evento: Cerrar galería expandida (múltiples listeners para compatibilidad iOS)
+  galleryCloseBtn.addEventListener('click', closeGallery);
+  galleryCloseBtn.addEventListener('touchend', closeGallery);
+  galleryCloseBtn.addEventListener('pointerup', (e) => {
+    if (e.pointerType !== 'mouse') {
+      closeGallery(e);
+    }
   });
 
-  // Evento: Cerrar overlay de foto
-  photoOverlayClose.addEventListener('click', () => {
+  // Ensure button can receive events in iOS
+  galleryCloseBtn.style.pointerEvents = 'auto';
+  galleryCloseBtn.style.touchAction = 'manipulation';
+
+  // Evento: Cerrar overlay de foto (múltiples listeners para compatibilidad iOS)
+  const closePhotoHandler = (e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     closePhotoOverlay();
+  };
+
+  photoOverlayClose.addEventListener('click', closePhotoHandler);
+  photoOverlayClose.addEventListener('touchend', closePhotoHandler);
+  photoOverlayClose.addEventListener('pointerup', (e) => {
+    if (e.pointerType !== 'mouse') {
+      closePhotoHandler(e);
+    }
   });
 
   // Evento: Click en overlay cierra también
@@ -1272,6 +1312,10 @@ function initExpandableGallery() {
       closePhotoOverlay();
     }
   });
+
+  // Ensure button can receive events in iOS
+  photoOverlayClose.style.pointerEvents = 'auto';
+  photoOverlayClose.style.touchAction = 'manipulation';
 }
 
 function openPhotoOverlay(imgSrc) {
