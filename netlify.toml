@@ -5,7 +5,6 @@
 [context.production]
   command = "echo 'Production deploy'"
 
-
 [[headers]]
   for = "/*"
   [headers.values]
