@@ -6,7 +6,7 @@
   command = "echo 'Production deploy'"
 
 [[redirects]]
-  from = "/*"
+  from = "/index.html"
   to = "/index.html"
   status = 200
 
