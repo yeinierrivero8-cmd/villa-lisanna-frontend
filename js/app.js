@@ -39,26 +39,22 @@ if (infoPanelToggle && infoPanel) {
   }, { passive: true });
 }
 
-// Guest Count Selector - FIX para iOS (sin picker nativo)
+// Guest Count Selector - FIX para iOS
 const guestSelector = document.getElementById('guestCount');
 if (guestSelector) {
-  guestSelector.addEventListener('input', (e) => {
-    let val = e.target.value;
-    val = val.replace(/[^0-9]/g, '');
-    if (val === '') val = '2';
-    const num = parseInt(val);
-    if (num < 1) val = '1';
-    if (num > 10) val = '10';
-    e.target.value = val;
-    console.log('Guests: ' + val);
-  });
+  const validateGuests = () => {
+    let val = guestSelector.value.trim();
+    if (val === '' || isNaN(val)) val = '2';
+    let num = parseInt(val, 10);
+    if (num < 1) num = 1;
+    if (num > 10) num = 10;
+    guestSelector.value = num.toString();
+    console.log('Guests updated to: ' + num);
+  };
 
-  guestSelector.addEventListener('keydown', (e) => {
-    const ok = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Enter'];
-    if (!/[0-9]/.test(e.key) && !ok.includes(e.key)) {
-      e.preventDefault();
-    }
-  });
+  guestSelector.addEventListener('input', validateGuests, false);
+  guestSelector.addEventListener('change', validateGuests, false);
+  guestSelector.addEventListener('blur', validateGuests, false);
 
   guestSelector.style.pointerEvents = 'auto';
   guestSelector.style.touchAction = 'manipulation';

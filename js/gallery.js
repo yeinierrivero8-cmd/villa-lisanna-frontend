@@ -28,12 +28,10 @@ function initGallery() {
     return;
   }
 
-  // Make the 4 compact gallery images clickable
-  const compactImages = document.querySelectorAll('.gallery-compact-grid img');
+  // Make the 4 compact gallery items clickable (register on both item and image)
+  const compactItems = document.querySelectorAll('.gallery-compact-item');
 
-  compactImages.forEach((img, index) => {
-    img.style.cursor = 'pointer';
-
+  compactItems.forEach((item, index) => {
     const openGallery = (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -45,12 +43,13 @@ function initGallery() {
       console.log('Gallery opened at image ' + (index + 1));
     };
 
-    // Multiple listeners for iOS compatibility
-    img.addEventListener('click', openGallery);
-    img.addEventListener('touchend', openGallery);
+    // Register on the item container for better iOS compatibility
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', openGallery, false);
+    item.addEventListener('touchend', openGallery, false);
 
-    img.style.pointerEvents = 'auto';
-    img.style.touchAction = 'manipulation';
+    item.style.pointerEvents = 'auto';
+    item.style.touchAction = 'manipulation';
   });
 
   // Display image function
