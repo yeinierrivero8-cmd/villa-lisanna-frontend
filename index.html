@@ -300,12 +300,13 @@
 </section>
 
 <script>
-  // TODAS las 39 fotos (4 destacadas + 35 adicionales)
+  // TODAS las 40 fotos
   const allPhotos = [
-    'WhatsApp Image 2026-09-25 at 7.11.02 PM (1).jpeg',
-    'WhatsApp Image 2026-09-25 at 7.11.02 PM (11).jpeg',
-    'WhatsApp Image 2026-09-25 at 7.11.02 PM (7).jpeg',
-    'WhatsApp Image 2026-09-25 at 7.11.02 PM (9).jpeg',
+    '00.jpeg',
+    'WhatsApp Image 2026-09-25 at 7.07.10 PM (1).jpeg',
+    'WhatsApp Image 2026-09-25 at 7.07.10 PM (2).jpeg',
+    'WhatsApp Image 2026-09-25 at 7.07.10 PM (3).jpeg',
+    'WhatsApp Image 2026-09-25 at 7.07.10 PM (4).jpeg',
     'WhatsApp Image 2026-09-25 at 7.07.10 PM.jpeg',
     'WhatsApp Image 2026-09-25 at 7.07.11 PM (1).jpeg',
     'WhatsApp Image 2026-09-25 at 7.07.11 PM (2).jpeg',
@@ -439,11 +440,11 @@
     currentIndex = endIndex;
 
     const photoCount = document.getElementById('photoCount');
-    photoCount.textContent = `Showing ${currentIndex} of 39 photos`;
+    photoCount.textContent = `Showing ${currentIndex} of ${allPhotos.length} photos`;
 
     if (currentIndex >= allPhotos.length) {
       document.getElementById('loadMoreBtn').style.display = 'none';
-      photoCount.textContent = `All 39 photos loaded`;
+      photoCount.textContent = `All ${allPhotos.length} photos loaded`;
     }
   }
 
