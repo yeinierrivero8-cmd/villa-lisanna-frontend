@@ -1151,29 +1151,6 @@ document.addEventListener('DOMContentLoaded', loadOffers);
 <script src="js/app.js" defer></script>
 <script src="js/gallery.js" defer></script>
 
-<!-- DEBUG: Simple error console -->
-<script>
-  window.dbg = window.dbg || {};
-  window.dbg.logs = [];
-
-  window.addEventListener('DOMContentLoaded', () => {
-    const panel = document.createElement('div');
-    panel.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:#000;color:#0F0;font-family:monospace;font-size:11px;padding:5px;max-height:100px;overflow-y:auto;z-index:99999;border-top:2px solid red';
-    document.body.appendChild(panel);
-
-    window.dbg.show = (msg) => {
-      const line = document.createElement('div');
-      line.textContent = msg;
-      panel.appendChild(line);
-      panel.scrollTop = panel.scrollHeight;
-    };
-
-  });
-
-  window.addEventListener('error', (e) => {
-    if (window.dbg.show) window.dbg.show('[ERROR] ' + e.message);
-  });
-</script>
 
 </body>
 </html>
