@@ -355,8 +355,9 @@
     const div = document.createElement('div');
     div.className = 'gallery-compact-item';
     div.style.cursor = 'pointer';
+    const encodedSrc = encodeURIComponent(src);
     div.innerHTML = `
-      <img src="/img/${src}" alt="Villa Lisanna photo ${index + 1}" loading="lazy">
+      <img src="/img/${encodedSrc}" alt="Villa Lisanna photo ${index + 1}" loading="lazy">
       <div class="gallery-item-overlay"></div>
     `;
     div.addEventListener('click', () => openLightbox(index));
@@ -377,7 +378,7 @@
 
   function preloadImage(src) {
     const img = new Image();
-    img.src = src;
+    img.src = src; // src should already be encoded when called
   }
 
   function showLightboxPhoto(index) {
@@ -397,11 +398,12 @@
       lightboxImage.alt = 'Photo unavailable';
     };
 
-    lightboxImage.src = `/img/${allPhotos[index]}`;
+    const encodedPhoto = encodeURIComponent(allPhotos[index]);
+    lightboxImage.src = `/img/${encodedPhoto}`;
     currentPhotoNum.textContent = index + 1;
 
-    preloadImage(`/img/${allPhotos[(index + 1) % allPhotos.length]}`);
-    preloadImage(`/img/${allPhotos[(index - 1 + allPhotos.length) % allPhotos.length]}`);
+    preloadImage(`/img/${encodeURIComponent(allPhotos[(index + 1) % allPhotos.length])}`);
+    preloadImage(`/img/${encodeURIComponent(allPhotos[(index - 1 + allPhotos.length) % allPhotos.length])}`);
 
     const activeThumbnail = document.querySelector(`.thumbnail.active`);
     if (activeThumbnail) activeThumbnail.classList.remove('active');
@@ -417,7 +419,7 @@
     thumbnailsContainer.innerHTML = '';
     allPhotos.forEach((photo, index) => {
       const thumb = document.createElement('img');
-      thumb.src = `/img/${photo}`;
+      thumb.src = `/img/${encodeURIComponent(photo)}`;
       thumb.alt = `Thumbnail ${index + 1}`;
       thumb.className = `thumbnail ${index === 0 ? 'active' : ''}`;
       thumb.dataset.index = index;
