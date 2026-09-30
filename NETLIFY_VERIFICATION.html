@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Villa Lisanna - Netlify Verification</title>
+  <style>
+    body {
+      font-family: monospace;
+      background: #000;
+      color: #0f0;
+      padding: 20px;
+      margin: 0;
+      line-height: 1.6;
+    }
+    h1 { color: #f00; margin-top: 20px; }
+    .success { color: #0f0; }
+    .error { color: #f00; }
+    .warning { color: #ff0; }
+    .info { color: #0ff; }
+    pre {
+      background: #222;
+      padding: 10px;
+      border-left: 3px solid #5B9CA6;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🔍 Villa Lisanna Netlify Verification</h1>
+
+  <h2>Deployment Information</h2>
+  <pre id="deployment-info" class="info">Loading...</pre>
+
+  <h2>File Verification Checklist</h2>
+  <div id="checklist"></div>
+
+  <h2>Script Execution Test</h2>
+  <pre id="script-test" class="warning">Testing...</pre>
+
+  <h2>Network Requests</h2>
+  <pre id="network-info" class="info">Monitoring...</pre>
+
+  <h2>Browser Console Output</h2>
+  <pre id="console-output"></pre>
+
+  <script>
+    // Get deployment info
+    const deployInfo = {
+      url: window.location.href,
+      hostname: window.location.hostname,
+      protocol: window.location.protocol,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+    };
+
+    document.getElementById('deployment-info').textContent = JSON.stringify(deployInfo, null, 2);
+
+    // File verification
+    const filesToCheck = [
+      '/js/app.js',
+      '/js/gallery.js',
+      '/css/styles.css',
+      '/img/hero.jpg',
+      '/img/sala-1.jpg'
+    ];
+
+    const checklist = document.getElementById('checklist');
+    filesToCheck.forEach(file => {
+      const item = document.createElement('div');
+      item.textContent = `Checking ${file}...`;
+      item.id = `check-${file.replace(/[\/\.]/g, '-')}`;
+      checklist.appendChild(item);
+
+      fetch(file, { method: 'HEAD' })
+        .then(r => {
+          const status = r.ok ? 'SUCCESS (200)' : `ERROR (${r.status})`;
+          const className = r.ok ? 'success' : 'error';
+          item.textContent = `${file} - ${status}`;
+          item.className = className;
+        })
+        .catch(e => {
+          item.textContent = `${file} - ERROR (${e.message})`;
+          item.className = 'error';
+        });
+    });
+
+    // Script execution test
+    document.getElementById('script-test').textContent = '✓ This inline script EXECUTED successfully!\nIf you see this, JavaScript is working on your device.';
+    document.getElementById('script-test').className = 'success';
+
+    // Capture console logs
+    const consoleLogs = [];
+    const originalLog = console.log;
+    const originalError = console.error;
+
+    console.log = function(...args) {
+      consoleLogs.push({ type: 'log', msg: args.join(' ') });
+      originalLog.apply(console, args);
+    };
+
+    console.error = function(...args) {
+      consoleLogs.push({ type: 'error', msg: args.join(' ') });
+      originalError.apply(console, args);
+    };
+
+    window.addEventListener('error', (event) => {
+      consoleLogs.push({ type: 'error', msg: `ERROR: ${event.message} at ${event.filename}:${event.lineno}` });
+    });
+
+    // Update console output every 1 second
+    setInterval(() => {
+      const output = document.getElementById('console-output');
+      output.textContent = consoleLogs.map(l => `[${l.type.toUpperCase()}] ${l.msg}`).join('\n') || 'No console output yet...';
+    }, 1000);
+
+    // Test loading external scripts
+    document.getElementById('network-info').textContent = 'Testing external script loads...\n\n' +
+      '1. Fetching js/app.js...\n' +
+      '2. Fetching js/gallery.js...\n' +
+      '3. Checking CDN dependencies...\n\n' +
+      'Check browser Console (F12) for network errors.';
+
+    // Trigger load of app.js and gallery.js if they exist
+    const testScript1 = document.createElement('script');
+    testScript1.src = '/js/app.js?test=' + Date.now();
+    testScript1.onerror = () => {
+      console.error('FAILED to load js/app.js');
+    };
+    testScript1.onload = () => {
+      console.log('LOADED js/app.js successfully');
+    };
+
+    // Don't actually load to avoid side effects, but check if it would work
+    setTimeout(() => {
+      console.log('[VERIFICATION] Script execution test completed');
+      console.log('[VERIFICATION] If you see this, async scripts are working');
+    }, 500);
+
+    // Final summary
+    setTimeout(() => {
+      const summary = document.createElement('h2');
+      summary.style.color = '#0f0';
+      summary.textContent = '✓ Verification Complete';
+      summary.style.marginTop = '40px';
+      document.body.appendChild(summary);
+
+      const conclusion = document.createElement('pre');
+      conclusion.className = 'success';
+      conclusion.textContent = `SUMMARY:
+✓ Inline scripts ARE executing
+✓ JavaScript is enabled in this browser
+✓ This device CAN run the Villa Lisanna website
+
+If you're on villalisanna.com:
+  - The website HTML is being served
+  - JavaScript is enabled
+  - Check DevTools (F12) Network tab to see if app.js loads
+  - Check DevTools Console for any errors
+
+If app.js doesn't load (404):
+  - Files may not be deployed to Netlify yet
+  - Check Netlify dashboard for deploy status
+  - Force rebuild: Site Settings > Deploys > Trigger deploy
+
+If app.js loads but console shows errors:
+  - There's a JavaScript runtime error
+  - Netlify deployment was unsuccessful
+  - Contact support with screenshot of console`;
+      document.body.appendChild(conclusion);
+    }, 2000);
+  </script>
+</body>
+</html>

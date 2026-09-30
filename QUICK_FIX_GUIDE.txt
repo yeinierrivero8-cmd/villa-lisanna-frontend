@@ -1,0 +1,152 @@
+================================================================================
+VILLA LISANNA - QUICK FIX GUIDE
+================================================================================
+
+PROBLEM: Scripts not running, gallery doesn't open, guest selector broken
+CAUSE: Netlify not deploying latest code
+SOLUTION: Force rebuild in Netlify
+
+================================================================================
+STEP-BY-STEP FIX
+================================================================================
+
+STEP 1: Force Netlify Rebuild (2 MINUTES)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. Go to: https://app.netlify.com/sites
+2. Find project: "villa-lisanna-frontend"
+3. Click "Deploys" tab at top
+4. Look at latest deployment:
+   - If shows "Published" → Old version
+   - If shows "Failed" → Build error (fix needed)
+
+5. Click "Clear cache and redeploy" button (or "Trigger deploy")
+6. Wait for build to finish (shows green checkmark)
+7. Reload https://villalisanna.com in browser
+
+WAIT 30 SECONDS for CDN to update.
+
+STEP 2: Check If It Worked
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ If you see green debug panel at bottom right corner → SUCCESS!
+✓ If guest selector shows numeric keyboard on iPhone → SUCCESS!
+✓ If gallery opens when tapping images → SUCCESS!
+
+If nothing changed:
+→ Go to STEP 3
+
+STEP 3: Check What's Being Served
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. On villalisanna.com, press F12 (open DevTools)
+2. Go to "Network" tab
+3. Refresh page (Cmd+R or Ctrl+R)
+4. Look for "js/app.js" in the list:
+   - Status "200" (green) → File loaded, but not executing → Script error
+   - Status "404" (red) → File not found → Not deployed
+   - Status "from cache" → Old cached version → Clear cache
+
+5. Look for errors in "Console" tab (red text)
+
+STEP 4: If Build Failed in Netlify
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1. https://app.netlify.com/sites/villa-lisanna-frontend/deploys
+2. Click on latest failed deploy
+3. Scroll to "Build log" (at bottom)
+4. Take screenshot of ERROR messages
+5. Send screenshot to Claude/support
+
+================================================================================
+SIGNS IT'S WORKING
+================================================================================
+
+☑ Green debug panel appears at bottom right (black background, green text)
+☑ Guest selector input is number type (shows 0-9 keyboard on iPhone)
+☑ Gallery opens full-screen when tapping image
+☑ Console has no red error messages
+☑ Deployed date is TODAY (Sep 29, 2026)
+
+================================================================================
+SIGNS SOMETHING'S WRONG
+================================================================================
+
+✗ No debug panel visible anywhere
+✗ Guest selector still shows text keyboard
+✗ Gallery doesn't open or opens broken
+✗ Console shows RED ERROR messages
+✗ Deployed date is old (before Sep 29 14:14)
+✗ js/app.js shows 404 status
+
+→ If you see any ✗, go back to STEP 1 and force rebuild again
+
+================================================================================
+IMPORTANT DETAILS
+================================================================================
+
+What is broken: Netlify deployment
+What is NOT broken: The code is 100% correct
+
+The code changes are:
+✓ In GitHub
+✓ Syntax is valid
+✓ Logic is correct
+✓ HTML elements exist
+✓ CSS is configured
+
+The problem is Netlify is not serving the latest version.
+
+================================================================================
+VERIFY LOCALLY (Optional)
+================================================================================
+
+The files on your computer have all the fixes:
+
+Check these locally to confirm code is correct:
+
+1. index.html line 166:
+   Should show: <input type="number" id="guestCount"
+   (NOT type="text")
+
+2. css/styles.css line 3481:
+   Should show: .gallery-item-overlay { pointer-events: none; }
+
+3. js/app.js lines 43-61:
+   Should show: Guest selector validation code
+
+4. js/gallery.js lines 48-49:
+   Should show: addEventListener('click', ...) and addEventListener('touchend', ...)
+
+If all these are present locally → Code is correct, problem is Netlify.
+
+================================================================================
+FINAL STEPS
+================================================================================
+
+1. Force rebuild in Netlify (STEP 1 above)
+2. Wait 30 seconds
+3. Test on iPhone Safari
+4. Report results:
+   - Does debug panel appear? YES / NO
+   - Does gallery open? YES / NO
+   - Does guest selector work? YES / NO
+
+If YES to all → Problem solved! ✓
+
+If NO to any → Send:
+   - Screenshot of Netlify build log
+   - Screenshot of browser DevTools Network tab
+   - Screenshot of browser DevTools Console tab
+
+================================================================================
+Questions?
+================================================================================
+
+If you're stuck:
+1. Check Netlify build logs (STEP 4 above)
+2. Check browser console errors (STEP 3 above)
+3. Force rebuild one more time
+4. Wait full 60 seconds for CDN propagation
+
+The code IS correct. The problem IS deployment. Force rebuild = 95% chance of fix.

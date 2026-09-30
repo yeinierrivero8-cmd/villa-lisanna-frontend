@@ -1,5 +1,3 @@
-// Simple Gallery - Click any of the 4 compact photos to view full gallery
-
 const allGalleryImages = [
   '/img/sala-1.jpg', '/img/sala-2.jpg', '/img/sala-3.jpg', '/img/sala-4.jpg',
   '/img/gallery-extra-1.jpg', '/img/gallery-extra-2.jpg', '/img/gallery-extra-3.jpg',
@@ -17,6 +15,8 @@ const allGalleryImages = [
 ];
 
 let currentImageIndex = 0;
+let touchStartX = 0;
+let isDragging = false;
 
 function initGallery() {
   const photoOverlay = document.getElementById('photoOverlay');
@@ -28,7 +28,6 @@ function initGallery() {
     return;
   }
 
-  // Make the 4 compact gallery items clickable (register on both item and image)
   const compactItems = document.querySelectorAll('.gallery-compact-item');
 
   compactItems.forEach((item, index) => {
@@ -40,62 +39,43 @@ function initGallery() {
       photoOverlay.classList.remove('hidden');
       photoOverlay.classList.add('active');
       document.body.style.overflow = 'hidden';
-      console.log('Gallery opened at image ' + (index + 1));
     };
 
-    // Register on the item container for better iOS compatibility
     item.style.cursor = 'pointer';
     item.addEventListener('click', openGallery, false);
     item.addEventListener('touchend', openGallery, false);
-
-    item.style.pointerEvents = 'auto';
-    item.style.touchAction = 'manipulation';
   });
 
-  // Display image function
   function displayImage() {
     overlayImg.src = allGalleryImages[currentImageIndex];
   }
 
-  // Close button
-  const closeGallery = (e) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  function closeGallery() {
     photoOverlay.classList.add('hidden');
     photoOverlay.classList.remove('active');
     document.body.style.overflow = '';
-    console.log('Gallery closed');
-  };
+    isDragging = false;
+  }
+
+  function nextImage() {
+    currentImageIndex = (currentImageIndex + 1) % allGalleryImages.length;
+    displayImage();
+  }
+
+  function prevImage() {
+    currentImageIndex = (currentImageIndex - 1 + allGalleryImages.length) % allGalleryImages.length;
+    displayImage();
+  }
 
   closeBtn.addEventListener('click', closeGallery);
   closeBtn.addEventListener('touchend', closeGallery);
-  closeBtn.style.pointerEvents = 'auto';
-  closeBtn.style.touchAction = 'manipulation';
 
-  // Click on overlay background to close
   photoOverlay.addEventListener('click', (e) => {
     if (e.target === photoOverlay) {
       closeGallery();
     }
   });
 
-  // Next image (navigate right)
-  function nextImage() {
-    currentImageIndex = (currentImageIndex + 1) % allGalleryImages.length;
-    displayImage();
-    console.log('Next: image ' + (currentImageIndex + 1) + ' of ' + allGalleryImages.length);
-  }
-
-  // Previous image (navigate left)
-  function prevImage() {
-    currentImageIndex = (currentImageIndex - 1 + allGalleryImages.length) % allGalleryImages.length;
-    displayImage();
-    console.log('Previous: image ' + (currentImageIndex + 1) + ' of ' + allGalleryImages.length);
-  }
-
-  // Keyboard navigation
   document.addEventListener('keydown', (e) => {
     if (!photoOverlay.classList.contains('active')) return;
     if (e.key === 'ArrowRight') nextImage();
@@ -103,25 +83,26 @@ function initGallery() {
     if (e.key === 'Escape') closeGallery();
   });
 
-  // Swipe navigation for mobile
-  let touchStartX = 0;
-  photoOverlay.addEventListener('touchstart', (e) => {
+  overlayImg.addEventListener('touchstart', (e) => {
     touchStartX = e.touches[0].clientX;
+    isDragging = true;
   }, false);
 
-  photoOverlay.addEventListener('touchend', (e) => {
+  overlayImg.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
     const touchEndX = e.changedTouches[0].clientX;
     const diff = touchStartX - touchEndX;
+
     if (Math.abs(diff) > 50) {
       if (diff > 0) nextImage();
       else prevImage();
     }
+    isDragging = false;
   }, false);
 
-  console.log('Gallery initialized - click any of the 4 photos to view gallery');
+  console.log('Gallery initialized - swipe to navigate');
 }
 
-// Initialize when DOM is ready
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initGallery);
 } else {
