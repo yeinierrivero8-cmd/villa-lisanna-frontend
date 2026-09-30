@@ -375,13 +375,33 @@
     document.body.style.overflow = '';
   }
 
+  function preloadImage(src) {
+    const img = new Image();
+    img.src = src;
+  }
+
   function showLightboxPhoto(index) {
     if (index < 0) index = allPhotos.length - 1;
     if (index >= allPhotos.length) index = 0;
 
     lightboxCurrentIndex = index;
+    const loader = document.getElementById('lightboxLoader');
+
+    loader.classList.remove('hidden');
+
+    lightboxImage.onload = () => {
+      loader.classList.add('hidden');
+    };
+    lightboxImage.onerror = () => {
+      loader.classList.add('hidden');
+      lightboxImage.alt = 'Photo unavailable';
+    };
+
     lightboxImage.src = `/img/${allPhotos[index]}`;
     currentPhotoNum.textContent = index + 1;
+
+    preloadImage(`/img/${allPhotos[(index + 1) % allPhotos.length]}`);
+    preloadImage(`/img/${allPhotos[(index - 1 + allPhotos.length) % allPhotos.length]}`);
 
     const activeThumbnail = document.querySelector(`.thumbnail.active`);
     if (activeThumbnail) activeThumbnail.classList.remove('active');
@@ -440,6 +460,32 @@
     if (e.target === lightbox) closeLightbox();
   });
 
+  // Touch/Swipe support for mobile
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  lightbox.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].clientX;
+  }, false);
+
+  lightbox.addEventListener('touchend', (e) => {
+    touchEndX = e.changedTouches[0].clientX;
+    handleSwipe();
+  }, false);
+
+  function handleSwipe() {
+    const diff = touchStartX - touchEndX;
+    const threshold = 50;
+
+    if (Math.abs(diff) > threshold) {
+      if (diff > 0) {
+        showLightboxPhoto(lightboxCurrentIndex + 1);
+      } else {
+        showLightboxPhoto(lightboxCurrentIndex - 1);
+      }
+    }
+  }
+
   document.getElementById('loadMoreBtn').addEventListener('click', loadMorePhotos);
 
   window.addEventListener('load', () => {
@@ -449,7 +495,9 @@
 </script>
 
 <!-- Lightbox Modal (Airbnb Style) -->
-<div id="galleryLightbox" class="gallery-lightbox hidden">
+<div id="galleryLightbox" class="gallery-lightbox hidden" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+  <h2 id="lightboxTitle" class="sr-only">Villa Lisanna Photo Gallery</h2>
+
   <button class="lightbox-close" aria-label="Close gallery">
     <i class="fas fa-times"></i>
   </button>
@@ -460,7 +508,12 @@
       <i class="fas fa-chevron-left"></i>
     </button>
 
-    <img id="lightboxImage" src="" alt="Gallery photo" class="lightbox-image">
+    <div class="lightbox-image-wrapper">
+      <img id="lightboxImage" src="" alt="Gallery photo" class="lightbox-image">
+      <div id="lightboxLoader" class="lightbox-loader hidden">
+        <div class="spinner"></div>
+      </div>
+    </div>
 
     <button class="lightbox-nav lightbox-next" aria-label="Next photo">
       <i class="fas fa-chevron-right"></i>
