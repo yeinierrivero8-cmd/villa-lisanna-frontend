@@ -357,10 +357,20 @@
     div.className = 'gallery-compact-item';
     div.style.cursor = 'pointer';
     const encodedSrc = encodeURIComponent(src);
+    const imgPath = `/img/${encodedSrc}`;
     div.innerHTML = `
-      <img src="/img/${encodedSrc}" alt="Villa Lisanna photo ${index + 1}" loading="lazy">
+      <img src="${imgPath}" alt="Villa Lisanna photo ${index + 1}" loading="eager">
       <div class="gallery-item-overlay"></div>
     `;
+    // Add error handling
+    const img = div.querySelector('img');
+    img.addEventListener('error', () => {
+      console.error(`Failed to load: ${imgPath}`);
+      div.style.opacity = '0.5';
+    });
+    img.addEventListener('load', () => {
+      console.log(`Loaded: ${imgPath}`);
+    });
     div.addEventListener('click', () => openLightbox(index));
     return div;
   }
