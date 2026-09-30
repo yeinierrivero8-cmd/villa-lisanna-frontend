@@ -3537,6 +3537,57 @@ a {
   border-color: rgba(91, 156, 166, 0.3);
 }
 
+/* FULL GALLERY GRID - All Photos Visible */
+.gallery-full-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  max-width: 1400px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.gallery-grid-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  aspect-ratio: 1 / 1;
+}
+
+.gallery-grid-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+.gallery-grid-item:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-grid-item:hover img {
+  filter: brightness(1.1);
+}
+
+@media (max-width: 768px) {
+  .gallery-full-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    margin: 30px auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery-full-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin: 20px auto;
+  }
+}
+
 /* OVERLAY FOTO GRANDE (Full Screen) */
 .photo-overlay {
   position: fixed;
