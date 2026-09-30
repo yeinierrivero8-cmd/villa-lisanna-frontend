@@ -344,6 +344,9 @@
     'WhatsApp Image 2026-09-25 at 7.11.02 PM.jpeg'
   ];
 
+  // Update total photos counter dynamically
+  document.getElementById('totalPhotos').textContent = allPhotos.length;
+
   const photosPerPage = 8;
   let currentIndex = 0;
   let lightboxCurrentIndex = 0;
@@ -536,7 +539,7 @@
   <!-- Counter & Thumbnails -->
   <div class="lightbox-footer">
     <div class="lightbox-counter">
-      <span id="currentPhotoNum">1</span> / <span id="totalPhotos">39</span>
+      <span id="currentPhotoNum">1</span> / <span id="totalPhotos">40</span>
     </div>
 
     <div class="lightbox-thumbnails">
