@@ -300,8 +300,12 @@
 </section>
 
 <script>
-  // Array de todas las 35 fotos adicionales (después de las 4 destacadas)
+  // TODAS las 39 fotos (4 destacadas + 35 adicionales)
   const allPhotos = [
+    'WhatsApp Image 2026-09-25 at 7.11.02 PM (1).jpeg',
+    'WhatsApp Image 2026-09-25 at 7.11.02 PM (11).jpeg',
+    'WhatsApp Image 2026-09-25 at 7.11.02 PM (7).jpeg',
+    'WhatsApp Image 2026-09-25 at 7.11.02 PM (9).jpeg',
     'WhatsApp Image 2026-09-25 at 7.07.10 PM.jpeg',
     'WhatsApp Image 2026-09-25 at 7.07.11 PM (1).jpeg',
     'WhatsApp Image 2026-09-25 at 7.07.11 PM (2).jpeg',
@@ -339,57 +343,140 @@
     'WhatsApp Image 2026-09-25 at 7.11.02 PM.jpeg'
   ];
 
-  const photosPerPage = 8; // Cargar 8 fotos por click
+  const photosPerPage = 8;
   let currentIndex = 0;
+  let lightboxCurrentIndex = 0;
+  const lightbox = document.getElementById('galleryLightbox');
+  const lightboxImage = document.getElementById('lightboxImage');
+  const currentPhotoNum = document.getElementById('currentPhotoNum');
+  const thumbnailsContainer = document.getElementById('thumbnailsContainer');
 
   function createPhotoElement(src, index) {
     const div = document.createElement('div');
     div.className = 'gallery-compact-item';
+    div.style.cursor = 'pointer';
     div.innerHTML = `
-      <img src="/img/${src}" alt="Villa Lisanna photo ${index + 5}" loading="lazy">
+      <img src="/img/${src}" alt="Villa Lisanna photo ${index + 1}" loading="lazy">
       <div class="gallery-item-overlay"></div>
     `;
+    div.addEventListener('click', () => openLightbox(index));
     return div;
+  }
+
+  function openLightbox(index) {
+    lightboxCurrentIndex = index;
+    showLightboxPhoto(index);
+    lightbox.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+
+  function showLightboxPhoto(index) {
+    if (index < 0) index = allPhotos.length - 1;
+    if (index >= allPhotos.length) index = 0;
+
+    lightboxCurrentIndex = index;
+    lightboxImage.src = `/img/${allPhotos[index]}`;
+    currentPhotoNum.textContent = index + 1;
+
+    const activeThumbnail = document.querySelector(`.thumbnail.active`);
+    if (activeThumbnail) activeThumbnail.classList.remove('active');
+
+    const newActive = document.querySelector(`.thumbnail[data-index="${index}"]`);
+    if (newActive) {
+      newActive.classList.add('active');
+      newActive.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+  }
+
+  function createThumbnails() {
+    thumbnailsContainer.innerHTML = '';
+    allPhotos.forEach((photo, index) => {
+      const thumb = document.createElement('img');
+      thumb.src = `/img/${photo}`;
+      thumb.alt = `Thumbnail ${index + 1}`;
+      thumb.className = `thumbnail ${index === 0 ? 'active' : ''}`;
+      thumb.dataset.index = index;
+      thumb.addEventListener('click', () => showLightboxPhoto(index));
+      thumbnailsContainer.appendChild(thumb);
+    });
   }
 
   function loadMorePhotos() {
     const grid = document.getElementById('galleryGrid');
     const endIndex = Math.min(currentIndex + photosPerPage, allPhotos.length);
 
-    // Agregar fotos al DOM
     for (let i = currentIndex; i < endIndex; i++) {
       grid.appendChild(createPhotoElement(allPhotos[i], i));
     }
 
     currentIndex = endIndex;
 
-    // Actualizar contador y botón
-    const totalLoaded = currentIndex + 4; // 4 fotos destacadas
     const photoCount = document.getElementById('photoCount');
-    photoCount.textContent = `Showing ${totalLoaded} of 39 photos`;
+    photoCount.textContent = `Showing ${currentIndex} of 39 photos`;
 
-    // Ocultar botón si no hay más fotos
     if (currentIndex >= allPhotos.length) {
       document.getElementById('loadMoreBtn').style.display = 'none';
       photoCount.textContent = `All 39 photos loaded`;
     }
   }
 
-  // Load More button
+  document.querySelector('.lightbox-close').addEventListener('click', closeLightbox);
+  document.querySelector('.lightbox-prev').addEventListener('click', () => showLightboxPhoto(lightboxCurrentIndex - 1));
+  document.querySelector('.lightbox-next').addEventListener('click', () => showLightboxPhoto(lightboxCurrentIndex + 1));
+
+  document.addEventListener('keydown', (e) => {
+    if (lightbox.classList.contains('hidden')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') showLightboxPhoto(lightboxCurrentIndex - 1);
+    if (e.key === 'ArrowRight') showLightboxPhoto(lightboxCurrentIndex + 1);
+  });
+
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+
   document.getElementById('loadMoreBtn').addEventListener('click', loadMorePhotos);
 
-  // Cargar primeras 8 fotos al abrir página
   window.addEventListener('load', () => {
+    createThumbnails();
     setTimeout(loadMorePhotos, 300);
   });
 </script>
 
-<!-- Overlay Foto Grande (Full Screen - Sin Modal) -->
-<div id="photoOverlay" class="photo-overlay hidden">
-  <button class="photo-overlay-close" id="photoOverlayClose" aria-label="Close">
+<!-- Lightbox Modal (Airbnb Style) -->
+<div id="galleryLightbox" class="gallery-lightbox hidden">
+  <button class="lightbox-close" aria-label="Close gallery">
     <i class="fas fa-times"></i>
   </button>
-  <img id="overlayImg" src="" alt="Full size photo" class="photo-overlay-img">
+
+  <!-- Main Image Container -->
+  <div class="lightbox-container">
+    <button class="lightbox-nav lightbox-prev" aria-label="Previous photo">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <img id="lightboxImage" src="" alt="Gallery photo" class="lightbox-image">
+
+    <button class="lightbox-nav lightbox-next" aria-label="Next photo">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+
+  <!-- Counter & Thumbnails -->
+  <div class="lightbox-footer">
+    <div class="lightbox-counter">
+      <span id="currentPhotoNum">1</span> / <span id="totalPhotos">39</span>
+    </div>
+
+    <div class="lightbox-thumbnails">
+      <div id="thumbnailsContainer" class="thumbnails-scroll"></div>
+    </div>
+  </div>
 </div>
 
 <!-- Amenidades Premium -->
