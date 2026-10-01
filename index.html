@@ -541,7 +541,16 @@
     }
   }
 
-  document.getElementById('loadMoreBtn').addEventListener('click', loadMorePhotos);
+  // Load More button - Support for iOS Safari which sometimes doesn't fire 'click' events
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', loadMorePhotos);
+    // iOS Safari fix: Also listen for touchend event
+    loadMoreBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      loadMorePhotos();
+    }, false);
+  }
 
   window.addEventListener('load', () => {
     createThumbnails();
