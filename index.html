@@ -1561,5 +1561,121 @@ updateGuestsDiagnostic();
 </script>
 <!-- END GUESTS DIAGNOSTIC -->
 
+<!-- BUTTON TOGGLE DIAGNOSTIC PANEL -->
+<div id="toggleDiagnosticPanel" style="
+  position: fixed;
+  top: 350px;
+  left: 10px;
+  right: 10px;
+  background: rgba(0, 50, 100, 0.95);
+  color: #00ffff;
+  padding: 12px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 10px;
+  line-height: 1.3;
+  z-index: 100002;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 2px solid #00ffff;
+">
+  <div style="color: #00ff00; font-weight: bold; margin-bottom: 8px;">🔧 TOGGLE HANDLER DIAGNOSTIC</div>
+  <div id="toggleDiagnosticContent">Waiting for button click...</div>
+</div>
+
+<script>
+const infoPanel = document.getElementById('infoPanel');
+const infoPanelToggle = document.getElementById('infoPanelToggle');
+
+let toggleDiagState = {
+  handlerExecuted: false,
+  panelClassBefore: '',
+  panelClassAfter: '',
+  ariaBefore: '',
+  ariaAfter: '',
+  eventsFired: [],
+  isOpenBefore: false,
+  isOpenAfter: false,
+  documentClickFired: false,
+  scrollListenerFired: false
+};
+
+function updateToggleDiagnostic() {
+  const panel = document.getElementById('toggleDiagnosticContent');
+  if (!panel) return;
+
+  const events = toggleDiagState.eventsFired.slice(-6).join(' → ');
+
+  panel.innerHTML = `
+    <div><strong>Toggle Handler Executed:</strong> <span style="color: ${toggleDiagState.handlerExecuted ? '#00ff00' : '#ff0000'}">${toggleDiagState.handlerExecuted ? '✓ YES' : '❌ NO'}</span></div>
+    <div><strong>Panel Class Before:</strong> ${toggleDiagState.panelClassBefore || '(no class)'}</div>
+    <div><strong>Panel Class After:</strong> <span style="color: ${toggleDiagState.isOpenAfter ? '#00ff00' : '#ff0000'}">${toggleDiagState.panelClassAfter || '(no class)'}</span></div>
+    <div><strong>is-open Before:</strong> ${toggleDiagState.isOpenBefore ? '✓ YES' : '❌ NO'}</div>
+    <div><strong>is-open After:</strong> <span style="color: ${toggleDiagState.isOpenAfter ? '#00ff00' : '#ff0000'}">${toggleDiagState.isOpenAfter ? '✓ YES' : '❌ NO'}</span></div>
+    <div style="margin-top: 8px; border-top: 1px solid #00ffff; padding-top: 8px;">
+      <div><strong>aria-expanded Before:</strong> ${toggleDiagState.ariaBefore || '(no attr)'}</div>
+      <div><strong>aria-expanded After:</strong> ${toggleDiagState.ariaAfter || '(no attr)'}</div>
+      <div style="margin-top: 6px; color: ${toggleDiagState.documentClickFired ? '#ff0000' : '#00ff00'}"><strong>Document Click Listener Fired:</strong> ${toggleDiagState.documentClickFired ? '⚠️ YES (closed panel!)' : '✓ NO'}</div>
+      <div style="color: ${toggleDiagState.scrollListenerFired ? '#ff0000' : '#00ff00'}"><strong>Scroll Listener Fired:</strong> ${toggleDiagState.scrollListenerFired ? '⚠️ YES (closed panel!)' : '✓ NO'}</div>
+      <div><strong>Events:</strong> ${events}</div>
+    </div>
+  `;
+}
+
+// Intercept the toggle button handler
+if (infoPanelToggle && infoPanel) {
+  // Store original addEventListener
+  const origAddEventListener = infoPanelToggle.addEventListener;
+
+  // Override to capture handler execution
+  infoPanelToggle.addEventListener = function(type, handler, options) {
+    if (type === 'click') {
+      const wrappedHandler = function(e) {
+        toggleDiagState.eventsFired.push('toggle-click');
+        toggleDiagState.handlerExecuted = true;
+        toggleDiagState.panelClassBefore = infoPanel.className;
+        toggleDiagState.isOpenBefore = infoPanel.classList.contains('is-open');
+        toggleDiagState.ariaBefore = infoPanelToggle.getAttribute('aria-expanded');
+
+        // Call original handler
+        handler.call(this, e);
+
+        // Check state AFTER handler
+        setTimeout(() => {
+          toggleDiagState.panelClassAfter = infoPanel.className;
+          toggleDiagState.isOpenAfter = infoPanel.classList.contains('is-open');
+          toggleDiagState.ariaAfter = infoPanelToggle.getAttribute('aria-expanded');
+          updateToggleDiagnostic();
+        }, 10);
+      };
+      return origAddEventListener.call(this, type, wrappedHandler, options);
+    }
+    return origAddEventListener.call(this, type, handler, options);
+  };
+
+  // Also monitor document click listener
+  const origDocumentAddEventListener = document.addEventListener;
+  document.addEventListener = function(type, handler, options) {
+    if (type === 'click') {
+      const wrappedHandler = function(e) {
+        if (!infoPanel.contains(e.target) && e.target !== infoPanelToggle) {
+          if (infoPanel.classList.contains('is-open')) {
+            toggleDiagState.eventsFired.push('doc-click→closed');
+            toggleDiagState.documentClickFired = true;
+            updateToggleDiagnostic();
+          }
+        }
+        return handler.call(this, e);
+      };
+      return origDocumentAddEventListener.call(this, type, wrappedHandler, options);
+    }
+    return origDocumentAddEventListener.call(this, type, handler, options);
+  };
+}
+
+updateToggleDiagnostic();
+</script>
+<!-- END TOGGLE DIAGNOSTIC -->
+
 </body>
 </html>
