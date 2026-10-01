@@ -408,7 +408,7 @@ body::before {
 .info-panel-content button,
 .info-panel-content select,
 .info-panel-content textarea {
-  pointer-events: auto;
+  pointer-events: auto !important;
 }
 
 .calendar-section {
