@@ -35,6 +35,14 @@ X-Frame-Options = "SAMEORIGIN"
 X-Content-Type-Options = "nosniff"
 Referrer-Policy = "strict-origin-when-cross-origin"
 
+# Allow image files to be served directly without redirect
+[[redirects]]
+from = "/img/*"
+to = "/img/:splat"
+status = 200
+force = false
+
+# Catch-all redirect to index.html for SPA (must be LAST)
 [[redirects]]
 from = "/*"
 to = "/index.html"
