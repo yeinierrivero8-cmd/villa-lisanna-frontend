@@ -1449,5 +1449,105 @@ document.addEventListener('touchend', (e) => {
 </script>
 <!-- END DIAGNOSTIC -->
 
+<!-- TEMPORARY DIAGNOSTIC PANEL - VISUAL DEBUG OVERLAY -->
+<div id="diagnosticPanel" style="
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  right: 10px;
+  background: rgba(0, 0, 0, 0.9);
+  color: #00ff00;
+  padding: 12px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  z-index: 100000;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 2px solid #00ff00;
+">
+  <div style="color: #ffff00; font-weight: bold; margin-bottom: 8px;">📊 DIAGNOSTIC PANEL</div>
+  <div id="diagnosticContent">Loading...</div>
+</div>
+
+<script>
+// DIAGNOSTIC STATE
+let diagnosticState = {
+  lastTapX: 0,
+  lastTapY: 0,
+  lastElement: null,
+  lastElementId: '',
+  lastTagName: '',
+  lastClassName: '',
+  lastZIndex: '',
+  lastPointerEvents: '',
+  isLoadMoreBtn: false,
+  loadMoreClickCount: 0,
+  lastLoadMoreTime: 0
+};
+
+// Update diagnostic panel UI
+function updateDiagnosticPanel() {
+  const panel = document.getElementById('diagnosticContent');
+  if (!panel) return;
+
+  const timeAgo = diagnosticState.lastLoadMoreTime
+    ? `${Math.round((Date.now() - diagnosticState.lastLoadMoreTime) / 1000)}s ago`
+    : 'never';
+
+  panel.innerHTML = `
+    <div><strong>Last Tap Coords:</strong> ${diagnosticState.lastTapX}, ${diagnosticState.lastTapY}</div>
+    <div><strong>Element ID:</strong> <span style="color: ${diagnosticState.isLoadMoreBtn ? '#00ff00' : '#ff0000'}">${diagnosticState.lastElementId || '(none)'}</span></div>
+    <div><strong>Tag:</strong> ${diagnosticState.lastTagName}</div>
+    <div><strong>Class:</strong> ${diagnosticState.lastClassName.substring(0, 40)}</div>
+    <div><strong>z-index:</strong> ${diagnosticState.lastZIndex}</div>
+    <div><strong>pointer-events:</strong> ${diagnosticState.lastPointerEvents}</div>
+    <div style="margin-top: 8px; border-top: 1px solid #00ff00; padding-top: 8px;">
+      <div><strong>Is LoadMoreBtn:</strong> <span style="color: ${diagnosticState.isLoadMoreBtn ? '#00ff00' : '#ff0000'}">${diagnosticState.isLoadMoreBtn ? '✅ YES' : '❌ NO'}</span></div>
+      <div style="color: #ffff00; font-weight: bold; margin-top: 6px;">Load More Clicks: ${diagnosticState.loadMoreClickCount}</div>
+      <div style="font-size: 10px; color: #aaa;">Last click: ${timeAgo}</div>
+    </div>
+  `;
+}
+
+// Detect all taps and touches
+document.addEventListener('pointerdown', (e) => {
+  const tapX = e.clientX;
+  const tapY = e.clientY;
+  const elementAtTap = document.elementFromPoint(tapX, tapY);
+
+  diagnosticState.lastTapX = Math.round(tapX);
+  diagnosticState.lastTapY = Math.round(tapY);
+  diagnosticState.lastElement = elementAtTap;
+  diagnosticState.lastElementId = elementAtTap?.id || '(none)';
+  diagnosticState.lastTagName = elementAtTap?.tagName || '?';
+  diagnosticState.lastClassName = elementAtTap?.className || '(none)';
+  diagnosticState.lastZIndex = window.getComputedStyle(elementAtTap).zIndex || 'auto';
+  diagnosticState.lastPointerEvents = window.getComputedStyle(elementAtTap).pointerEvents || 'auto';
+  diagnosticState.isLoadMoreBtn = elementAtTap?.id === 'loadMoreBtn';
+
+  updateDiagnosticPanel();
+}, { passive: true });
+
+// Intercept Load More button clicks
+const loadMoreBtn = document.getElementById('loadMoreBtn');
+if (loadMoreBtn) {
+  const originalLoadMore = loadMoreBtn.onclick;
+
+  // Wrap the click handler to detect when it fires
+  loadMoreBtn.addEventListener('click', () => {
+    diagnosticState.loadMoreClickCount++;
+    diagnosticState.lastLoadMoreTime = Date.now();
+    updateDiagnosticPanel();
+    console.log('[DIAGNOSTIC] Load More click detected! Count:', diagnosticState.loadMoreClickCount);
+  }, { capture: true });
+}
+
+// Initial update
+updateDiagnosticPanel();
+</script>
+<!-- END VISUAL DIAGNOSTIC PANEL -->
+
 </body>
 </html>
