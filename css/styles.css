@@ -261,7 +261,7 @@ body::before {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(91, 156, 166, 0.2);
-  z-index: 998;
+  z-index: 99;
   border-radius: 12px;
   box-shadow: var(--shadow-lg);
   transition: opacity 0.3s ease, max-height 0.3s ease;
@@ -613,6 +613,14 @@ body::before {
     font-size: 14px;
     padding: 12px 24px;
   }
+}
+
+/* iOS Safari Fix: Load More button must be above all overlays */
+#loadMoreBtn {
+  z-index: 1001 !important;
+  pointer-events: auto !important;
+  position: relative;
+  touch-action: manipulation;
 }
 
 .btn-full {
@@ -3243,10 +3251,12 @@ a:focus-visible {
 
 /* ========== RADICAL FIX: Botón BOOK NOW clickeable ========== */
 
-/* Deshabilitar pointer-events en TODO excepto el botón */
+/* Removed: Global pointer-events: auto was causing z-index conflicts in iOS Safari
+   This rule was capturing ALL taps and preventing Load More button from receiving events
 * {
   pointer-events: auto;
 }
+*/
 
 #bookingBtn {
   position: relative !important;

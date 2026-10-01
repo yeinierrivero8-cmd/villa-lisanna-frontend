@@ -1416,6 +1416,38 @@ document.addEventListener('DOMContentLoaded', loadOffers);
 <script src="js/app.js" defer></script>
 <!-- Removed: js/gallery.js was conflicting with new gallery implementation -->
 
+<!-- TEMPORARY DIAGNOSTIC: Identify which element receives taps in iOS Safari -->
+<script>
+document.addEventListener('touchend', (e) => {
+  const tapX = e.changedTouches[0].clientX;
+  const tapY = e.changedTouches[0].clientY;
+  const elementAtTap = document.elementFromPoint(tapX, tapY);
+
+  console.log('[TAP DIAGNOSTIC]', {
+    coordinates: `${tapX}, ${tapY}`,
+    elementId: elementAtTap?.id || '(no id)',
+    elementClass: elementAtTap?.className.substring(0, 50) || '(no class)',
+    elementTag: elementAtTap?.tagName || '(no tag)',
+    zIndex: window.getComputedStyle(elementAtTap).zIndex,
+    pointerEvents: window.getComputedStyle(elementAtTap).pointerEvents,
+    isLoadMoreBtn: elementAtTap?.id === 'loadMoreBtn'
+  });
+
+  let current = elementAtTap;
+  let depth = 0;
+  while (current && depth < 5) {
+    console.log(`  [Level ${depth}]`, {
+      tag: current.tagName,
+      id: current.id || '(no id)',
+      zIndex: window.getComputedStyle(current).zIndex,
+      pointerEvents: window.getComputedStyle(current).pointerEvents
+    });
+    current = current.parentElement;
+    depth++;
+  }
+}, { passive: false });
+</script>
+<!-- END DIAGNOSTIC -->
 
 </body>
 </html>
