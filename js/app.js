@@ -22,7 +22,7 @@ if (infoPanelToggle && infoPanel) {
 
   // Cerrar el panel si se hace click fuera (desktop)
   document.addEventListener('click', (e) => {
-    if (!skipNextDocumentClick && !infoPanel.contains(e.target) && e.target !== infoPanelToggle) {
+    if (!skipNextDocumentClick && !infoPanel.contains(e.target) && e.target !== infoPanelToggle && !guestSelector.contains(e.target)) {
       infoPanel.classList.remove('is-open');
       infoPanelToggle.setAttribute('aria-expanded', 'false');
     }
