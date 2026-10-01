@@ -59,6 +59,8 @@ if (guestSelector) {
   guestSelector.addEventListener('input', validateGuests, false);
   guestSelector.addEventListener('change', validateGuests, false);
   guestSelector.addEventListener('blur', validateGuests, false);
+  guestSelector.addEventListener('touchend', validateGuests, false);
+  guestSelector.addEventListener('pointerup', validateGuests, false);
 
   guestSelector.style.pointerEvents = 'auto';
   guestSelector.style.touchAction = 'manipulation';
