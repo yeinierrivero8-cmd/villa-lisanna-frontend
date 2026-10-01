@@ -9,16 +9,20 @@ const infoPanelToggle = document.getElementById('infoPanelToggle');
 const infoPanel = document.getElementById('infoPanel');
 
 if (infoPanelToggle && infoPanel) {
+  let skipNextDocumentClick = false;
+
   infoPanelToggle.addEventListener('click', (e) => {
     e.stopPropagation();
+    skipNextDocumentClick = true;
     const isOpen = infoPanel.classList.contains('is-open');
     infoPanel.classList.toggle('is-open');
     infoPanelToggle.setAttribute('aria-expanded', !isOpen);
+    setTimeout(() => { skipNextDocumentClick = false; }, 10);
   });
 
   // Cerrar el panel si se hace click fuera (desktop)
   document.addEventListener('click', (e) => {
-    if (!infoPanel.contains(e.target) && e.target !== infoPanelToggle) {
+    if (!skipNextDocumentClick && !infoPanel.contains(e.target) && e.target !== infoPanelToggle) {
       infoPanel.classList.remove('is-open');
       infoPanelToggle.setAttribute('aria-expanded', 'false');
     }
