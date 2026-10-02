@@ -22,7 +22,7 @@ if (infoPanelToggle && infoPanel) {
 
   // Cerrar el panel si se hace click fuera (desktop)
   document.addEventListener('click', (e) => {
-    if (!skipNextDocumentClick && !infoPanel.contains(e.target) && e.target !== infoPanelToggle && !guestSelector.contains(e.target)) {
+    if (!skipNextDocumentClick && !infoPanel.contains(e.target) && e.target !== infoPanelToggle && !guestSelector.contains(e.target) && document.activeElement !== guestSelector) {
       infoPanel.classList.remove('is-open');
       infoPanelToggle.setAttribute('aria-expanded', 'false');
     }
@@ -43,27 +43,12 @@ if (infoPanelToggle && infoPanel) {
   }, { passive: true });
 }
 
-// Guest Count Selector - FIX para iOS
+// Guest Count Selector - Native select (iOS compatible)
 const guestSelector = document.getElementById('guestCount');
 if (guestSelector) {
-  const validateGuests = () => {
-    let val = guestSelector.value.trim();
-    if (val === '' || isNaN(val)) val = '2';
-    let num = parseInt(val, 10);
-    if (num < 1) num = 1;
-    if (num > 10) num = 10;
-    guestSelector.value = num.toString();
-    console.log('Guests updated to: ' + num);
-  };
-
-  guestSelector.addEventListener('input', validateGuests, false);
-  guestSelector.addEventListener('change', validateGuests, false);
-  guestSelector.addEventListener('blur', validateGuests, false);
-  guestSelector.addEventListener('touchend', validateGuests, false);
-  guestSelector.addEventListener('pointerup', validateGuests, false);
-
-  guestSelector.style.pointerEvents = 'auto';
-  guestSelector.style.touchAction = 'manipulation';
+  guestSelector.addEventListener('change', () => {
+    console.log('Guests updated to: ' + guestSelector.value);
+  }, false);
 }
 // Calendario Flatpickr - Configuración dinámica de disponibilidad (Lazy-loaded)
 function initializeFlatpickr() {
