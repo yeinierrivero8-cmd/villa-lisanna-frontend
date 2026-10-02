@@ -22,8 +22,8 @@ class StripeService:
                     'price_data': {
                         'currency': 'usd',
                         'product_data': {
-                            'name': f'Villa Lisanna - Depósito Reserva {booking.confirmation_code}',
-                            'description': f'Depósito (50%) del {booking.check_in_date} al {booking.check_out_date}',
+                            'name': f'Villa Lisanna - Reserva {booking.confirmation_code}',
+                            'description': f'Pago completo de reserva (100%) del {booking.check_in_date} al {booking.check_out_date}',
                         },
                         'unit_amount': int(booking.deposit_amount * 100),
                     },
@@ -104,7 +104,12 @@ class StripeService:
             if payment_type == 'deposit':
                 booking.deposit_paid = True
                 booking.stripe_deposit_payment_id = session.payment_intent
-                booking.status = 'confirmed'
+                # If balance_amount = 0 (100% full payment), mark booking as completed
+                if booking.balance_amount == 0:
+                    booking.balance_paid = True
+                    booking.status = 'completed'
+                else:
+                    booking.status = 'confirmed'
             elif payment_type == 'balance':
                 booking.balance_paid = True
                 booking.stripe_balance_payment_id = session.payment_intent

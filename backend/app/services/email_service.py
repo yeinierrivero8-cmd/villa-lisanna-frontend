@@ -112,18 +112,23 @@ class EmailService:
 
         subject = f"Nueva Solicitud de Reserva: {confirmation_code}"
 
-        payment_qr_url = f"{current_app.config.get('BASE_URL', 'https://www.villalisanna.com')}/api/bookings/{confirmation_code}/balance-checkout"
-        qr_result = StripeService.generate_payment_qr(confirmation_code, payment_qr_url)
-
         qr_image = ""
-        if qr_result['success']:
-            qr_image = f"""
-            <h3 style="color: #FFD700;">Código QR para Pago de Saldo</h3>
-            <p style="font-size: 12px; color: #666;">Muéstrale este QR al cliente el día del check-in. Él escanea y paga el saldo restante.</p>
-            <div style="text-align: center; margin: 20px 0;">
-                <img src="{qr_result['qr_data_uri']}" alt="QR Pago Saldo" style="width: 250px; height: 250px; border: 2px solid #FFD700; padding: 10px; background: #fff;">
-            </div>
-            <p style="font-size: 12px; color: #666;"><strong>Link directo (si el QR no funciona):</strong><br>{payment_qr_url}</p>
+        if booking.balance_amount > 0:
+            payment_qr_url = f"{current_app.config.get('BASE_URL', 'https://www.villalisanna.com')}/api/bookings/{confirmation_code}/balance-checkout"
+            qr_result = StripeService.generate_payment_qr(confirmation_code, payment_qr_url)
+
+            if qr_result['success']:
+                qr_image = f"""
+                <h3 style="color: #FFD700;">Código QR para Pago de Saldo</h3>
+                <p style="font-size: 12px; color: #666;">Muéstrale este QR al cliente el día del check-in. Él escanea y paga el saldo restante.</p>
+                <div style="text-align: center; margin: 20px 0;">
+                    <img src="{qr_result['qr_data_uri']}" alt="QR Pago Saldo" style="width: 250px; height: 250px; border: 2px solid #FFD700; padding: 10px; background: #fff;">
+                </div>
+                <p style="font-size: 12px; color: #666;"><strong>Link directo (si el QR no funciona):</strong><br>{payment_qr_url}</p>
+                """
+        else:
+            qr_image = """
+            <p style="color: #27ae60; font-size: 12px;"><strong>✓ Reserva pagada completamente - No hay saldo pendiente.</strong></p>
             """
 
         html_content = f"""
