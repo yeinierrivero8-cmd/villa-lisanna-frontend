@@ -291,9 +291,10 @@ def booking_success():
 
         if session.payment_status == 'paid':
             booking.deposit_paid = True
-            booking.status = 'confirmed'
+            booking.balance_paid = True
+            booking.status = 'completed'
             db.session.commit()
-            print(f"[SUCCESS] Booking {booking.id} marked as confirmed")
+            print(f"[SUCCESS] Booking {booking.id} marked as completed")
 
         html = f'''<html><body style="font-family: Arial; text-align: center; padding: 50px;">
         <h1>✅ Reserva Confirmada</h1>

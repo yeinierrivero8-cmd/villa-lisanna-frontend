@@ -70,8 +70,8 @@ class PricingService:
         taxes = subtotal * config.sales_tax_rate
         total_taxable = subtotal + taxes
 
-        deposit_amount = round(total_taxable * 0.5, 2)
-        balance_amount = round(total_taxable - deposit_amount, 2)
+        deposit_amount = round(total_taxable, 2)
+        balance_amount = 0.0
 
         return {
             'nights': nights,

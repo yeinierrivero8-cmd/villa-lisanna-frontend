@@ -38,8 +38,9 @@ def stripe_webhook():
 
             if payment_type == 'deposit':
                 booking.deposit_paid = True
+                booking.balance_paid = True
                 booking.stripe_deposit_payment_id = session.get('payment_intent')
-                booking.status = 'confirmed'
+                booking.status = 'completed'
             elif payment_type == 'balance':
                 booking.balance_paid = True
                 booking.stripe_balance_payment_id = session.get('payment_intent')

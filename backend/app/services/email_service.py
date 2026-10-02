@@ -150,9 +150,7 @@ class EmailService:
                         <li>Subtotal: ${booking.subtotal:,.2f}</li>
                         <li>Limpieza: ${booking.cleaning_fee:,.2f}</li>
                         <li>Impuestos: ${booking.taxes:,.2f}</li>
-                        <li>Total: ${booking.total_amount:,.2f}</li>
-                        <li><strong>Depósito (50%): ${booking.deposit_amount:,.2f}</strong></li>
-                        <li><strong>Saldo (50%): ${booking.balance_amount:,.2f}</strong></li>
+                        <li><strong>Total a Cobrar: ${booking.total_amount:,.2f}</strong></li>
                     </ul>
 
                     {qr_image}
